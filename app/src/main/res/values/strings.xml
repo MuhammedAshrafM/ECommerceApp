@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">EcommerceApp</string>
+
+    <string name="facebook_app_id">518140535531488</string>
+    <string name="fb_login_protocol_scheme">fb518140535531488</string>
+
+    <string name="welcomeText">Find, Discover, Choose, and Buy anything online.</string>
+    <string name="accountExist">Already have an account</string>
+    <string name="join">Join Now</string>
+
+    <string name="userName">UserName</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="rememberMe">Remember Me</string>
+    <string name="forgetPassword">Forget Password?</string>
+    <string name="login">Login</string>
+    <string name="or">OR</string>
+    <string name="createAccount">Create your account</string>
+    <string name="singUpGoogle">Sign up with Google</string>
+    <string name="singUpFacebook">Sign up with Facebook</string>
+
+    <string name="name">Name</string>
+    <string name="emailAddress">Your email address</string>
+    <string name="createPassword">Create a password</string>
+    <string name="infoPassword">Your password must be at least 6 characters.</string>
+
+    <string name="nameField">You must add a name</string>
+    <string name="userNameField">You must add an userName</string>
+    <string name="emailField">You must add an email</string>
+    <string name="passwordField">You must add a password</string>
+
+    <string name="singUpSuccess">Thanks for singing up with ECommerce App! you can log in now.</string>
+    <string name="singUpField">An error occurred, please try again later.</string>
+    <string name="singUpRepeated">This email is already used by another user!
+        please use another an email or login by this account.</string>
+    <string name="createAccountRepeated">This username is already used by another user.</string>
+    <string name="logInField">Login failed! the userName or password you entered is incorrect or your email used is incorrect.</string>
+
+
+</resources>
