@@ -36,5 +36,6 @@
     <string name="createAccountRepeated">This username is already used by another user.</string>
     <string name="logInField">Login failed! the userName or password you entered is incorrect or your email used is incorrect.</string>
 
+    <string name="test">test</string>
 
 </resources>
