@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@android:id/progress"
+        android:width="100dp"
+        android:height="100dp"
+        android:bottom="15dp"
+        android:gravity="center"
+        android:left="15dp"
+        android:right="15dp"
+        android:top="15dp">
+
+        <rotate android:fromDegrees="0"
+            android:toDegrees="360"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <layer-list>
+
+                <item
+                    android:width="80dp"
+                    android:height="80dp"
+                    android:gravity="center">
+
+                    <shape
+                        android:gravity="center"
+                        android:shape="oval">
+                        <size
+                            android:width="80dp"
+                            android:height="80dp" />
+                        <stroke
+                            android:width="2dp"
+                            android:color="@color/basicColor" />
+
+                        <solid
+                            android:color="@color/whiteColor" />
+                    </shape>
+                </item>
+
+
+                <item
+                    android:width="20dp"
+                    android:height="20dp"
+                    android:bottom="20dp"
+                    android:start="30dp"
+                    android:gravity="bottom">
+
+                    <shape
+                        android:gravity="right"
+                        android:shape="oval">
+                        <size
+                            android:width="80dp"
+                            android:height="80dp" />
+                        <solid
+                            android:color="@color/colorAccent" />
+                    </shape>
+                </item>
+
+                <item
+                    android:width="20dp"
+                    android:height="20dp"
+                    android:bottom="60dp"
+                    android:start="30dp"
+                    android:gravity="bottom">
+
+                    <shape
+                        android:gravity="right"
+                        android:shape="oval">
+                        <size
+                            android:width="80dp"
+                            android:height="80dp" />
+                        <solid
+                            android:color="@color/colorAccent2" />
+                    </shape>
+                </item>
+                <item
+                    android:width="20dp"
+                    android:height="20dp"
+                    android:bottom="40dp"
+                    android:start="60dp"
+                    android:gravity="bottom">
+
+                    <shape
+                        android:gravity="right"
+                        android:shape="oval">
+                        <size
+                            android:width="80dp"
+                            android:height="80dp" />
+                        <solid
+                            android:color="@color/colorAccent3" />
+                    </shape>
+                </item>
+
+
+            </layer-list>
+        </rotate>
+    </item>
+
+</layer-list>

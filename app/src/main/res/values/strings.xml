@@ -1,13 +1,26 @@
 <resources>
+    <integer-array name="categoryImages">
+        <item>@drawable/mobiles</item>
+        <item>@drawable/electronics</item>
+        <item>@drawable/home_kitchen</item>
+        <item>@drawable/beauty</item>
+        <item>@drawable/appliances</item>
+        <item>@drawable/toys</item>
+        <item>@drawable/office_products</item>
+        <item>@drawable/automotive</item>
+        <item>@drawable/babies</item>
+        <item>@drawable/sports</item>
+
+    </integer-array>
+
     <string name="app_name">EcommerceApp</string>
-
     <string name="facebook_app_id">518140535531488</string>
-    <string name="fb_login_protocol_scheme">fb518140535531488</string>
 
+    <string name="fb_login_protocol_scheme">fb518140535531488</string>
     <string name="welcomeText">Find, Discover, Choose, and Buy anything online.</string>
     <string name="accountExist">Already have an account</string>
-    <string name="join">Join Now</string>
 
+    <string name="join">Join Now</string>
     <string name="userName">UserName</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
@@ -16,25 +29,61 @@
     <string name="login">Login</string>
     <string name="or">OR</string>
     <string name="createAccount">Create your account</string>
-    <string name="singUpGoogle">Sign up with Google</string>
-    <string name="singUpFacebook">Sign up with Facebook</string>
+    <string name="signUpGoogle">Sign up with Google</string>
+    <string name="signInGoogle">Sign in with Google</string>
+    <string name="signUpFacebook">Sign up with Facebook</string>
 
+    <string name="signInFacebook">Sign in with Facebook</string>
     <string name="name">Name</string>
     <string name="emailAddress">Your email address</string>
     <string name="createPassword">Create a password</string>
-    <string name="infoPassword">Your password must be at least 6 characters.</string>
 
+    <string name="infoPassword">Your password must be at least 6 characters.</string>
     <string name="nameField">You must add a name</string>
     <string name="userNameField">You must add an userName</string>
     <string name="emailField">You must add an email</string>
-    <string name="passwordField">You must add a password</string>
 
+    <string name="passwordField">You must add a password</string>
     <string name="singUpSuccess">Thanks for singing up with ECommerce App! you can log in now.</string>
     <string name="singUpField">An error occurred, please try again later.</string>
     <string name="singUpRepeated">This email is already used by another user!
         please use another an email or login by this account.</string>
     <string name="createAccountRepeated">This username is already used by another user.</string>
+
     <string name="logInField">Login failed! the userName or password you entered is incorrect or your email used is incorrect.</string>
 
+    <string name="checkConnection">Please check your internet connection and try again.</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_account">Account</string>
+    <string name="title_cart">My Cart</string>
+    <string name="title_orders">Orders</string>
+    <string name="addCart">Add To Cart</string>
+    <string name="search">Search</string>
+
+
+    <plurals name="numberOfProductsAvailable">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <string name="title_notifications">Notifications</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string-array name="categoryNames">
+        <item>Mobile &amp; Accessories</item>
+        <item>Electronics</item>
+        <item>Home &amp; Kitchen</item>
+        <item>Perfumes &amp; Beauty</item>
+        <item>Appliances</item>
+        <item>Toys</item>
+        <item>Office Products</item>
+        <item>Automotive</item>
+        <item>Moms &amp; Babies</item>
+        <item>Sports</item>
+    </string-array>
 
 </resources>

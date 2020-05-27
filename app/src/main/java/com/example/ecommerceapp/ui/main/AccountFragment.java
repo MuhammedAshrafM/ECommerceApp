@@ -44,27 +44,32 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
     private static final int RC_SIGN_UP = 99;
     private CallbackManager callbackManager;
     private AccountInterface accountInterface;
-    private View view;
     private FragmentAccountBinding binding;
+    private View root;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_account,container,false);
-        view = binding.getRoot();
 
+        root = binding.getRoot();
         binding.signUpGoogleBt.setOnClickListener(this);
         binding.signUpFacebookBt.setFragment(this);
-        
+
         binding.signUpGoogleBt.setSize(SignInButton.SIZE_STANDARD);
         TextView textView = (TextView) binding.signUpGoogleBt.getChildAt(0);
-        textView.setText(getString(R.string.singUpGoogle));
+        if(getActivity().getClass().getSimpleName().equals("RegisterActivity")){
+            textView.setText(getString(R.string.signUpGoogle));
+        }
+        else if(getActivity().getClass().getSimpleName().equals("LoginActivity")){
+            textView.setText(getString(R.string.signInGoogle));
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             textView.setTextColor(getContext().getColor(R.color.basicColor));
         }
 
-        return view;
+        return root;
     }
 
     @Override
@@ -103,6 +108,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
             }
             @Override
             public void onError(FacebookException error) {
+                accountInterface.onFacebookListener(null);
             }
         });
 
@@ -129,6 +135,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
         // Pass the activity result back to the Facebook SDK
         callbackManager.onActivityResult(requestCode, resultCode, data);
 
+        accountInterface.onProgressDialogListener(false);
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_UP) {
             // The Task returned from this call is always completed, no need to attach
@@ -136,6 +143,8 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignUpResult(task);
         }
+
+
     }
 
 

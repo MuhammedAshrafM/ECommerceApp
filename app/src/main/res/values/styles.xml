@@ -16,4 +16,17 @@
         <item name="colorAccent">@color/basicColor</item>
     </style>
 
+    <style name="ProgressTheme2" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:indeterminateDrawable">@drawable/custom_progress</item>
+        <item name="android:minHeight">100dp</item>
+        <item name="android:minWidth">100dp</item>
+    </style>
+
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@color/orangeColor</item>
+        <item name="colorControlActivated">@color/yellowColor</item>
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 </resources>

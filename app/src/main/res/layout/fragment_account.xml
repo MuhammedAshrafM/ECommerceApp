@@ -22,7 +22,8 @@
             android:layout_weight="1" />
 
 
-        <com.facebook.login.widget.LoginButton xmlns:facebook="http://schemas.android.com/apk/res-auto"
+        <com.facebook.login.widget.LoginButton
+            xmlns:facebook="http://schemas.android.com/apk/res-auto"
             android:id="@+id/sign_up_facebook_bt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,8 +31,8 @@
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="1"
-            facebook:com_facebook_login_text="@string/singUpFacebook" />
+            android:layout_weight="1" />
 
+<!--        facebook:com_facebook_login_text="@string/signUpFacebook"-->
     </LinearLayout>
 </layout>

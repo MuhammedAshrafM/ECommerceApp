@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class UserModel {
 
-
     @SerializedName("id")
     private String id;
     @SerializedName("name")
@@ -20,6 +19,18 @@ public class UserModel {
     private String password;
     @SerializedName("validated")
     private int validated;
+
+    public UserModel() {
+    }
+
+    public UserModel(String id, String name, String userName, String email, String password, int validated) {
+        this.id = id;
+        this.name = name;
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.validated = validated;
+    }
 
     public UserModel(String name, String userName, String password) {
         this.name = name;

@@ -1,13 +1,13 @@
 package com.example.ecommerceapp.ui.main;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.AccountInterface;
+import com.example.ecommerceapp.data.InternetConnection;
+import com.example.ecommerceapp.data.Utils;
 import com.example.ecommerceapp.databinding.ActivityRegisterBinding;
 import com.example.ecommerceapp.pojo.UserModel;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -28,6 +28,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private String name, userName, email, password;
     private UserViewModel viewModel;
     private Snackbar snackbar;
+    private Utils utils;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,11 +42,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onStart();
 
         viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-        viewModel.mutableLiveData.observe(this, new Observer<String>() {
+        viewModel.getSignUpUser().observe(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 displayProgressDialog(false);
-                responseData(s);
+                if(s != null) {
+                    responseData(s);
+                }else {
+                    displaySnackBar(true, null);
+                }
             }
         });
     }
@@ -64,28 +69,34 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         else if(response.equals("RepeatedAccount")){
             message = getString(R.string.createAccountRepeated);
         }
-        snackbar = Snackbar.make(findViewById(R.id.container), message, Snackbar.LENGTH_INDEFINITE);
 
-        snackbar.setAction(android.R.string.ok, new View.OnClickListener() {
-            @Override
-            @TargetApi(Build.VERSION_CODES.M)
-            public void onClick(View v) {
-                snackbar.dismiss();
-            }
-        });
-
-        snackbar.show();
+        displaySnackBar(true, message);
+//        snackbar = Snackbar.make(findViewById(R.id.container), message, Snackbar.LENGTH_INDEFINITE);
+//
+//        snackbar.setAction(android.R.string.ok, new View.OnClickListener() {
+//            @Override
+//            @TargetApi(Build.VERSION_CODES.M)
+//            public void onClick(View v) {
+//                snackbar.dismiss();
+//            }
+//        });
+//
+//        snackbar.show();
     }
     private void getFacebookData(JSONObject object){
-        try {
+        if(object != null) {
+            try {
 //            id = object.getString("id");
 //            imageProfilePath = new URL("https://graph.facebook.com/" + object.getString("id") +
 //                    "/picture?width=250&height=250").toString();
-            name = object.getString("first_name") + " " + object.getString("last_name");
-            email = object.getString("email");
-            signUp(name, email);
-        } catch (JSONException e) {
-            e.printStackTrace();
+                name = object.getString("first_name") + " " + object.getString("last_name");
+                email = object.getString("email");
+                signUp(name, email);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else {
+            displaySnackBar(true,null);
         }
     }
 
@@ -96,9 +107,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
     private void createAccount(){
         if(validateRegister()){
-            UserModel user = new UserModel(name,userName,password);
-            displayProgressDialog(true);
-            viewModel.createAccount(user);
+            if (InternetConnection.isNetworkOnline(this)) {
+                UserModel user = new UserModel(name, userName, password);
+                displayProgressDialog(true);
+                viewModel.createAccount(user);
+            }else {
+                displaySnackBar(true, null);
+            }
         }
     }
 
@@ -154,6 +169,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
 
     }
+    private void displaySnackBar(boolean show, String msg){
+        if(msg == null){
+            msg = getString(R.string.checkConnection);
+        }
+        utils = new Utils(this);
+        utils.snackBar(findViewById(R.id.container), msg);
+        utils.displaySnackBar(show);
+    }
 
     @Override
     public void onClick(View view) {
@@ -181,4 +204,5 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void onProgressDialogListener(boolean show) {
         displayProgressDialog(show);
     }
+
 }
