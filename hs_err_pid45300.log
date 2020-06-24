@@ -1,0 +1,157 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x0000000002937bd0, pid=45300, tid=0x000000000000c2f0
+#
+# JRE version: OpenJDK Runtime Environment (8.0_212-b04) (build 1.8.0_212-release-1586-b04)
+# Java VM: OpenJDK 64-Bit Server VM (25.212-b04 mixed mode windows-amd64 compressed oops)
+# Problematic frame:
+# 
+[error occurred during error reporting (printing problematic frame), id 0xc0000005]
+
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+# If you would like to submit a bug report, please visit:
+#   
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000000001a991000):  JavaThread "Daemon worker" [_thread_in_Java, id=49904, stack(0x000000001cba0000,0x000000001cda0000)]
+
+siginfo: ExceptionCode=0xc0000005, reading address 0x000000002a796e70
+
+Registers:
+RAX=0x0000000000000a24, RBX=0x000000002a5c9dc8, RCX=0x0000000000039a10, RDX=0x000000001cd99df8
+RSP=0x000000001cd99e68, RBP=0x000000001cd99ee0, RSI=0x0000000022a44508, RDI=0x00000001001628b8
+R8 =0x00000000a00c4758, R9 =0x00000000a0652af0, R10=0x0000000057178470, R11=0x00000000a02ab2c8
+R12=0x0000000000000000, R13=0x000000002a5c9bc5, R14=0x000000001cd99f58, R15=0x000000001a991000
+RIP=0x0000000002937bd0, EFLAGS=0x0000000000010202
+
+Top of Stack: (sp=0x000000001cd99e68)
+0x000000001cd99e68:   0000000080000080 0000000000000004
+0x000000001cd99e78:   0000000000000000 000000001cd99ee0
+0x000000001cd99e88:   0000000000000007 0000000040000000
+0x000000001cd99e98:   00000000e087ccb0 000000001cd99ea0
+0x000000001cd99ea8:   000000002a5c9bc5 000000001cd99f58
+0x000000001cd99eb8:   000000002a5c9dc8 0000000000000000
+0x000000001cd99ec8:   000000002a5c9ca8 0000000000000000
+0x000000001cd99ed8:   000000001cd99f38 000000001cd99fa0
+0x000000001cd99ee8:   0000000002937e20 0000000000000000
+0x000000001cd99ef8:   0000000000000000 0000000000000000
+0x000000001cd99f08:   0000000000000001 0000000000000004
+0x000000001cd99f18:   0000000080000080 0000000000000007
+0x000000001cd99f28:   0000000040000000 0000000000000000
+0x000000001cd99f38:   0000000000000000 0000000000000001
+0x000000001cd99f48:   00000000e0883150 00000000e087ccb0
+0x000000001cd99f58:   00000000e087ccb0 000000001cd99f60 
+
+Instructions: (pc=0x0000000002937bd0)
+0x0000000002937bb0:   48 8b 65 f0 48 c7 45 f0 00 00 00 00 4c 8b 6d c8
+0x0000000002937bc0:   4c 8b 75 d0 41 0f b7 4d 01 48 8b 5d d8 c1 e1 02
+0x0000000002937bd0:   8b 5c cb 28 81 e3 ff 00 00 00 48 8d 24 dc 41 0f
+0x0000000002937be0:   b6 5d 03 49 83 c5 03 49 ba 70 84 17 57 00 00 00 
+
+
+Register to memory mapping:
+
+RAX=0x0000000000000a24 is an unknown value
+RBX=0x000000002a5c9dc8 is pointing into metadata
+RCX=0x0000000000039a10 is an unknown value
+RDX=0x000000001cd99df8 is pointing into the stack for thread: 0x000000001a991000
+RSP=0x000000001cd99e68 is pointing into the stack for thread: 0x000000001a991000
+RBP=0x000000001cd99ee0 is pointing into the stack for thread: 0x000000001a991000
+RSI=0x0000000022a44508 is pointing into metadata
+RDI=0x00000001001628b8 is pointing into metadata
+R8 =0x00000000a00c4758 is an oop
+java.lang.ThreadLocal 
+ - klass: 'java/lang/ThreadLocal'
+R9 =0x00000000a0652af0 is an oop
+java.lang.Class 
+ - klass: 'java/lang/Class'
+R10=0x0000000057178470 is an unknown value
+R11=0x00000000a02ab2c8 is an oop
+[Lsun.nio.fs.NativeBuffer; 
+ - klass: 'sun/nio/fs/NativeBuffer'[]
+ - length: 3
+R12=0x0000000000000000 is an unknown value
+R13=0x000000002a5c9bc5 is pointing into metadata
+R14=0x000000001cd99f58 is pointing into the stack for thread: 0x000000001a991000
+R15=0x000000001a991000 is a thread
+
+
+Stack: [0x000000001cba0000,0x000000001cda0000],  sp=0x000000001cd99e68,  free space=2023k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  0x0000000002937bd0
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x0000000019ebd800 JavaThread "Build operations Thread 4" [_thread_blocked, id=3912, stack(0x00000000231c0000,0x00000000233c0000)]
+  0x0000000019ebb000 JavaThread "Build operations Thread 3" [_thread_blocked, id=40172, stack(0x0000000022fc0000,0x00000000231c0000)]
+  0x0000000019ec2000 JavaThread "Build operations Thread 2" [_thread_blocked, id=39640, stack(0x0000000022dc0000,0x0000000022fc0000)]
+  0x0000000019ebc800 JavaThread "Build operations" [_thread_blocked, id=49176, stack(0x0000000022bc0000,0x0000000022dc0000)]
+  0x0000000019ebf000 JavaThread "Cache worker for execution history cache (C:\Users\Mu7ammed_A4raf\.gradle\caches\5.6.4\executionHistory)" [_thread_blocked, id=46140, stack(0x00000000221c0000,0x00000000223c0000)]
+  0x000000001af63800 JavaThread "Cache worker for cache directory md-rule (C:\Users\Mu7ammed_A4raf\.gradle\caches\5.6.4\md-rule)" [_thread_blocked, id=49616, stack(0x0000000021fc0000,0x00000000221c0000)]
+  0x000000001af69800 JavaThread "Cache worker for cache directory md-supplier (C:\Users\Mu7ammed_A4raf\.gradle\caches\5.6.4\md-supplier)" [_thread_blocked, id=49656, stack(0x0000000021b40000,0x0000000021d40000)]
+  0x000000001af64800 JavaThread "Cache worker for file hash cache (F:\Projects\AndroidStudioProjects\EcommerceApp\.gradle\5.6.4\fileHashes)" [_thread_blocked, id=48388, stack(0x000000001fc40000,0x000000001fe40000)]
+  0x000000001af68000 JavaThread "Cache worker for journal cache (C:\Users\Mu7ammed_A4raf\.gradle\caches\journal-1)" [_thread_blocked, id=48932, stack(0x000000001d9a0000,0x000000001dba0000)]
+  0x000000001af65000 JavaThread "File lock request listener" [_thread_in_native, id=50164, stack(0x000000001d7a0000,0x000000001d9a0000)]
+  0x000000001af66800 JavaThread "Cache worker for file hash cache (C:\Users\Mu7ammed_A4raf\.gradle\caches\5.6.4\fileHashes)" [_thread_blocked, id=48000, stack(0x000000001d5a0000,0x000000001d7a0000)]
+  0x000000001aa82800 JavaThread "Thread-9" [_thread_blocked, id=48204, stack(0x000000001d1a0000,0x000000001d3a0000)]
+  0x000000001a9d7000 JavaThread "Stdin handler" [_thread_blocked, id=49320, stack(0x000000001cfa0000,0x000000001d1a0000)]
+  0x000000001a9d6800 JavaThread "Asynchronous log dispatcher for DefaultDaemonConnection: socket connection from /127.0.0.1:23663 to /127.0.0.1:23664" [_thread_blocked, id=49268, stack(0x000000001cda0000,0x000000001cfa0000)]
+=>0x000000001a991000 JavaThread "Daemon worker" [_thread_in_Java, id=49904, stack(0x000000001cba0000,0x000000001cda0000)]
+  0x000000001aa96000 JavaThread "Cancel handler" [_thread_blocked, id=48920, stack(0x000000001c9a0000,0x000000001cba0000)]
+  0x000000001a8cd000 JavaThread "Handler for socket connection from /127.0.0.1:23663 to /127.0.0.1:23664" [_thread_in_native, id=49348, stack(0x000000001c5a0000,0x000000001c7a0000)]
+  0x000000001a8cb000 JavaThread "Daemon" [_thread_blocked, id=44464, stack(0x000000001c3a0000,0x000000001c5a0000)]
+  0x000000001a91d800 JavaThread "Daemon periodic checks" [_thread_blocked, id=50052, stack(0x000000001c1a0000,0x000000001c3a0000)]
+  0x000000001a8ef000 JavaThread "Incoming local TCP Connector on port 23663" [_thread_in_native, id=50148, stack(0x000000001bec0000,0x000000001c0c0000)]
+  0x000000001906e000 JavaThread "Daemon health stats" [_thread_blocked, id=49752, stack(0x000000001b780000,0x000000001b980000)]
+  0x0000000018805800 JavaThread "Service Thread" daemon [_thread_blocked, id=48148, stack(0x0000000018be0000,0x0000000018de0000)]
+  0x00000000166a3800 JavaThread "C1 CompilerThread2" daemon [_thread_blocked, id=48420, stack(0x00000000185e0000,0x00000000187e0000)]
+  0x00000000166a0000 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=49480, stack(0x00000000183e0000,0x00000000185e0000)]
+  0x000000001669c000 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=49484, stack(0x00000000181e0000,0x00000000183e0000)]
+  0x000000001669a800 JavaThread "Attach Listener" daemon [_thread_blocked, id=49488, stack(0x0000000017fe0000,0x00000000181e0000)]
+  0x0000000016699800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=49696, stack(0x0000000017de0000,0x0000000017fe0000)]
+  0x000000000264b000 JavaThread "Finalizer" daemon [_thread_blocked, id=48540, stack(0x0000000017b00000,0x0000000017d00000)]
+  0x0000000016689000 JavaThread "Reference Handler" daemon [_thread_blocked, id=47232, stack(0x0000000017900000,0x0000000017b00000)]
+  0x00000000026de800 JavaThread "main" [_thread_blocked, id=50060, stack(0x0000000002730000,0x0000000002930000)]
+
+Other Threads:
+  0x0000000016667000 VMThread [stack: 0x0000000017700000,0x0000000017900000] [id=49856]
+  0x000000001880e800 WatcherThread [stack: 0x0000000018de0000,0x0000000018fe0000] [id=49476]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+heap address: 0x00000000a0000000, size: 1536 MB, Compressed Oops mode: 32-bit
+Narrow klass base: 0x0000000000000000, Narrow klass shift: 3
+Compressed class space size: 1073741824 Address: 0x0000000100000000
+
+Heap:
+ PSYoungGen      total 83968K, used 18673K [0x00000000e0000000, 0x00000000e7080000, 0x0000000100000000)
+  eden space 71168K, 13% used [0x00000000e0000000,0x00000000e090a600,0x00000000e4580000)
+  from space 12800K, 73% used [0x00000000e4580000,0x00000000e4eb1e68,0x00000000e5200000)
+  to   space 13312K, 0% used [0x00000000e6380000,0x00000000e6380000,0x00000000e7080000)
+ ParOldGen       total 96256K, used 19036K [0x00000000a0000000, 0x00000000a5e00000, 0x00000000e0000000)
+  object space 96256K, 19% used [0x00000000a0000000,0x00000000a1297210,0x00000000a5e00000)
+ Metaspace       used 42315K, capacity 43658K, committed 43944K, reserved 1087488K
+  class space    used 5685K, capacity 6050K, committed 6056K, reserved 1048576K
+
+Card table byte_map: [0x0000000011cf0000,0x0000000012000000] byte_map_base: 0x00000000117f0000
+
+Marking Bits: (ParMarkBitMap*) 0x0000000057189f30
+ Begin Bits: [0x0000000012a00000, 0x0000000014200000)
+ End Bits:   [0x0000000014200000, 0x0000000015a00000)
+
+Polling page: 0x00000000003e0000
+
+CodeCache: size=245760Kb used=13075Kb max_used=13244Kb free=232684Kb
+ bounds [0x0000000002930000, 0x0000000003630000, 0x0000000011930000]
+ total_blobs=4684 nmethods=3926 adapters=671
+ compilation: enabled
+
+Compilation events (10 events):

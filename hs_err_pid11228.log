@@ -1,0 +1,83 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x0000000002b65b66, pid=11228, tid=0x0000000000002be4
+#
+# JRE version: OpenJDK Runtime Environment (8.0_212-b04) (build 1.8.0_212-release-1586-b04)
+# Java VM: OpenJDK 64-Bit Server VM (25.212-b04 mixed mode windows-amd64 compressed oops)
+# Problematic frame:
+# j  com.sun.tools.javac.code.Type$ClassType.accept(Ljavax/lang/model/type/TypeVisitor;Ljava/lang/Object;)Ljava/lang/Object;+3
+#
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+# If you would like to submit a bug report, please visit:
+#   
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x000000001af3a800):  JavaThread "Execution worker for ':'" [_thread_in_Java, id=11236, stack(0x0000000027690000,0x0000000027890000)]
+
+siginfo: ExceptionCode=0xc0000005, reading address 0xffffffffffffffff
+
+Registers:
+RAX=0x00fec381491b8b4d, RBX=0x000000002f1c3468, RCX=0x00000000eef89c08, RDX=0x0000000100b1b5d0
+RSP=0x0000000027889e28, RBP=0x0000000027889e88, RSI=0x0000000100a053a0, RDI=0x0000000000000050
+R8 =0x00000000e8667c18, R9 =0x00000000eef89b58, R10=0x0000000074580bd0, R11=0x0000000100a053a0
+R12=0x0000000000000000, R13=0x0000000000000000, R14=0x0000000100b1b810, R15=0x000000001af3a800
+RIP=0x0000000002b65b66, EFLAGS=0x0000000000010246
+
+Top of Stack: (sp=0x0000000027889e28)
+0x0000000027889e28:   0000000002b47ef4 0000000000000000
+0x0000000027889e38:   00000000e8667c68 00000000eef89c08
+0x0000000027889e48:   0000000027889e48 0000000028112113
+0x0000000027889e58:   0000000027889ea8 00000000281db9b8
+0x0000000027889e68:   0000000000000000 0000000028112120
+0x0000000027889e78:   0000000000000000 0000000027889e98
+0x0000000027889e88:   0000000027889ef0 0000000002b47ef4
+0x0000000027889e98:   0000000000000000 00000000eef89c08
+0x0000000027889ea8:   00000000e8667c68 0000000027889eb0
+0x0000000027889eb8:   000000002f2f2865 0000000027889f00
+0x0000000027889ec8:   000000002f2f4e28 0000000000000000
+0x0000000027889ed8:   000000002f2f2888 0000000027889e98
+0x0000000027889ee8:   0000000027889f00 0000000027889f48
+0x0000000027889ef8:   0000000002b47e20 00000000e8667c68
+0x0000000027889f08:   0000000027889f08 00000000285717c7
+0x0000000027889f18:   0000000027889fd0 0000000028584760 
+
+Instructions: (pc=0x0000000002b65b66)
+0x0000000002b65b46:   00 e9 0e 00 00 00 49 89 55 10 41 be 01 00 00 00
+0x0000000002b65b56:   4d 89 75 18 49 83 c5 30 4c 89 6d e0 48 8b 43 08
+0x0000000002b65b66:   48 8b 40 08 48 8b 40 18 8b 5b 24 83 eb f6 f7 db
+0x0000000002b65b76:   44 8b aa 10 01 00 00 4e 8d ac ea a8 01 00 00 48 
+
+
+Register to memory mapping:
+
+RAX=0x00fec381491b8b4d is an unknown value
+RBX=0x000000002f1c3468 is pointing into metadata
+RCX=0x00000000eef89c08 is an oop
+com.google.auto.common.MoreTypes$DeclaredTypeVisitor 
+ - klass: 'com/google/auto/common/MoreTypes$DeclaredTypeVisitor'
+RDX=0x0000000100b1b5d0 is pointing into metadata
+RSP=0x0000000027889e28 is pointing into the stack for thread: 0x000000001af3a800
+RBP=0x0000000027889e88 is pointing into the stack for thread: 0x000000001af3a800
+RSI=0x0000000100a053a0 is pointing into metadata
+RDI=0x0000000000000050 is an unknown value
+R8 =0x00000000e8667c18 is an oop
+com.sun.tools.javac.code.Symbol$ClassSymbol 
+ - klass: 'com/sun/tools/javac/code/Symbol$ClassSymbol'
+R9 =0x00000000eef89b58 is an oop
+java.lang.Class 
+ - klass: 'java/lang/Class'
+R10=0x0000000074580bd0 is an unknown value
+R11=0x0000000100a053a0 is pointing into metadata
+R12=0x0000000000000000 is an unknown value
+R13=0x0000000000000000 is an unknown value
+R14=0x0000000100b1b810 is pointing into metadata
+R15=0x000000001af3a800 is a thread
+
+
+Stack: [0x0000000027690000,0x0000000027890000],  sp=0x0000000027889e28,  free space=2023k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  0x0000000002b65b66
