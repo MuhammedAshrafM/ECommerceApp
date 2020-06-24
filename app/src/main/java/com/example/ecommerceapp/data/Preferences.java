@@ -3,7 +3,16 @@ package com.example.ecommerceapp.data;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.ecommerceapp.pojo.ProductModel;
 import com.example.ecommerceapp.pojo.UserModel;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 public class Preferences {
 
@@ -15,20 +24,16 @@ public class Preferences {
 
     private static Preferences INSTANCE;
 
-//    private static final String IS_FIRST_TIME = "IsFirstTime";
-//    private static final String CITY_LOCATION = "CityLocation";
-//    private static final String AREA_LOCATION = "AreaLocation";
     private static final String IS_DATA_USER_EXIST = "IsDataUserExist";
     private static final String ID_USER = "id";
     private static final String NAME_USER = "name";
     private static final String EMAIL_USER = "email";
     private static final String USER_NAME = "UserName";
     private static final String PASSWORD_USER = "password";
+    private static final String IMAGE_PROFILE_USER = "imageProfilePath";
     private static final String VALIDATED_USER = "validated";
-//    private static final String IMAGE_PROFILE_USER_PATH = "ImageProfileUserPath";
-//    private static final String LAST_NAME_USER = "LastNameUser";
-//    private static final String PHONE_NUMBER_USER = "PhoneNumberUser";
-//    private static final String CREDIT_CARD_USER = "CreditCardUser";
+    private static final String PRODUCTS_CARTED = "productsCarted";
+    private static final String PRODUCTS_WISHED = "productsWished";
 
     // create Shared Preferences by a name and mode type
     public Preferences(Context context, String PREFERENCES_NAME) {
@@ -45,49 +50,10 @@ public class Preferences {
         return INSTANCE;
     }
 
-//    // set true for Shared Preferences if user add specific location, and the opposite false
-//    public void setFirstTimeLaunch(boolean isFirstTime) {
-//        editor.putBoolean(IS_FIRST_TIME, isFirstTime);
-//        editor.commit();
-//    }
-
-//    // check to adding location or not
-//    public boolean isFirstTimeLaunch() {
-//        return preferences.getBoolean(IS_FIRST_TIME, true);
-//    }
-
     // delete all data for this Shared Preferences
     public void deleteSharedPreferencesData() {
         editor.clear().commit();
     }
-
-//    // set location data Specified by the user
-//    public void setSpecifiedLocation(String cityLocation, String areaLocation) {
-//        editor.putString(CITY_LOCATION, cityLocation);
-//        editor.putString(AREA_LOCATION, areaLocation);
-//        editor.commit();
-//    }
-
-//    // get location data Specified by the user
-//    public HashMap<String,String> getSpecifiedLocation() {
-//        HashMap<String,String> hashMap = new HashMap<>();
-//        hashMap.put(CITY_LOCATION, preferences.getString(CITY_LOCATION, ""));
-//        hashMap.put(AREA_LOCATION, preferences.getString(AREA_LOCATION, ""));
-//        return hashMap;
-//    }
-
-//    // get location city Specified by the user
-//    public String getSpecifiedLocationCity() {
-//        return preferences.getString(CITY_LOCATION, "");
-//    }
-//
-//
-//    // get location area Specified by the user
-//    public String getSpecifiedLocationArea() {
-//        return preferences.getString(AREA_LOCATION, "");
-//    }
-//
-
 
     // set true for Shared Preferences if user add normal data, and the opposite false
     public void setDataUserExist(boolean isDataUserExist) {
@@ -107,25 +73,18 @@ public class Preferences {
         editor.putString(USER_NAME, user.getUserName());
         editor.putString(EMAIL_USER, user.getEmail());
         editor.putString(PASSWORD_USER, user.getPassword());
+        editor.putString(IMAGE_PROFILE_USER, user.getImagePath());
         editor.putInt(VALIDATED_USER, user.getValidated());
         editor.putBoolean(IS_DATA_USER_EXIST, true);
-//        editor.putString(FIRST_NAME_USER, fName);
-//        editor.putString(LAST_NAME_USER, lName);
-//        editor.putString(IMAGE_PROFILE_USER_PATH, imagePath);
         editor.commit();
     }
 
-//    // set phone number user
-//    public void setPhoneNumber(String phoneNumber){
-//        editor.putString(PHONE_NUMBER_USER, phoneNumber);
-//        editor.commit();
-//    }
-//
-//    // set credit card user
-//    public void setCreditCardUser(String creditCard){
-//        editor.putString(CREDIT_CARD_USER, creditCard);
-//        editor.commit();
-//    }
+    public void validateAccountUser(UserModel user){
+        editor.putString(EMAIL_USER, user.getEmail());
+        editor.putString(IMAGE_PROFILE_USER, user.getImagePath());
+        editor.putInt(VALIDATED_USER, user.getValidated());
+        editor.commit();
+    }
 
     // get normal data of the user
     public UserModel getDataUser() {
@@ -136,9 +95,160 @@ public class Preferences {
         user.setUserName(preferences.getString(USER_NAME, ""));
         user.setEmail(preferences.getString(EMAIL_USER, ""));
         user.setPassword(preferences.getString(PASSWORD_USER, ""));
+        user.setImagePath(preferences.getString(IMAGE_PROFILE_USER, ""));
         user.setValidated(preferences.getInt(VALIDATED_USER, 0));
 
         return user;
+    }
+
+    public void removeDataUser(){
+        editor.clear().commit();
+    }
+
+    public ArrayList<String> setProductCarted(ProductModel productModel){
+        ArrayList<String> productModels =  new ArrayList<>();
+        String json = preferences.getString(PRODUCTS_CARTED, null);
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+
+        if(json != null){
+            productModels = gson.fromJson(json, type);
+        }
+
+        productModels.add(productModel.getId());
+        json = gson.toJson(productModels);
+        editor.putString(PRODUCTS_CARTED, json);
+        editor.commit();
+
+        return productModels;
+    }
+//    public ArrayList<String> setProductsCarted(ArrayList<String> productModels){
+//        Gson gson = new Gson();
+//
+//        String json = gson.toJson(productModels);
+//        editor.putString(PRODUCTS_CARTED, json);
+//        editor.commit();
+//
+//        return productModels;
+//    }
+    public ArrayList<String> removeProductCarted(ProductModel productModel){
+        String json = preferences.getString(PRODUCTS_CARTED, null);
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonElement jsonElement = (JsonElement) parser.parse(gson.toJson(productModel.getId()));
+        JsonArray jsonArray = (JsonArray) parser.parse(json);
+        jsonArray.remove(jsonElement);
+        json = jsonArray.toString();
+
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+
+        editor.putString(PRODUCTS_CARTED, jsonArray.toString());
+        editor.commit();
+
+        return gson.fromJson(json, type);
+    }
+    public void removeProductsCarted(){
+        editor.clear().commit();
+    }
+
+    public boolean isProductCarted(ProductModel productModel){
+        String json = preferences.getString(PRODUCTS_CARTED, null);
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        if(json != null){
+            JsonElement jsonElement = (JsonElement) parser.parse(gson.toJson(productModel.getId()));
+            JsonArray jsonArray = (JsonArray) parser.parse(json);
+
+            return jsonArray.contains(jsonElement);
+        }
+        return false;
+
+    }
+    public ArrayList<String> getProductsCarted(){
+        ArrayList<String> productModels =  new ArrayList<>();
+        String json = preferences.getString(PRODUCTS_CARTED, null);
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+
+        if(json != null){
+            productModels = gson.fromJson(json, type);
+        }
+
+        return productModels;
+    }
+
+    public ArrayList<String> setProductWished(ProductModel productModel){
+        ArrayList<String> productModels =  new ArrayList<>();
+        String json = preferences.getString(PRODUCTS_WISHED, null);
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+
+        if(json != null){
+            productModels = gson.fromJson(json, type);
+        }
+
+        productModels.add(productModel.getId());
+        json = gson.toJson(productModels);
+        editor.putString(PRODUCTS_WISHED, json);
+        editor.commit();
+
+        return productModels;
+    }
+
+//    public ArrayList<String> setProductsWished(ArrayList<String> productModels){
+//        Gson gson = new Gson();
+//
+//        String json = gson.toJson(productModels);
+//        editor.putString(PRODUCTS_WISHED, json);
+//        editor.commit();
+//
+//        return productModels;
+//    }
+
+
+    public ArrayList<String> removeProductWished(ProductModel productModel){
+        String json = preferences.getString(PRODUCTS_WISHED, null);
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonElement jsonElement = (JsonElement) parser.parse(gson.toJson(productModel.getId()));
+        JsonArray jsonArray = (JsonArray) parser.parse(json);
+        jsonArray.remove(jsonElement);
+        json = jsonArray.toString();
+
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+
+        editor.putString(PRODUCTS_WISHED, jsonArray.toString());
+        editor.commit();
+
+        return gson.fromJson(json, type);
+    }
+    public void removeProductsWished(){
+        editor.clear().commit();
+    }
+
+    public boolean isProductWished(ProductModel productModel){
+        String json = preferences.getString(PRODUCTS_WISHED, null);
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        if(json != null){
+            JsonElement jsonElement = (JsonElement) parser.parse(gson.toJson(productModel.getId()));
+            JsonArray jsonArray = (JsonArray) parser.parse(json);
+
+            return jsonArray.contains(jsonElement);
+        }
+        return false;
+    }
+    public ArrayList<String> getProductsWished(){
+        ArrayList<String> productModels =  new ArrayList<>();
+        String json = preferences.getString(PRODUCTS_WISHED, null);
+        Gson gson = new Gson();
+        Type type = new TypeToken<ArrayList<String>>(){}.getType();
+
+        if(json != null){
+            productModels = gson.fromJson(json, type);
+        }
+
+        return productModels;
     }
 
 }

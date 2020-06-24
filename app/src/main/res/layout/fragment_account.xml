@@ -15,6 +15,7 @@
             android:id="@+id/sign_up_google_bt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:elevation="2dp"
             android:layout_marginBottom="5dp"
             android:layout_marginEnd="10dp"
             android:layout_marginStart="10dp"
@@ -27,12 +28,13 @@
             android:id="@+id/sign_up_facebook_bt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:elevation="2dp"
             android:layout_marginBottom="5dp"
             android:layout_marginEnd="15dp"
             android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            facebook:com_facebook_login_text="@string/continueFacebook" />
 
-<!--        facebook:com_facebook_login_text="@string/signUpFacebook"-->
-    </LinearLayout>
+        </LinearLayout>
 </layout>

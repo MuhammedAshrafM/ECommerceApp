@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_style"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/logoApp_iv"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@mipmap/ic_launcher_app_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logoApp_iv">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/sortBy"
+            android:textColor="@color/blackColor" />
+
+        <CheckedTextView
+            android:id="@+id/sort_most_helpful"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/mostHelpful"
+            android:textColor="@color/blackColor" />
+
+        <CheckedTextView
+            android:id="@+id/sort_most_recent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/mostRecent"
+            android:textColor="@color/blackColor" />
+
+        <CheckedTextView
+            android:id="@+id/sort_highest_ratings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/highestRatings"
+            android:textColor="@color/blackColor" />
+
+
+        <CheckedTextView
+            android:id="@+id/sort_lowest_ratings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/lowestRatings"
+            android:textColor="@color/blackColor" />
+
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

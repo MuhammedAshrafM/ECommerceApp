@@ -17,55 +17,29 @@ public class UserModel {
     private String email;
     @SerializedName("password")
     private String password;
+    @SerializedName("imagePath")
+    private String imagePath;
     @SerializedName("validated")
     private int validated;
 
     public UserModel() {
+        this.id = "";
+        this.name = "";
+        this.userName = "";
+        this.email = "";
+        this.password = "";
+        this.imagePath = "";
+        this.validated = 0;
     }
 
-    public UserModel(String id, String name, String userName, String email, String password, int validated) {
+    public UserModel(String id, String name, String userName, String email, String password, String imagePath, int validated) {
         this.id = id;
         this.name = name;
         this.userName = userName;
         this.email = email;
         this.password = password;
+        this.imagePath = imagePath;
         this.validated = validated;
-    }
-
-    public UserModel(String name, String userName, String password) {
-        this.name = name;
-        this.userName = userName;
-        this.password = password;
-        this.id = "";
-        this.email = "";
-        this.validated = 0;
-    }
-
-    public UserModel(String name,String email) {
-        this.name = name;
-        this.email = email;
-        this.id = "";
-        this.validated = 0;
-        this.userName = "";
-        this.password = "";
-    }
-
-    public UserModel(String userName,String password, boolean b) {
-        this.userName = userName;
-        this.password = password;
-        this.name = "";
-        this.email = "";
-        this.id = "";
-        this.validated = 0;
-    }
-
-    public UserModel(String email) {
-        this.email = email;
-        this.name = "";
-        this.id = "";
-        this.validated = 0;
-        this.userName = "";
-        this.password = "";
     }
 
     public String getId() {
@@ -108,6 +82,14 @@ public class UserModel {
         this.password = password;
     }
 
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
     public int getValidated() {
         return validated;
     }
@@ -125,6 +107,7 @@ public class UserModel {
         map.put("userName",userName);
         map.put("email",email);
         map.put("password",password);
+        map.put("imagePath",imagePath);
         map.put("validated",validated);
 
         return map;

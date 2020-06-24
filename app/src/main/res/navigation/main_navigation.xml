@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@+id/navigation_welcome">
+
+    <fragment
+        android:id="@+id/navigation_welcome"
+        android:name="com.example.ecommerceapp.ui.main.WelcomeFragment"
+        android:label="@string/title_welcome"
+        tools:layout="@layout/fragment_welcome">
+
+        <action
+            android:id="@+id/action_navigation_welcome_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/navigation_welcome"
+            app:popUpToInclusive="true"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.ecommerceapp.ui.main.MainFragment"
+        android:label="MainFragment"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
+        <action
+            android:id="@+id/action_mainFragment_to_registerFragment"
+            app:destination="@id/registerFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.ecommerceapp.ui.main.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login" />
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.example.ecommerceapp.ui.main.RegisterFragment"
+        android:label="RegisterFragment"
+        tools:layout="@layout/fragment_register" />
+
+</navigation>

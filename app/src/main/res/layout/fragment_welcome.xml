@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/basicColor"
+        tools:context=".ui.main.WelcomeFragment">
+
+
+        <ImageView
+            android:id="@+id/app_logo"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:src="@mipmap/ic_cart" />
+
+        <TextView
+            android:id="@+id/welcome_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="200dp"
+            android:fontFamily="@font/kaushanscript_regular"
+            android:gravity="center"
+            android:text="@string/welcomeText"
+            android:textColor="@color/whiteColor"
+            android:textSize="25sp"
+            android:textStyle="bold|italic" />
+
+
+    </RelativeLayout>
+</layout>

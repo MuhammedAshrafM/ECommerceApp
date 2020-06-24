@@ -1,76 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/whiteColor"
-    android:orientation="vertical">
+    android:background="@drawable/background_style"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/logoApp_iv"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@mipmap/ic_launcher_app_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:gravity="center"
-        android:text="Sort by"
-        android:textColor="@color/cardview_shadow_start_color"
-        android:layout_weight="1"/>
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logoApp_iv">
 
-    <TextView
-        android:id="@+id/sort_new"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="New Arrivals"
-        android:textColor="@color/blackColor"
-        android:layout_weight="1"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/sortBy"
+            android:textColor="@color/blackColor" />
+
+        <CheckedTextView
+            android:id="@+id/sort_best_matches"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/bestMatches"
+            android:textColor="@color/blackColor" />
+
+        <CheckedTextView
+            android:id="@+id/sort_price_low"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/lowToHighPrice"
+            android:textColor="@color/blackColor" />
+
+        <CheckedTextView
+            android:id="@+id/sort_price_high"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/highToLowPrice"
+            android:textColor="@color/blackColor" />
+
+        <CheckedTextView
+            android:id="@+id/sort_offer_low"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/lowToHighOffer"
+            android:textColor="@color/blackColor" />
+
+        <CheckedTextView
+            android:id="@+id/sort_offer_high"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/highToLowOffer"
+            android:textColor="@color/blackColor" />
 
 
-    <TextView
-        android:id="@+id/sort_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="Sort by"
-        android:textColor="@color/blackColor"
-        android:layout_weight="1"/>
+        <CheckedTextView
+            android:id="@+id/sort_top_rated"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/topRated"
+            android:textColor="@color/blackColor" />
 
 
-    <TextView
-        android:id="@+id/sort_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="Sort by"
-        android:textColor="@color/blackColor"
-        android:layout_weight="1"/>
+        <CheckedTextView
+            android:id="@+id/sort_new"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checkMarkTint="@color/whiteColor"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="@string/newArrivals"
+            android:textColor="@color/blackColor" />
 
 
-    <TextView
-        android:id="@+id/sort_3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="Sort by"
-        android:textColor="@color/blackColor"
-        android:layout_weight="1"/>
+    </LinearLayout>
 
-
-    <TextView
-        android:id="@+id/sort_4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="Sort by"
-        android:textColor="@color/blackColor"
-        android:layout_weight="1"/>
-
-
-    <TextView
-        android:id="@+id/sort_5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:text="Sort by"
-        android:textColor="@color/blackColor"
-        android:layout_weight="1"/>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,6 @@
 package com.example.ecommerceapp.ui.main;
 
-import com.example.ecommerceapp.data.ECommerceClient;
+import com.example.ecommerceapp.data.EcoClient;
 import com.example.ecommerceapp.pojo.UserModel;
 
 import java.util.ArrayList;
@@ -19,14 +19,23 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class UserViewModel extends ViewModel {
 
+    private MutableLiveData<String> mutableLiveErrorMessage;
+
     private MutableLiveData<String> mutableLiveDataSignUp;
     private MutableLiveData<ArrayList<UserModel>> mutableLiveDataLogIn;
     private CompositeDisposable compositeDisposable;
 
     public UserViewModel() {
+        mutableLiveErrorMessage = new MutableLiveData<>();
+
         mutableLiveDataSignUp = new MutableLiveData<>();
         mutableLiveDataLogIn = new MutableLiveData<>();
         compositeDisposable = new CompositeDisposable();
+    }
+
+
+    public LiveData<String> getErrorMessage() {
+        return mutableLiveErrorMessage;
     }
 
     public LiveData<String> getSignUpUser() {
@@ -38,7 +47,7 @@ public class UserViewModel extends ViewModel {
 
     public void createAccount(UserModel userModel){
 
-        Single<String> observable = ECommerceClient.getINSTANCE()
+        Single<String> observable = EcoClient.getINSTANCE()
                 .createAccount(userModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -56,7 +65,7 @@ public class UserViewModel extends ViewModel {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                mutableLiveDataSignUp.setValue(null);
+                mutableLiveErrorMessage.setValue(e.getMessage());
             }
         };
         observable.subscribe(observer);
@@ -64,7 +73,7 @@ public class UserViewModel extends ViewModel {
     }
     public void signUp(UserModel userModel){
 
-        Single<String> observable = ECommerceClient.getINSTANCE()
+        Single<String> observable = EcoClient.getINSTANCE()
                 .signUp(userModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -82,7 +91,7 @@ public class UserViewModel extends ViewModel {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                mutableLiveDataSignUp.setValue(null);
+                mutableLiveErrorMessage.setValue(e.getMessage());
             }
         };
         observable.subscribe(observer);
@@ -91,7 +100,7 @@ public class UserViewModel extends ViewModel {
 
     public void logInAccount(UserModel userModel){
 
-        Single<Map<String,ArrayList<UserModel>>> observable = ECommerceClient.getINSTANCE()
+        Single<Map<String,ArrayList<UserModel>>> observable = EcoClient.getINSTANCE()
                 .logInAccount(userModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -109,7 +118,7 @@ public class UserViewModel extends ViewModel {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                mutableLiveDataLogIn.setValue(null);
+                mutableLiveErrorMessage.setValue(e.getMessage());
             }
         };
         observable.subscribe(observer);
@@ -117,7 +126,7 @@ public class UserViewModel extends ViewModel {
     }
     public void logIn(UserModel userModel){
 
-        Single<Map<String,ArrayList<UserModel>>> observable = ECommerceClient.getINSTANCE()
+        Single<Map<String,ArrayList<UserModel>>> observable = EcoClient.getINSTANCE()
                 .logIn(userModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -136,7 +145,7 @@ public class UserViewModel extends ViewModel {
 
             @Override
             public void onError(@NonNull Throwable e) {
-                mutableLiveDataLogIn.setValue(null);
+                mutableLiveErrorMessage.setValue(e.getMessage());
             }
         };
 

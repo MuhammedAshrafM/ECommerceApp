@@ -7,62 +7,23 @@
 
     </data>
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.main.MainActivity"
-        android:background="@drawable/shopping_cart">
+        android:background="@color/basicColor"
+        tools:context=".ui.main.MainActivity">
 
-        <ImageView
-            android:id="@+id/app_logo"
-            android:layout_width="300dp"
-            android:layout_height="120dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="60dp"
-            android:src="@mipmap/ic_launcher_app_icon" />
 
-        <TextView
+        <fragment
+            android:id="@+id/nav_host_fragment"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="@string/welcomeText"
-            android:textSize="25sp"
-            android:textColor="@color/basicColor"
-            android:gravity="center"
-            android:textStyle="bold|italic" />
-
-
-        <Button
-            android:id="@+id/joinAppButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/openAppButton"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:padding="10dp"
-            android:textAllCaps="false"
-            android:text="@string/join"
-            android:textSize="20sp"
-            android:textColor="@color/whiteColor"
-            android:background="@drawable/background_simple_button" />
-
-        <Button
-            android:id="@+id/openAppButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:padding="10dp"
-            android:textAllCaps="false"
-            android:text="@string/accountExist"
-            android:textSize="20sp"
-            android:textColor="@color/whiteColor"
-            android:background="@drawable/background_button" />
-
-    </RelativeLayout>
+            android:layout_height="match_parent"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navGraph="@navigation/main_navigation" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/containerSpecialProducts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        tools:context=".ui.home.SpecialProductsFragment">
+
+
+        <TextView
+            android:id="@+id/typeView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            android:gravity="center"
+            android:text="Recently Viewed Items"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/basicColor"
+            android:textSize="20dp"
+            android:layout_margin="15dp"
+            android:padding="5dp"
+            android:background="@drawable/background_button2"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewSpecialProducts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_below="@id/typeView"
+            android:scrollbars="none"/>
+    </RelativeLayout>
+</layout>

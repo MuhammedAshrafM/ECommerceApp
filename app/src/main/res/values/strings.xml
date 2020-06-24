@@ -1,25 +1,21 @@
 <resources>
-    <integer-array name="categoryImages">
-        <item>@drawable/mobiles</item>
-        <item>@drawable/electronics</item>
-        <item>@drawable/home_kitchen</item>
-        <item>@drawable/beauty</item>
-        <item>@drawable/appliances</item>
-        <item>@drawable/toys</item>
-        <item>@drawable/office_products</item>
-        <item>@drawable/automotive</item>
-        <item>@drawable/babies</item>
-        <item>@drawable/sports</item>
+    <plurals name="numberOfProductsAvailable">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+    <plurals name="numberOfReviewsAvailable">
+        <item quantity="one">%d review</item>
+        <item quantity="other">%d reviews</item>
+    </plurals>
 
-    </integer-array>
+    <string name="app_name">EcoApp</string>
 
-    <string name="app_name">EcommerceApp</string>
     <string name="facebook_app_id">518140535531488</string>
-
     <string name="fb_login_protocol_scheme">fb518140535531488</string>
-    <string name="welcomeText">Find, Discover, Choose, and Buy anything online.</string>
-    <string name="accountExist">Already have an account</string>
 
+    <string name="welcomeText">Find, Discover, Choose, and Buy anything online.</string>
+
+    <string name="accountExist">Already have an account</string>
     <string name="join">Join Now</string>
     <string name="userName">UserName</string>
     <string name="email">Email</string>
@@ -29,61 +25,132 @@
     <string name="login">Login</string>
     <string name="or">OR</string>
     <string name="createAccount">Create your account</string>
-    <string name="signUpGoogle">Sign up with Google</string>
-    <string name="signInGoogle">Sign in with Google</string>
-    <string name="signUpFacebook">Sign up with Facebook</string>
+    <!--    <string name="signUpGoogle">Sign up with Google</string>-->
+    <!--    <string name="signInGoogle">Sign in with Google</string>-->
+    <string name="continueGoogle">Continue with Google</string>
 
-    <string name="signInFacebook">Sign in with Facebook</string>
+    <!--    <string name="signUpFacebook">Sign up with Facebook</string>-->
+    <!--    <string name="signInFacebook">Sign in with Facebook</string>-->
+    <string name="continueFacebook">Continue with Facebook</string>
     <string name="name">Name</string>
     <string name="emailAddress">Your email address</string>
-    <string name="createPassword">Create a password</string>
 
+    <string name="createPassword">Create a password</string>
     <string name="infoPassword">Your password must be at least 6 characters.</string>
+    <string name="incorrectPassword">The Password you entered is incorrect.</string>
     <string name="nameField">You must add a name</string>
     <string name="userNameField">You must add an userName</string>
-    <string name="emailField">You must add an email</string>
+    <string name="pictureField">You must select image profile</string>
 
+    <string name="emailField">You must add an email</string>
     <string name="passwordField">You must add a password</string>
     <string name="singUpSuccess">Thanks for singing up with ECommerce App! you can log in now.</string>
     <string name="singUpField">An error occurred, please try again later.</string>
     <string name="singUpRepeated">This email is already used by another user!
         please use another an email or login by this account.</string>
+
     <string name="createAccountRepeated">This username is already used by another user.</string>
 
+    <string name="loginSuccess">Login Successfully</string>
     <string name="logInField">Login failed! the userName or password you entered is incorrect or your email used is incorrect.</string>
-
+    <string name="validateAccountSuccess">Your account is validated now.</string>
+    <string name="validateAccountField">An error occurred, please try again later.</string>
+    <string name="validateAccountRepeated">Validate Account failed! This email is already used by another user!
+        please use another an email.</string>
+    <string name="editAccountSuccess">Your account is updated.</string>
+    <string name="editAccountField">An error occurred, please try again later.</string>
+    <string name="editAccountRepeated">Update Account failed! This userName is already used by another user!
+        please use another an userName.</string>
     <string name="checkConnection">Please check your internet connection and try again.</string>
+    <string name="carted">Item added to cart ☺</string>
+    <string name="unCarted">Item removed from cart 😔</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
+    <string name="title_more">More</string>
     <string name="title_account">Account</string>
     <string name="title_cart">My Cart</string>
     <string name="title_orders">Orders</string>
-    <string name="addCart">Add To Cart</string>
-    <string name="search">Search</string>
-
-
-    <plurals name="numberOfProductsAvailable">
-        <item quantity="one">%d item</item>
-        <item quantity="other">%d items</item>
-    </plurals>
-
     <string name="title_notifications">Notifications</string>
+    <string name="addCart">Add To Cart</string>
+    <string name="title_welcome">Welcome</string>
+    <string name="title_menu">Menu</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_profile_edit">Edit Profile</string>
+    <string name="title_wish">My Wishlist</string>
+
+    <string name="sortBy">Sort by</string>
+    <string name="bestMatches">Best Matches</string>
+    <string name="lowToHighPrice">Price: Low to High</string>
+    <string name="highToLowPrice">Price: High to Low</string>
+    <string name="lowToHighOffer">Offer: Low to High</string>
+    <string name="highToLowOffer">Offer: High to Low</string>
+    <string name="topRated">Top Rated</string>
+    <string name="newArrivals">New Arrivals</string>
+
+    <string name="logOut">Log Out</string>
+    <string name="confirm_logOut">Do you want to log out?</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="see_profile">See your profile</string>
+    <string name="account_not_validated">Your account is not validated</string>
+    <string name="validate_account_info">To validate your account continue with google or facebook</string>
+    <string name="account_not_validated_info">Validate your account first to edit your profile</string>
+    <string name="editAccount">Edit Account</string>
+    <string name="editPassword">Edit Password</string>
+    <string name="changePassword">Change your password</string>
+    <string name="oldPassword">Old Password</string>
+    <string name="newPassword">New Password</string>
+
+    <string name="subTotal">Sub Total:</string>
+    <string name="checkout">Proceed To Checkout</string>
+    <string name="egp">EGP</string>
+    <string name="off_percent">% OFF</string>
+    <string name="off">OFF</string>
+    <string name="percent">%</string>
+    <string name="cartEmpty">Oops! 😮 Your cart is empty, you must add an item</string>
+    <string name="buying_info">Validate your account first to complete the purchase information.</string>
+
+    <string name="search">Search</string>
+    <string name="edit">Edit</string>
+    <string name="share">Share</string>
+
+    <string name="description">Description</string>
+    <string name="readMore">Read More</string>
+    <string name="specifications">Specifications</string>
+    <string name="reviews">Reviews</string>
+    <string name="seeAll">See All</string>
+    <string name="writeReview">Write Review</string>
+    <string name="reviewGoodComment">Whats good about this product</string>
+    <string name="reviewNotGoodComment">Whats not good about this product</string>
+    <string name="reviewComment">Describe your experience</string>
+    <string name="submitReview">Submit Review</string>
+    <string name="infoRating">Tap on star to rate</string>
+    <string name="reviewCommentField">You must add a review</string>
+    <string name="reviewAdded">Your review added</string>
+    <string name="reviewField">An error occurred, please try again later.</string>
+    <string name="add_review_info">Validate your account first to Add a review.</string>
+
+    <string name="mostHelpful">Most helpful</string>
+    <string name="mostRecent">Most recent</string>
+    <string name="highestRatings">Highest ratings first</string>
+    <string name="lowestRatings">Lowest ratings first</string>
+
+    <string name="ratings">Ratings</string>
+    <string name="stars">of 5 stars</string>
+
+    <string name="recentlyViewed">Recently Viewed Items</string>
+    <string name="bought">People also bought</string>
+    <string name="suggested">Suggested for you</string>
+
+    <string name="upTo">Up to</string>
+
+    <string name="selectImage">Select Image From Gallery</string>
+
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string-array name="categoryNames">
-        <item>Mobile &amp; Accessories</item>
-        <item>Electronics</item>
-        <item>Home &amp; Kitchen</item>
-        <item>Perfumes &amp; Beauty</item>
-        <item>Appliances</item>
-        <item>Toys</item>
-        <item>Office Products</item>
-        <item>Automotive</item>
-        <item>Moms &amp; Babies</item>
-        <item>Sports</item>
-    </string-array>
 
+    <!--    &amp;-->
 </resources>

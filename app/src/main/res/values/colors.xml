@@ -17,6 +17,11 @@
     <color name="yellowColor">#FFC107</color>
     <color name="greenColor">#4BCF70</color>
     <color name="gray">#F3F2F2</color>
+    <color name="gray2">#A1A0A0</color>
+    <color name="gray3">#EDECEC</color>
+    <color name="transparentColor">#99141414</color>
     <color name="buttonColor">#394043</color>
     <color name="buttonColor2">#6196AE</color>
+    <color name="backgroundColor">#cbf3f0</color>
+    <color name="backgroundColor2">#66FAED</color>
 </resources>

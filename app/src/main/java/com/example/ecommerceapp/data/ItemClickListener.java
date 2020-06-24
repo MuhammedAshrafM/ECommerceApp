@@ -2,14 +2,16 @@ package com.example.ecommerceapp.data;
 
 import android.view.View;
 
-/**
- * Created by Mu7ammed_A4raf on 07-Dec-17.
- */
+import com.example.ecommerceapp.pojo.ProductModel;
+
 
 public interface ItemClickListener {
 
     void onItemClick(View view, int position);
 
-    void onCartClick(View view, String productId);
+    void onCartClick(View view, ProductModel productModel, boolean carted, int newSize);
 
+    void onCartView(double subTotal, boolean added);
+
+    void onWishClick(View view, ProductModel productModel, boolean wished);
 }

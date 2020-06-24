@@ -1,7 +1,7 @@
 package com.example.ecommerceapp.ui.main;
 
 import android.content.Intent;
-import android.os.Build;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,25 +58,21 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
 
         binding.signUpGoogleBt.setSize(SignInButton.SIZE_STANDARD);
         TextView textView = (TextView) binding.signUpGoogleBt.getChildAt(0);
-        if(getActivity().getClass().getSimpleName().equals("RegisterActivity")){
-            textView.setText(getString(R.string.signUpGoogle));
-        }
-        else if(getActivity().getClass().getSimpleName().equals("LoginActivity")){
-            textView.setText(getString(R.string.signInGoogle));
-        }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            textView.setTextColor(getContext().getColor(R.color.basicColor));
-        }
+        textView.setText(getString(R.string.continueGoogle));
+
+        textView.setTextColor(Color.rgb(3,169,244));
 
         return root;
     }
+
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        accountInterface = (AccountInterface) getActivity();
+        accountInterface = (AccountInterface) getParentFragment();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();

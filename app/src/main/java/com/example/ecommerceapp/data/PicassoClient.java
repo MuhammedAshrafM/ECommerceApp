@@ -20,11 +20,11 @@ public class PicassoClient {
     private Context context;
     private WeakReference<ContentResolver> contentResolverWeakReference;
 
-    public static void loadImage(Context context, String url, ImageView imageView) {
+    public static void loadProfileImage(Context context, String url, ImageView imageView) {
         if (url.length() > 0 && url != null) {
             Picasso.with(context).load(url).into(imageView);
         } else {
-            Picasso.with(context).load(R.mipmap.ic_launcher_logout).into(imageView);
+            Picasso.with(context).load(R.mipmap.ic_launcher_profile).into(imageView);
         }
 
     }
@@ -33,9 +33,8 @@ public class PicassoClient {
         if (url.length() > 0 && url != null) {
             Picasso.with(context).load(url).into(imageView);
         } else {
-            Picasso.with(context).load(R.drawable.mobiles).into(imageView);
+            Picasso.with(context).load(R.drawable.background_style).into(imageView);
         }
-
     }
 
     //target to save
