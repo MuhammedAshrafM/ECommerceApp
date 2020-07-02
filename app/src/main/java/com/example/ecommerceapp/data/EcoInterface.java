@@ -1,5 +1,6 @@
 package com.example.ecommerceapp.data;
 
+import com.example.ecommerceapp.pojo.BrandModel;
 import com.example.ecommerceapp.pojo.CategoryModel;
 import com.example.ecommerceapp.pojo.ImageProductModel;
 import com.example.ecommerceapp.pojo.ProductModel;
@@ -45,7 +46,7 @@ public interface EcoInterface {
     @FormUrlEncoded
     @POST("ecommerce.php")
     public Single<ArrayList<ProductModel>> getLimitProductsRecentlyViewed(@Field("method") String funName,
-                                                                     @Field("userId") String userId);
+                                                                          @Field("userId") String userId);
 
     @FormUrlEncoded
     @POST("ecommerce.php")
@@ -59,6 +60,12 @@ public interface EcoInterface {
     @FormUrlEncoded
     @POST("ecommerce.php")
     public Single<ArrayList<Map<String,Float>>> getSubCategoriesOfferInfo(@Field("method") String funName);
+
+
+    @FormUrlEncoded
+    @POST("ecommerce.php")
+    public Single<ArrayList<SubCategoryModel>> getSubCategoriesSearched(@Field("method") String funName,
+                                                                        @Field("query") String query);
 
     @FormUrlEncoded
     @POST("ecommerce.php")
@@ -79,13 +86,15 @@ public interface EcoInterface {
     @POST("ecommerce.php")
     public Single<ArrayList<ProductModel>> getLimitBoughtProducts(@Field("method") String funName,
                                                                   @Field("subCategoryId") String subCategoryId,
-                                                                  @Field("productId") String productId);
+                                                                  @Field("productId") String productId,
+                                                                  @Field("userId") String userId);
 
 
     @FormUrlEncoded
     @POST("ecommerce.php")
     public Single<ArrayList<ProductModel>> getSelectedProducts(@Field("method") String funName,
-                                                               @Field("productIds[]") String[] productIds);
+                                                               @Field("productIds[]") ArrayList<String> productIds);
+
     @FormUrlEncoded
     @POST("ecommerce.php")
     public Single<ArrayList<ProductModel>> getProduct(@Field("method") String funName,
@@ -97,6 +106,15 @@ public interface EcoInterface {
     public Single<ArrayList<ImageProductModel>> getImagesProduct(@Field("method") String funName,
                                                                  @Field("productId") String productId);
 
+    @FormUrlEncoded
+    @POST("ecommerce.php")
+    public Single<ArrayList<ProductModel>> getProductsSearched(@Field("method") String funName,
+                                                               @Field("query") String query);
+
+    @FormUrlEncoded
+    @POST("ecommerce.php")
+    public Single<Map<String,Double>> getInfoProductsSearched(@Field("method") String funName,
+                                                              @Field("query") String query);
 
     @FormUrlEncoded
     @POST("ecommerce.php")
@@ -106,7 +124,7 @@ public interface EcoInterface {
     @FormUrlEncoded
     @POST("ecommerce.php")
     public Single<ArrayList<UserModel>> getLimitUsersReview(@Field("method") String funName,
-                                                          @Field("productId") String productId);
+                                                            @Field("productId") String productId);
 
 
     @FormUrlEncoded
@@ -129,5 +147,19 @@ public interface EcoInterface {
     @POST("ecommerce.php")
     public Single<String> addReview(@Field("method") String funName, @FieldMap Map<String, Object> mapReview);
 
+
+    @FormUrlEncoded
+    @POST("ecommerce.php")
+    public Single<ArrayList<BrandModel>> getBrandsSearched(@Field("method") String funName,
+                                                           @Field("query") String query);
+
+
+    @FormUrlEncoded
+    @POST("ecommerce.php")
+    public Single<ArrayList<ProductModel>> getProductsFiltered(@Field("method") String funName,
+                                                               @Field("query") String query,
+                                                               @Field("subCategoryIds[]") ArrayList<String> subCategoryIds,
+                                                               @FieldMap Map<String, Double> priceRange,
+                                                               @Field("brandIds[]") ArrayList<String> brandsIds);
 
 }

@@ -9,8 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ecommerceapp.R;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.ItemClickListener;
-import com.example.ecommerceapp.data.PicassoClient;
 import com.example.ecommerceapp.pojo.CategoryModel;
 import com.example.ecommerceapp.pojo.ProductModel;
 
@@ -42,7 +42,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
         holder.nameTV.setText(categories.get(position).getName());
-        PicassoClient.loadCategoryImage(context, categories.get(position).getImagePath(), holder.imageView);
+        GlideClient.loadCategoryImage(context, categories.get(position).getImagePath(), holder.imageView);
 
         holder.setItemClickListener(new ItemClickListener() {
             @Override
@@ -65,9 +65,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             public void onWishClick(View view, ProductModel productModel, boolean wished) {
 
             }
-
         });
-
     }
 
     @Override
@@ -87,7 +85,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
         private ItemClickListener itemClickListener;
 
-        public CategoryViewHolder(@NonNull View itemView) {
+        private CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTV = itemView.findViewById(R.id.category_name);
             imageView = itemView.findViewById(R.id.category_image);
@@ -95,7 +93,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             itemView.setOnClickListener(this);
         }
 
-        public void setItemClickListener(ItemClickListener itemClickListener){
+        private void setItemClickListener(ItemClickListener itemClickListener){
             this.itemClickListener=itemClickListener;
         }
 

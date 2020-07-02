@@ -4,7 +4,6 @@ import android.content.IntentFilter;
 import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +27,7 @@ import com.example.ecommerceapp.pojo.UserModel;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,8 +44,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewpager.widget.ViewPager;
-
-import static androidx.constraintlayout.widget.Constraints.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -165,7 +163,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
             displayProgressDialog(true);
             homeViewModel.getProduct(product.getId(), user.getId());
             homeViewModel.getLimitReviews(product.getId());
-            homeViewModel.getSpecialProducts(product.getSubCategoryId(), product.getId());
+            homeViewModel.getSpecialProducts(product.getSubCategoryId(), product.getId(), user.getId());
         } else {
             displaySnackBar(true, null, 0);
         }
@@ -287,11 +285,9 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     private void setInitialData(){
 
         if(Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).isProductCarted(product)){
-            Log.d(TAG, "MERO: setInitialData checked " + product.getTitle() + " / " +product);
             binding.saveInCartBt.setBackgroundResource(R.mipmap.ic_launcher_cart_added);
             binding.saveInCartBt.setChecked(true);
         }else {
-            Log.d(TAG, "MERO: setInitialData unchecked " + product.getTitle() + " / " +product);
             binding.saveInCartBt.setBackgroundResource(R.mipmap.ic_launcher_add_cart);
             binding.saveInCartBt.setChecked(false);
         }
@@ -324,8 +320,8 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
         float offer = product.getOffer();
 
         binding.productTitleTv.setText(product.getTitle());
-        binding.productOfferTv.setText(String.format("%.0f%s",offer,"% OFF"));
-        binding.productRateNumTv.setText(String.format("%d %s",product.getReviewsCount(), "Reviews"));
+        binding.productOfferTv.setText(String.format(Locale.getDefault(),"%.0f%s",offer,"% OFF"));
+        binding.productRateNumTv.setText(String.format(Locale.getDefault(),"%d %s",product.getReviewsCount(), "Reviews"));
         binding.productPriceTv.setText(decimalFormat.format(price) + getContext().getString(R.string.egp));
         binding.productPriceWithoutOfferTv.setText(decimalFormat.format(product.getPrice())
                 + getContext().getString(R.string.egp));
@@ -492,12 +488,8 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.myCart:
-                navController.navigate(R.id.action_productFragment_to_navigation_cart);
-                break;
-            default:
-                break;
+        if(item.getItemId() == R.id.myCart){
+            navController.navigate(R.id.action_productFragment_to_navigation_cart);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -534,7 +526,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
 
     @Override
     public void onCartClick(View view, ProductModel productModel, boolean carted, int newSize) {
-
+        cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(), newSize, R.drawable.ic_cart));
     }
 
     @Override

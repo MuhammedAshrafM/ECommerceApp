@@ -1,5 +1,6 @@
 package com.example.ecommerceapp.data;
 
+import com.example.ecommerceapp.pojo.BrandModel;
 import com.example.ecommerceapp.pojo.CategoryModel;
 import com.example.ecommerceapp.pojo.ImageProductModel;
 import com.example.ecommerceapp.pojo.ProductModel;
@@ -28,7 +29,7 @@ public class EcoClient {
     private static EcoClient INSTANCE;
 
 
-    public EcoClient() {
+    private EcoClient() {
 
         Gson gson = new GsonBuilder()
                 .setLenient()
@@ -60,7 +61,7 @@ public class EcoClient {
 
     }
 
-    public static EcoClient getINSTANCE(){
+    public synchronized static EcoClient getINSTANCE(){
 
         if(INSTANCE == null){
             INSTANCE = new EcoClient();
@@ -103,6 +104,9 @@ public class EcoClient {
     public Single<ArrayList<Map<String,Float>>> getSubCategoriesOfferInfo(){
         return ecoInterface.getSubCategoriesOfferInfo("getSubCategoriesOfferInfo");
     }
+    public Single<ArrayList<SubCategoryModel>> getSubCategoriesSearched(String query){
+        return ecoInterface.getSubCategoriesSearched("getSubCategoriesSearched", query);
+    }
     public Single<ArrayList<ProductModel>> getProductsCategory(String categoryId){
         return ecoInterface.getProductsCategory("getProductsCategory", categoryId);
     }
@@ -115,10 +119,10 @@ public class EcoClient {
     public Single<ArrayList<ProductModel>> getLimitSuggestedProducts(String subCategoryId, String productId){
         return ecoInterface.getLimitSuggestedProducts("getLimitSuggestedProducts", subCategoryId, productId);
     }
-    public Single<ArrayList<ProductModel>> getLimitBoughtProducts(String subCategoryId, String productId){
-        return ecoInterface.getLimitBoughtProducts("getLimitBoughtProducts", subCategoryId, productId);
+    public Single<ArrayList<ProductModel>> getLimitBoughtProducts(String subCategoryId, String productId, String userId){
+        return ecoInterface.getLimitBoughtProducts("getLimitBoughtProducts", subCategoryId, productId, userId);
     }
-    public Single<ArrayList<ProductModel>> getSelectedProducts(String[] productIds){
+    public Single<ArrayList<ProductModel>> getSelectedProducts(ArrayList<String> productIds){
         return ecoInterface.getSelectedProducts("getSelectedProducts", productIds);
     }
     public Single<ArrayList<ProductModel>> getProduct(String productId, String userId){
@@ -126,6 +130,12 @@ public class EcoClient {
     }
     public Single<ArrayList<ImageProductModel>> getImagesProduct(String productId){
         return ecoInterface.getImagesProduct("getImagesProduct", productId);
+    }
+    public Single<ArrayList<ProductModel>> getProductsSearched(String query){
+        return ecoInterface.getProductsSearched("getProductsSearched", query);
+    }
+    public Single<Map<String,Double>> getInfoProductsSearched(String query){
+        return ecoInterface.getInfoProductsSearched("getInfoProductsSearched", query);
     }
     public Single<ArrayList<ReviewModel>> getLimitReviews(String productId){
         return ecoInterface.getLimitReviews("getLimitReviews", productId);
@@ -146,5 +156,13 @@ public class EcoClient {
         return ecoInterface.addReview("addReview", reviewModel.toMap(productId));
     }
 
-
+    public Single<ArrayList<BrandModel>> getBrandsSearched(String query){
+        return ecoInterface.getBrandsSearched("getBrandsSearched", query);
+    }
+    public Single<ArrayList<ProductModel>> getProductsFiltered(String query,
+                                                               ArrayList<String> subCategoryIds,
+                                                               Map<String, Double> priceRange,
+                                                               ArrayList<String> brandsIds){
+        return ecoInterface.getProductsFiltered("getProductsFiltered", query, subCategoryIds, priceRange, brandsIds);
+    }
 }

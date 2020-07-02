@@ -104,7 +104,7 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
             if(productsWishedId.size() > 0) {
                 displayProgressDialog(true);
                 productIds = new String[productsWishedId.size()];
-                moreViewModel.getProductsWished(productsWishedId.toArray(productIds));
+                moreViewModel.getProductsWished(productsWishedId);
             }
         }else {
             displaySnackBar(true, null, 0);
@@ -248,12 +248,9 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.myCart:
-                navController.navigate(R.id.action_wishFragment_to_navigation_cart);
-                break;
-            default:
-                break;
+
+        if(item.getItemId() == R.id.myCart){
+            navController.navigate(R.id.action_wishFragment_to_navigation_cart);
         }
         return super.onOptionsItemSelected(item);
     }

@@ -120,7 +120,6 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
                 displaySnackBar(true);
             }
         }
-
         binding.viewPager.setOnPageChangeListener(this);
     }
 
@@ -278,13 +277,8 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()){
-            case R.id.myCart:
-                navController.navigate(R.id.action_navigation_home_to_navigation_cart);
-                break;
-            default:
-
-                break;
+        if(item.getItemId() == R.id.myCart){
+            navController.navigate(R.id.action_navigation_home_to_navigation_cart);
         }
 
         return super.onOptionsItemSelected(item);

@@ -103,7 +103,7 @@ public class CartFragment extends Fragment implements View.OnClickListener, Item
             if(productsCartedId.size() > 0) {
                 displayProgressDialog(true);
                 productIds = new String[productsCartedId.size()];
-                cartViewModel.getProductsCarted(productsCartedId.toArray(productIds));
+                cartViewModel.getProductsCarted(productsCartedId);
             }
         }else {
             displaySnackBar(true, null, 0);
@@ -184,8 +184,6 @@ public class CartFragment extends Fragment implements View.OnClickListener, Item
                 }else {
                     if(subTotal == 0){
                         displaySnackBar(true, getString(R.string.cartEmpty), -2);
-                    }else {
-
                     }
                     // payment method
                 }

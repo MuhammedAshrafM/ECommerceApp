@@ -18,7 +18,7 @@
         <RelativeLayout
         android:id="@+id/containerProduct"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
             tools:context=".ui.home.ProductFragment">
 
             <com.google.android.material.appbar.AppBarLayout
@@ -94,7 +94,7 @@
                     android:background="@color/redColor3"
                     android:textColor="@color/whiteColor"
                     android:textStyle="bold"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     android:minLines="1"
                     android:maxLines="2"
                     android:paddingTop="3dp"
@@ -128,7 +128,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:visibility="visible" />
+                    android:visibility="gone" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
@@ -149,7 +149,7 @@
                 android:maxLines="2"
                 android:lines="2"
                 android:background="@color/whiteColor"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:textStyle="normal"
                 android:padding="10dp"/>
 
@@ -157,6 +157,7 @@
                 android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:baselineAligned="false"
                 android:elevation="2dp"
                 android:paddingTop="15dp"
                 android:paddingBottom="10dp"
@@ -182,7 +183,7 @@
                     android:lines="1"
                     android:maxLines="1"
                     android:textColor="@color/blackColor"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -196,7 +197,7 @@
                     android:maxLines="1"
                     android:padding="5dp"
                     android:textColor="@color/com_facebook_likeview_text_color"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -230,7 +231,7 @@
                     android:lines="1"
                     android:maxLines="1"
                     android:textColor="@color/basicColor"
-                    android:textSize="10dp"
+                    android:textSize="10sp"
                     android:textStyle="normal" />
 
             </LinearLayout>
@@ -267,7 +268,8 @@
                     android:textColor="@color/basicColor"
                     android:text="@string/description"
                     android:textAllCaps="false"
-                    android:textSize="20dp" />
+                    android:textSize="20sp"
+                    style="?android:buttonBarButtonStyle"/>
 
                 <Button
                     android:id="@+id/product_specifications_bt"
@@ -286,7 +288,8 @@
                     android:textColor="@color/basicColor"
                     android:text="@string/specifications"
                     android:textAllCaps="false"
-                    android:textSize="20dp" />
+                    android:textSize="20sp"
+                    style="?android:buttonBarButtonStyle" />
             </LinearLayout>
 <!--            <LinearLayout-->
 <!--                android:id="@+id/product_description_lila"-->
@@ -439,7 +442,7 @@
                     android:background="@color/whiteColor"
                     android:text="@string/reviews"
                     android:textColor="@color/blackColor"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:textStyle="normal" />
 
                 <TextView
@@ -458,7 +461,7 @@
                     android:background="@color/whiteColor"
                     android:text="@string/seeAll"
                     android:textColor="@color/basicColor"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     android:textStyle="normal"/>
             </LinearLayout>
 
@@ -485,19 +488,18 @@
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:drawableLeft="@android:drawable/stat_notify_chat"
+                    android:drawableLeft="@drawable/ic_review"
                     android:drawablePadding="10dp"
-                    android:drawableStart="@android:drawable/stat_notify_chat"
-                    android:drawableTint="@color/gray2"
+                    android:drawableStart="@drawable/ic_review"
                     android:gravity="start|center"
                     android:lines="1"
                     android:maxLines="1"
                     android:text="@string/writeReview"
                     android:textColor="@color/basicColor"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:textStyle="normal" />
             </LinearLayout>
 

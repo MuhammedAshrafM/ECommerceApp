@@ -1,8 +1,6 @@
 package com.example.ecommerceapp.ui.home;
 
-import android.app.AlertDialog;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -12,12 +10,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
 import android.widget.SearchView;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
+import com.example.ecommerceapp.data.SortDialog;
 import com.example.ecommerceapp.data.ItemClickListener;
+import com.example.ecommerceapp.data.ItemDialogClickListener;
 import com.example.ecommerceapp.data.MyApplication;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.data.Utils;
@@ -26,6 +25,7 @@ import com.example.ecommerceapp.pojo.ProductModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,7 +46,7 @@ import static com.example.ecommerceapp.data.Utils.filter;
  * Use the {@link ProductsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProductsFragment extends Fragment implements View.OnClickListener,
+public class ProductsFragment extends Fragment implements View.OnClickListener, ItemDialogClickListener,
         ItemClickListener, SearchView.OnQueryTextListener, ConnectivityReceiver.ConnectivityReceiveListener {
 
     private NavController navController;
@@ -59,9 +59,7 @@ public class ProductsFragment extends Fragment implements View.OnClickListener,
     private View root;
     private Menu menu;
     private SearchView searchView;
-    private AlertDialog alertDialog;
-    private CheckedTextView chTVBestMatches, chTVPriceLow, chTVPriceHigh, chTVOfferLow, chTVOfferHigh,
-            chTVTopRated, chTVNew;
+    private SortDialog dialog = null;
     private MenuItem searchMenuItem, cartMenuItem;
     private ItemClickListener listener;
 
@@ -117,6 +115,7 @@ public class ProductsFragment extends Fragment implements View.OnClickListener,
             subCategoryId = getArguments().getString(ARG_PARAM2);
             subCategoryName = getArguments().getString(ARG_PARAM3);
             offer = getArguments().getBoolean(ARG_PARAM4);
+
         }
     }
 
@@ -156,8 +155,8 @@ public class ProductsFragment extends Fragment implements View.OnClickListener,
         if (subCategoryId != null) {
 
             products = new ArrayList<>();
-            binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,products.size(),products.size()));
-            adapter.setList(products, false);
+//            binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,products.size(),products.size()));
+//            adapter.setList(products, false);
             if (ConnectivityReceiver.isConnected()) {
                 displayProgressDialog(true);
                 if(!offer) {
@@ -173,15 +172,14 @@ public class ProductsFragment extends Fragment implements View.OnClickListener,
             binding.toolbar.setVisibility(View.GONE);
             binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,products.size(),products.size()));
             adapter.setList(products, true);
+            setViewSortDialog();
         }
-        setViewSortDialog();
     }
 
     @Override
     public void onStart() {
         super.onStart();
         menu = null;
-
 
         homeViewModel.getProducts().observe(getViewLifecycleOwner(), new Observer<ArrayList<ProductModel>>() {
             @Override
@@ -191,6 +189,7 @@ public class ProductsFragment extends Fragment implements View.OnClickListener,
                     products = productModels;
                     binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,products.size(),products.size()));
                     adapter.setList(products, false);
+                    setViewSortDialog();
                 }
             }
         });
@@ -237,269 +236,25 @@ public class ProductsFragment extends Fragment implements View.OnClickListener,
     }
 
     private void setViewSortDialog(){
-        View view = getLayoutInflater().inflate(R.layout.layout_sort, null);
-        chTVBestMatches = (CheckedTextView) view.findViewById(R.id.sort_best_matches);
-        chTVPriceLow = (CheckedTextView) view.findViewById(R.id.sort_price_low);
-        chTVPriceHigh = (CheckedTextView) view.findViewById(R.id.sort_price_high);
-        chTVOfferLow = (CheckedTextView) view.findViewById(R.id.sort_offer_low);
-        chTVOfferHigh = (CheckedTextView) view.findViewById(R.id.sort_offer_high);
-        chTVTopRated = (CheckedTextView) view.findViewById(R.id.sort_top_rated);
-        chTVNew = (CheckedTextView) view.findViewById(R.id.sort_new);
-        chTVBestMatches.setOnClickListener(this);
-        chTVPriceLow.setOnClickListener(this);
-        chTVPriceHigh.setOnClickListener(this);
-        chTVOfferLow.setOnClickListener(this);
-        chTVOfferHigh.setOnClickListener(this);
-        chTVTopRated.setOnClickListener(this);
-        chTVNew.setOnClickListener(this);
-
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(view);
-        alertDialog = builder.create();
-
-        setBestProducts();
+        dialog = dialog.getINSTANCE(getContext(), getActivity(), R.style.MaterialDialogSheet, this, R.string.products);
     }
 
-    private void unCheckedBest(){
-        chTVBestMatches.setChecked(false);
-        chTVBestMatches.setTextColor(Color.BLACK);
-        chTVBestMatches.setCheckMarkDrawable(null);
-    }
-    private void unCheckedPriceLow(){
-        chTVPriceLow.setChecked(false);
-        chTVPriceLow.setTextColor(Color.BLACK);
-        chTVPriceLow.setCheckMarkDrawable(null);
-    }
-    private void unCheckedPriceHigh(){
-        chTVPriceHigh.setChecked(false);
-        chTVPriceHigh.setTextColor(Color.BLACK);
-        chTVPriceHigh.setCheckMarkDrawable(null);
-    }
-    private void unCheckedOfferLow(){
-        chTVOfferLow.setChecked(false);
-        chTVOfferLow.setTextColor(Color.BLACK);
-        chTVOfferLow.setCheckMarkDrawable(null);
-    }
-    private void unCheckedOfferHigh(){
-        chTVOfferHigh.setChecked(false);
-        chTVOfferHigh.setTextColor(Color.BLACK);
-        chTVOfferHigh.setCheckMarkDrawable(null);
-    }
-    private void unCheckedTop(){
-        chTVTopRated.setChecked(false);
-        chTVTopRated.setTextColor(Color.BLACK);
-        chTVTopRated.setCheckMarkDrawable(null);
-    }
-    private void unCheckedNew(){
-        chTVNew.setChecked(false);
-        chTVNew.setTextColor(Color.BLACK);
-        chTVNew.setCheckMarkDrawable(null);
-    }
-
-    private void setBestProducts(){
-        unCheckedPriceLow();
-        unCheckedPriceHigh();
-        unCheckedOfferLow();
-        unCheckedOfferHigh();
-        unCheckedTop();
-        unCheckedNew();
-
-        if(!chTVBestMatches.isChecked()) {
-            chTVBestMatches.setChecked(true);
-            chTVBestMatches.setTextColor(Color.WHITE);
-            chTVBestMatches.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.bestMatches));
-
-            if (subCategoryId != null) {
-                Collections.sort(products, ProductModel.bestMatchesComparator);
-                adapter.setList(products, false);
-            }else {
-                Collections.sort(products, ProductModel.bestMatchesComparator);
-                adapter.setList(products, true);
-            }
+    private void setSortProducts(int id, Comparator<ProductModel> comparator){
+        Collections.sort(products, comparator);
+        if (subCategoryId != null) {
+            adapter.setList(products, false);
+        }else {
+            adapter.setList(products, true);
         }
-        alertDialog.dismiss();
+        binding.sortByTv.setText(getString(id));
     }
-    private void setLowPriceProducts(){
-
-        unCheckedBest();
-        unCheckedPriceHigh();
-        unCheckedOfferLow();
-        unCheckedOfferHigh();
-        unCheckedTop();
-        unCheckedNew();
-
-        if(!chTVPriceLow.isChecked()) {
-            chTVPriceLow.setChecked(true);
-            chTVPriceLow.setTextColor(Color.WHITE);
-            chTVPriceLow.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.lowToHighPrice));
-
-            if (subCategoryId != null) {
-                Collections.sort(products, ProductModel.priceLowComparator);
-                adapter.setList(products, false);
-            }else {
-                Collections.sort(products, ProductModel.priceLowComparator);
-                adapter.setList(products, true);
-            }
-        }
-        alertDialog.dismiss();
-    }
-    private void setHighPriceProducts(){
-
-        unCheckedBest();
-        unCheckedPriceLow();
-        unCheckedOfferLow();
-        unCheckedOfferHigh();
-        unCheckedTop();
-        unCheckedNew();
-
-        if(!chTVPriceHigh.isChecked()) {
-            chTVPriceHigh.setChecked(true);
-            chTVPriceHigh.setTextColor(Color.WHITE);
-            chTVPriceHigh.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.highToLowPrice));
-
-            if (subCategoryId != null) {
-                Collections.sort(products, ProductModel.priceHighComparator);
-                adapter.setList(products, false);
-            }else {
-                Collections.sort(products, ProductModel.priceHighComparator);
-                adapter.setList(products, true);
-            }
-        }
-        alertDialog.dismiss();
-    }
-    private void setLowOfferProducts(){
-
-        unCheckedBest();
-        unCheckedPriceHigh();
-        unCheckedPriceLow();
-        unCheckedOfferHigh();
-        unCheckedTop();
-        unCheckedNew();
-
-        if(!chTVOfferLow.isChecked()) {
-            chTVOfferLow.setChecked(true);
-            chTVOfferLow.setTextColor(Color.WHITE);
-            chTVOfferLow.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.lowToHighOffer));
-
-            if (subCategoryId != null) {
-                Collections.sort(products, ProductModel.offerLowComparator);
-                adapter.setList(products, false);
-            }else {
-                Collections.sort(products, ProductModel.offerLowComparator);
-                adapter.setList(products, true);
-            }
-        }
-        alertDialog.dismiss();
-    }
-    private void setHighOfferProducts(){
-
-        unCheckedBest();
-        unCheckedPriceHigh();
-        unCheckedPriceLow();
-        unCheckedOfferLow();
-        unCheckedTop();
-        unCheckedNew();
-
-        if(!chTVOfferHigh.isChecked()) {
-            chTVOfferHigh.setChecked(true);
-            chTVOfferHigh.setTextColor(Color.WHITE);
-            chTVOfferHigh.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.highToLowOffer));
-
-            if (subCategoryId != null) {
-                Collections.sort(products, ProductModel.offerHighComparator);
-                adapter.setList(products, false);
-            }else {
-                Collections.sort(products, ProductModel.offerHighComparator);
-                adapter.setList(products, true);
-            }
-        }
-        alertDialog.dismiss();
-    }
-    private void setTopRatedProducts(){
-        unCheckedBest();
-        unCheckedPriceLow();
-        unCheckedPriceHigh();
-        unCheckedOfferLow();
-        unCheckedOfferHigh();
-        unCheckedNew();
-
-        if(!chTVTopRated.isChecked()) {
-            chTVTopRated.setChecked(true);
-            chTVTopRated.setTextColor(Color.WHITE);
-            chTVTopRated.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.topRated));
-
-            if (subCategoryId != null) {
-                Collections.sort(products, ProductModel.topRatedComparator);
-                adapter.setList(products, false);
-            }else {
-                Collections.sort(products, ProductModel.topRatedComparator);
-                adapter.setList(products, true);
-            }
-        }
-        alertDialog.dismiss();
-    }
-    private void setNewProducts(){
-        unCheckedBest();
-        unCheckedPriceLow();
-        unCheckedPriceHigh();
-        unCheckedOfferLow();
-        unCheckedOfferHigh();
-        unCheckedTop();
-
-        if(!chTVNew.isChecked()) {
-            chTVNew.setChecked(true);
-            chTVNew.setTextColor(Color.WHITE);
-            chTVNew.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.newArrivals));
-
-            if (subCategoryId != null) {
-                Collections.sort(products, ProductModel.newComparator);
-                adapter.setList(products, false);
-            }else {
-                Collections.sort(products, ProductModel.newComparator);
-                adapter.setList(products, true);
-            }
-        }
-        alertDialog.dismiss();
-    }
-
-
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.sortBy_bt:
-                alertDialog.show();
-                break;
-            case R.id.sortBy_tv:
-                alertDialog.show();
-                break;
-            case R.id.sort_best_matches:
-                setBestProducts();
-                break;
-            case R.id.sort_price_low:
-                setLowPriceProducts();
-                break;
-            case R.id.sort_price_high:
-                setHighPriceProducts();
-                break;
-            case R.id.sort_offer_low:
-                setLowOfferProducts();
-                break;
-            case R.id.sort_offer_high:
-                setHighOfferProducts();
-                break;
-            case R.id.sort_top_rated:
-                setTopRatedProducts();
-                break;
-            case R.id.sort_new:
-                setNewProducts();
+            case R.id.sortBy_bt: case R.id.sortBy_tv:
+                if(dialog != null) {
+                    dialog.show();
+                }
                 break;
 
             default:
@@ -574,13 +329,8 @@ public class ProductsFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.myCart:
-                navController.navigate(R.id.action_productsFragment_to_navigation_cart);
-                break;
-            default:
-
-                break;
+        if(item.getItemId() == R.id.myCart){
+            navController.navigate(R.id.action_productsFragment_to_navigation_cart);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -615,6 +365,38 @@ public class ProductsFragment extends Fragment implements View.OnClickListener,
     public void onNetworkConnectionChanged(boolean isConnected) {
         if(!isConnected) {
             displaySnackBar(true, null, 0);
+        }
+    }
+
+    @Override
+    public void onItemDialogClick(View view, int id) {
+        switch (id){
+
+            case R.string.bestMatches:
+                setSortProducts(R.string.bestMatches, ProductModel.bestMatchesComparator);
+                break;
+            case R.string.lowToHighPrice:
+                setSortProducts(R.string.lowToHighPrice, ProductModel.priceLowComparator);
+                break;
+            case R.string.highToLowPrice:
+                setSortProducts(R.string.highToLowPrice, ProductModel.priceHighComparator);
+                break;
+            case R.string.lowToHighOffer:
+                setSortProducts(R.string.lowToHighOffer, ProductModel.offerLowComparator);
+                break;
+            case R.string.highToLowOffer:
+                setSortProducts(R.string.highToLowOffer, ProductModel.offerHighComparator);
+                break;
+            case R.string.topRated:
+                setSortProducts(R.string.topRated, ProductModel.topRatedComparator);
+                break;
+            case R.string.newArrivals:
+                setSortProducts(R.string.newArrivals, ProductModel.newComparator);
+                break;
+
+            default:
+
+                break;
         }
     }
 }

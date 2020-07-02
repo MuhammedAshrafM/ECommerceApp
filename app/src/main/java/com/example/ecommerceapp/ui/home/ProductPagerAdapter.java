@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.example.ecommerceapp.R;
-import com.example.ecommerceapp.data.PicassoClient;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.pojo.ImageProductModel;
 
 import java.util.ArrayList;
@@ -45,8 +45,8 @@ public class ProductPagerAdapter extends PagerAdapter {
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View root = layoutInflater.inflate(R.layout.layout_image_product, container, false);
-        ImageView productIv = (ImageView)root.findViewById(R.id.product_image);
-        PicassoClient.loadCategoryImage(context, productImages.get(position).getImagePath(), productIv);
+        ImageView productIv = root.findViewById(R.id.product_image);
+        GlideClient.loadCategoryImage(context, productImages.get(position).getImagePath(), productIv);
         container.addView(root);
         return root;
     }

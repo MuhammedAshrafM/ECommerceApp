@@ -189,8 +189,6 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
                 if (productModels != null && productModels.size() > 0) {
                     products = productModels;
                     displayProducts(products, false);
-                }else {
-                    displaySnackBar(true, null);
                 }
             }
         });
@@ -295,13 +293,8 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.myCart:
-                navController.navigate(R.id.action_subCategoryFragment_to_navigation_cart);
-                break;
-            default:
-
-                break;
+        if(item.getItemId() == R.id.myCart){
+            navController.navigate(R.id.action_subCategoryFragment_to_navigation_cart);
         }
         return super.onOptionsItemSelected(item);
     }

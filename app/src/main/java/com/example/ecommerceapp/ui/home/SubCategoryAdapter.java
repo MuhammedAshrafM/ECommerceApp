@@ -9,8 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.ecommerceapp.R;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.ItemClickListener;
-import com.example.ecommerceapp.data.PicassoClient;
 import com.example.ecommerceapp.pojo.ProductModel;
 import com.example.ecommerceapp.pojo.SubCategoryModel;
 
@@ -42,7 +42,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
     @Override
     public void onBindViewHolder(@NonNull SubCategoryViewHolder holder, int position) {
         holder.nameTV.setText(categories.get(position).getName());
-        PicassoClient.loadCategoryImage(context, categories.get(position).getImagePath(), holder.imageView);
+        GlideClient.loadCategoryImage(context, categories.get(position).getImagePath(), holder.imageView);
 
         holder.setItemClickListener(new ItemClickListener() {
             @Override
@@ -92,7 +92,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
 
         private ItemClickListener itemClickListener;
 
-        public SubCategoryViewHolder(@NonNull View itemView) {
+        private SubCategoryViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTV = itemView.findViewById(R.id.category_name);
             imageView = itemView.findViewById(R.id.category_image);
@@ -100,7 +100,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
             itemView.setOnClickListener(this);
         }
 
-        public void setItemClickListener(ItemClickListener itemClickListener){
+        private void setItemClickListener(ItemClickListener itemClickListener){
             this.itemClickListener=itemClickListener;
         }
 

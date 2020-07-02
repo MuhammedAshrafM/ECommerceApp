@@ -19,7 +19,7 @@ public class CartViewModel extends ViewModel {
 
     private MutableLiveData<String> mutableLiveErrorMessage;
 
-    public MutableLiveData<ArrayList<ProductModel>> mutableLiveProductsCarted;
+    private MutableLiveData<ArrayList<ProductModel>> mutableLiveProductsCarted;
 
     public CartViewModel() {
         mutableLiveErrorMessage = new MutableLiveData<>();
@@ -36,7 +36,7 @@ public class CartViewModel extends ViewModel {
         return mutableLiveProductsCarted;
     }
 
-    public void getProductsCarted(String[] productIds){
+    public void getProductsCarted(ArrayList<String> productIds){
 
         Single<ArrayList<ProductModel>> observable = EcoClient.getINSTANCE()
                 .getSelectedProducts(productIds)

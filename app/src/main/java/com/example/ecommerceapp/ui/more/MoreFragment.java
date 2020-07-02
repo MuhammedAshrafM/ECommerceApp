@@ -1,6 +1,6 @@
 package com.example.ecommerceapp.ui.more;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -14,15 +14,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.MyApplication;
-import com.example.ecommerceapp.data.PicassoClient;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.data.Utils;
 import com.example.ecommerceapp.databinding.FragmentMoreBinding;
@@ -51,7 +50,7 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
     private View root;
     private Utils utils;
     private UserModel user;
-    private AlertDialog alertDialog;
+    private Dialog dialog;
     private Button logOutBt, cancelLogOutBt;
     private SearchView searchView;
     private Menu menu;
@@ -97,7 +96,7 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
         user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
 
         binding.userNameTv.setText(user.getName());
-        PicassoClient.loadProfileImage(getContext(), user.getImagePath(), binding.userPictureIv);
+        GlideClient.loadProfileImage(getContext(), user.getImagePath(), binding.userPictureIv);
 
         binding.userProfileLila.setOnClickListener(this);
         binding.wishListBt.setOnClickListener(this);
@@ -123,22 +122,18 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
 
     private void setAlertDialog(){
         View view = getLayoutInflater().inflate(R.layout.layout_log_out, null);
-        logOutBt = (Button) view.findViewById(R.id.ok_bt);
-        cancelLogOutBt = (Button) view.findViewById(R.id.cancel_bt);
+        logOutBt = view.findViewById(R.id.ok_bt);
+        cancelLogOutBt = view.findViewById(R.id.cancel_bt);
 
         logOutBt.setOnClickListener(this);
         cancelLogOutBt.setOnClickListener(this);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(view);
-        alertDialog = builder.create();
-
-        Window window = alertDialog.getWindow();
-        WindowManager.LayoutParams params = window.getAttributes();
-
-        params.gravity = Gravity.BOTTOM;
-        params.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-        window.setAttributes(params);
+        dialog = new Dialog(getContext(), R.style.MaterialDialogSheet);
+        dialog.setContentView(view);
+        dialog.setCancelable(true);
+        dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
     private void logOut(){
         Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).removeDataUser();
@@ -170,7 +165,7 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
                 break;
 
             case R.id.logOut_bt:
-                alertDialog.show();
+                dialog.show();
                 break;
 
             case R.id.ok_bt:
@@ -178,7 +173,7 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
                 break;
 
             case R.id.cancel_bt:
-                alertDialog.dismiss();
+                dialog.dismiss();
                 break;
 
             default:
@@ -219,13 +214,8 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()){
-            case R.id.myCart:
-                navController.navigate(R.id.action_navigation_more_to_navigation_cart);
-                break;
-            default:
-
-                break;
+        if(item.getItemId() == R.id.myCart){
+            navController.navigate(R.id.action_navigation_more_to_navigation_cart);
         }
 
         return super.onOptionsItemSelected(item);

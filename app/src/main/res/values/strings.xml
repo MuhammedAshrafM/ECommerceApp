@@ -64,6 +64,7 @@
     <string name="checkConnection">Please check your internet connection and try again.</string>
     <string name="carted">Item added to cart ☺</string>
     <string name="unCarted">Item removed from cart 😔</string>
+    <string name="Qty">Qty:</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="title_home">Home</string>
     <string name="title_more">More</string>
@@ -78,6 +79,8 @@
     <string name="title_profile_edit">Edit Profile</string>
     <string name="title_wish">My Wishlist</string>
 
+    <string name="products">Products</string>
+    <string name="subCategories">subCategories</string>
     <string name="sortBy">Sort by</string>
     <string name="bestMatches">Best Matches</string>
     <string name="lowToHighPrice">Price: Low to High</string>
@@ -91,7 +94,7 @@
     <string name="confirm_logOut">Do you want to log out?</string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="see_profile">See your profile</string>
     <string name="account_not_validated">Your account is not validated</string>
@@ -109,6 +112,7 @@
     <string name="off_percent">% OFF</string>
     <string name="off">OFF</string>
     <string name="percent">%</string>
+    <string name="stock">in stock</string>
     <string name="cartEmpty">Oops! 😮 Your cart is empty, you must add an item</string>
     <string name="buying_info">Validate your account first to complete the purchase information.</string>
 
@@ -145,6 +149,20 @@
     <string name="suggested">Suggested for you</string>
 
     <string name="upTo">Up to</string>
+
+    <string name="category">Category</string>
+    <string name="priceRange">Price Range</string>
+    <string name="brand">Brand</string>
+    <string name="done">Done</string>
+
+    <string name="priceFrom">From (EGP)</string>
+    <string name="minPrice">Min Price</string>
+    <string name="priceTo">To (EGP)</string>
+    <string name="maxPrice">Max Price</string>
+
+    <string name="minPriceKey">minPrice</string>
+    <string name="maxPriceKey">maxPrice</string>
+    <string name="maxOfferKey">maxOffer</string>
 
     <string name="selectImage">Select Image From Gallery</string>
 

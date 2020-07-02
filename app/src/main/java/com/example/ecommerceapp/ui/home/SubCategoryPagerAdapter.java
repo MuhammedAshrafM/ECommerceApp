@@ -10,10 +10,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.ecommerceapp.R;
-import com.example.ecommerceapp.data.PicassoClient;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.pojo.SubCategoryModel;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
@@ -53,14 +54,14 @@ public class SubCategoryPagerAdapter extends PagerAdapter {
     public Object instantiateItem(@NonNull ViewGroup container, final int position) {
         layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View root = layoutInflater.inflate(R.layout.layout_image_sub_category, container, false);
-        ImageView subCategoryIv = (ImageView)root.findViewById(R.id.sub_category_image);
-        TextView subCategoryOfferTv = (TextView) root.findViewById(R.id.sub_category_offer_tv);
-        TextView subCategoryNameTv = (TextView) root.findViewById(R.id.sub_category_name_tv);
-        subCategoryOfferTv.setText(String.format("%s%.0f%s", context.getString(R.string.upTo) + "\n",
-                infoSubCategories.get(position).get("maxOffer"),
+        ImageView subCategoryIv = root.findViewById(R.id.sub_category_image);
+        TextView subCategoryOfferTv = root.findViewById(R.id.sub_category_offer_tv);
+        TextView subCategoryNameTv = root.findViewById(R.id.sub_category_name_tv);
+        subCategoryOfferTv.setText(String.format(Locale.getDefault(),"%s%.0f%s", context.getString(R.string.upTo) + "\n",
+                infoSubCategories.get(position).get(context.getString(R.string.maxOfferKey)),
                 context.getString(R.string.percent) + "\n" + context.getString(R.string.off)));
         subCategoryNameTv.setText(subCategoryModels.get(position).getName());
-        PicassoClient.loadCategoryImage(context, subCategoryModels.get(position).getImagePath(), subCategoryIv);
+        GlideClient.loadCategoryImage(context, subCategoryModels.get(position).getImagePath(), subCategoryIv);
 
         root.setOnClickListener(new View.OnClickListener() {
             @Override

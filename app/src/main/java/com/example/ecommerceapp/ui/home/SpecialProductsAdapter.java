@@ -11,13 +11,14 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.ecommerceapp.R;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.ItemClickListener;
-import com.example.ecommerceapp.data.PicassoClient;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.pojo.ProductModel;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -52,8 +53,8 @@ public class SpecialProductsAdapter extends RecyclerView.Adapter<SpecialProducts
         double price = products.get(position).getPrice() * ((100 - products.get(position).getOffer())/100);
         float offer = products.get(position).getOffer();
 
-        PicassoClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
-        holder.productOfferTV.setText(String.format("%.0f%s",offer, context.getString(R.string.off_percent)));
+        GlideClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
+        holder.productOfferTV.setText(String.format(Locale.getDefault(),"%.0f%s",offer, context.getString(R.string.off_percent)));
         holder.productTitleTV.setText(products.get(position).getTitle());
         holder.productPriceTV.setText(decimalFormat.format(price) + " " + context.getString(R.string.egp));
         holder.productPriceWithoutOfferTV.setText(decimalFormat.format(products.get(position).getPrice()) + " "
@@ -157,11 +158,11 @@ public class SpecialProductsAdapter extends RecyclerView.Adapter<SpecialProducts
         private ImageView imageView;
         private TextView productOfferTV, productTitleTV, productPriceTV,
                 productPriceWithoutOfferTV;
-        ToggleButton saveInCartBt, saveInWishListBt;
+        private ToggleButton saveInCartBt, saveInWishListBt;
 
         private ItemClickListener itemClickListener;
 
-        public SpecialProductViewHolder(@NonNull View itemView) {
+        private SpecialProductViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.product_image);
             productOfferTV = itemView.findViewById(R.id.product_offer);
@@ -174,7 +175,7 @@ public class SpecialProductsAdapter extends RecyclerView.Adapter<SpecialProducts
             itemView.setOnClickListener(this);
         }
 
-        public void setItemClickListener(ItemClickListener itemClickListener){
+        private void setItemClickListener(ItemClickListener itemClickListener){
             this.itemClickListener=itemClickListener;
         }
 

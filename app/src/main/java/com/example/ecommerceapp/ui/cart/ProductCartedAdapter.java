@@ -12,13 +12,14 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.ecommerceapp.R;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.ItemClickListener;
-import com.example.ecommerceapp.data.PicassoClient;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.pojo.ProductModel;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -56,8 +57,8 @@ implements View.OnClickListener {
         int quantity = products.get(position).getQuantity();
         int count = Integer.parseInt(String.valueOf(holder.quantityTV.getText()));
 
-        PicassoClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
-        holder.productOfferTV.setText(String.format("%.0f%s",offer, context.getString(R.string.off_percent)));
+        GlideClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
+        holder.productOfferTV.setText(String.format(Locale.getDefault(),"%.0f%s",offer, context.getString(R.string.off_percent)));
         holder.productTitleTV.setText(products.get(position).getTitle());
         holder.productPriceTV.setText(decimalFormat.format(price) + " " + context.getString(R.string.egp));
         holder.productPriceWithoutOfferTV.setText(decimalFormat.format(products.get(position).getPrice()) + " "
@@ -177,7 +178,7 @@ implements View.OnClickListener {
 
         private ItemClickListener itemClickListener;
 
-        public ProductCartedViewHolder(@NonNull View itemView) {
+        private ProductCartedViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.product_image);
             productOfferTV = itemView.findViewById(R.id.product_offer);
@@ -194,7 +195,7 @@ implements View.OnClickListener {
         }
 
 
-        public void setItemClickListener(ItemClickListener itemClickListener){
+        private void setItemClickListener(ItemClickListener itemClickListener){
             this.itemClickListener=itemClickListener;
         }
 

@@ -21,7 +21,7 @@ public class MoreViewModel extends ViewModel {
 
     private MutableLiveData<String> mutableLiveErrorMessage;
 
-    public MutableLiveData<ArrayList<ProductModel>> mutableLiveProductsWished;
+    private MutableLiveData<ArrayList<ProductModel>> mutableLiveProductsWished;
     private MutableLiveData<String> mutableLiveDataValidateAccount;
     private MutableLiveData<ArrayList<UserModel>> mutableLiveDataEditAccount;
 
@@ -48,7 +48,7 @@ public class MoreViewModel extends ViewModel {
     }
 
 
-    public void getProductsWished(String[] productIds){
+    public void getProductsWished(ArrayList<String> productIds){
 
         Single<ArrayList<ProductModel>> observable = EcoClient.getINSTANCE()
                 .getSelectedProducts(productIds)

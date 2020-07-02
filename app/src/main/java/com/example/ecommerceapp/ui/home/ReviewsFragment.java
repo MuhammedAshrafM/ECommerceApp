@@ -1,8 +1,6 @@
 package com.example.ecommerceapp.ui.home;
 
-import android.app.AlertDialog;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,10 +9,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckedTextView;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
+import com.example.ecommerceapp.data.SortDialog;
+import com.example.ecommerceapp.data.ItemDialogClickListener;
 import com.example.ecommerceapp.data.MyApplication;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.data.Utils;
@@ -25,6 +24,8 @@ import com.example.ecommerceapp.pojo.UserModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Locale;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
@@ -44,7 +45,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
  * Use the {@link ReviewsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ReviewsFragment extends Fragment implements View.OnClickListener,
+public class ReviewsFragment extends Fragment implements View.OnClickListener, ItemDialogClickListener,
         ConnectivityReceiver.ConnectivityReceiveListener{
 
     private NavController navController;
@@ -54,8 +55,7 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener,
     private ArrayList<UserModel> users;
     private View root;
     private Menu menu;
-    private AlertDialog alertDialog;
-    private CheckedTextView chTVMostHelpful, chTVMostRecent, chTVHighestRatings, chTVLowestRatings;
+    private SortDialog dialog = null;
     private MenuItem cartMenuItem;
     private ReviewAdapter adapter;
     private Utils utils;
@@ -151,8 +151,8 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener,
 
         user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
         binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfReviewsAvailable,0,0));
-        binding.reviewRateTv.setText(String.format("%.1f %s",0.0, getString(R.string.stars)));
-        binding.reviewNumRateTv.setText(String.format("(%d %s)",0, getString(R.string.ratings)));
+        binding.reviewRateTv.setText(String.format(Locale.getDefault(),"%.1f %s",0.0, getString(R.string.stars)));
+        binding.reviewNumRateTv.setText(String.format(Locale.getDefault(), "(%d %s)",0, getString(R.string.ratings)));
     }
 
 
@@ -232,125 +232,23 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener,
     }
 
     private void setViewSortDialog(){
-        View view = getLayoutInflater().inflate(R.layout.layout_sort_review, null);
-        chTVMostHelpful = (CheckedTextView) view.findViewById(R.id.sort_most_helpful);
-        chTVMostRecent = (CheckedTextView) view.findViewById(R.id.sort_most_recent);
-        chTVHighestRatings = (CheckedTextView) view.findViewById(R.id.sort_highest_ratings);
-        chTVLowestRatings = (CheckedTextView) view.findViewById(R.id.sort_lowest_ratings);
-
-        chTVMostHelpful.setOnClickListener(this);
-        chTVMostRecent.setOnClickListener(this);
-        chTVHighestRatings.setOnClickListener(this);
-        chTVLowestRatings.setOnClickListener(this);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(view);
-        alertDialog = builder.create();
-
-        setMHelpfulReviews();
+        dialog = dialog.getINSTANCE(getContext(), getActivity(), R.style.MaterialDialogSheet, this, R.string.reviews);
     }
 
     private void setReviewRate(Map<String, Object> infoReviews){
         if(!infoReviews.get("reviewsCount").toString().equals("0")){
             binding.reviewRateBar.setRating(Float.valueOf(infoReviews.get("reviewsRateAverage").toString()));
-            binding.reviewRateTv.setText(String.format("%.1f %s",Float.valueOf(infoReviews.get("reviewsRateAverage").toString()), getString(R.string.stars)));
-            binding.reviewNumRateTv.setText(String.format("(%d %s)",Integer.valueOf(infoReviews.get("reviewsCount").toString()), getString(R.string.ratings)));
+            binding.reviewRateTv.setText(String.format(Locale.getDefault(), "%.1f %s",Float.valueOf(infoReviews.get("reviewsRateAverage").toString()), getString(R.string.stars)));
+            binding.reviewNumRateTv.setText(String.format(Locale.getDefault(), "(%d %s)",Integer.valueOf(infoReviews.get("reviewsCount").toString()), getString(R.string.ratings)));
         }
     }
 
-    private void unCheckedMHelpful(){
-        chTVMostHelpful.setChecked(false);
-        chTVMostHelpful.setTextColor(Color.BLACK);
-        chTVMostHelpful.setCheckMarkDrawable(null);
-    }
-    private void unCheckedMRecent(){
-        chTVMostRecent.setChecked(false);
-        chTVMostRecent.setTextColor(Color.BLACK);
-        chTVMostRecent.setCheckMarkDrawable(null);
-    }
-    private void unCheckedHighest(){
-        chTVHighestRatings.setChecked(false);
-        chTVHighestRatings.setTextColor(Color.BLACK);
-        chTVHighestRatings.setCheckMarkDrawable(null);
-    }
-    private void unCheckedLowest(){
-        chTVLowestRatings.setChecked(false);
-        chTVLowestRatings.setTextColor(Color.BLACK);
-        chTVLowestRatings.setCheckMarkDrawable(null);
-    }
 
-    private void setMHelpfulReviews(){
-        unCheckedLowest();
-        unCheckedHighest();
-        unCheckedMRecent();
-
-        if(!chTVMostHelpful.isChecked()) {
-            chTVMostHelpful.setChecked(true);
-            chTVMostHelpful.setTextColor(Color.WHITE);
-            chTVMostHelpful.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.mostHelpful));
-
-            Collections.sort(reviews, ReviewModel.mostHelpfulComparator);
-            users = ReviewModel.sortList(reviews, users);
-            adapter.setList(reviews, users);
-        }
-        alertDialog.dismiss();
-    }
-
-    private void setLowestReviews(){
-
-        unCheckedMHelpful();
-        unCheckedHighest();
-        unCheckedMRecent();
-
-        if(!chTVLowestRatings.isChecked()) {
-            chTVLowestRatings.setChecked(true);
-            chTVLowestRatings.setTextColor(Color.WHITE);
-            chTVLowestRatings.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.lowestRatings));
-
-            Collections.sort(reviews, ReviewModel.lowestRatingComparator);
-            users = ReviewModel.sortList(reviews, users);
-            adapter.setList(reviews, users);
-        }
-        alertDialog.dismiss();
-    }
-
-    private void setHighestReviews(){
-
-        unCheckedMHelpful();
-        unCheckedLowest();
-        unCheckedMRecent();
-
-        if(!chTVHighestRatings.isChecked()) {
-            chTVHighestRatings.setChecked(true);
-            chTVHighestRatings.setTextColor(Color.WHITE);
-            chTVHighestRatings.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.highestRatings));
-
-            Collections.sort(reviews, ReviewModel.highestRatingComparator);
-            users = ReviewModel.sortList(reviews, users);
-            adapter.setList(reviews, users);
-        }
-        alertDialog.dismiss();
-    }
-
-    private void setMRecentReviews(){
-        unCheckedMHelpful();
-        unCheckedHighest();
-        unCheckedLowest();
-
-        if(!chTVMostRecent.isChecked()) {
-            chTVMostRecent.setChecked(true);
-            chTVMostRecent.setTextColor(Color.WHITE);
-            chTVMostRecent.setCheckMarkDrawable(R.drawable.ic_sorted);
-            binding.sortByTv.setText(getString(R.string.mostRecent));
-
-            Collections.sort(reviews, ReviewModel.mostRecentComparator);
-            users = ReviewModel.sortList(reviews, users);
-            adapter.setList(reviews, users);
-        }
-        alertDialog.dismiss();
+    private void setSortReviews(int id, Comparator<ReviewModel> comparator){
+        Collections.sort(reviews, comparator);
+        users = ReviewModel.sortList(reviews, users);
+        adapter.setList(reviews, users);
+        binding.sortByTv.setText(getString(id));
     }
 
     private ArrayList<UserModel> getNewSort(ArrayList<ReviewModel> reviewModels, ArrayList<UserModel> userModels){
@@ -386,13 +284,8 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.myCart:
-                navController.navigate(R.id.action_reviewsFragment_to_navigation_cart);
-                break;
-
-            default:
-                break;
+        if(item.getItemId() == R.id.myCart){
+            navController.navigate(R.id.action_reviewsFragment_to_navigation_cart);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -401,23 +294,10 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.sortBy_bt:
-                alertDialog.show();
-                break;
-            case R.id.sortBy_tv:
-                alertDialog.show();
-                break;
-            case R.id.sort_most_helpful:
-                setMHelpfulReviews();
-                break;
-            case R.id.sort_lowest_ratings:
-                setLowestReviews();
-                break;
-            case R.id.sort_highest_ratings:
-                setHighestReviews();
-                break;
-            case R.id.sort_most_recent:
-                setMRecentReviews();
+            case R.id.sortBy_bt: case R.id.sortBy_tv:
+                if(dialog != null) {
+                    dialog.show();
+                }
                 break;
             case R.id.add_review_fAB:
                 if(user.getValidated() == 0){
@@ -442,6 +322,29 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener,
     public void onNetworkConnectionChanged(boolean isConnected) {
         if(!isConnected) {
             displaySnackBar(true, null, 0);
+        }
+    }
+
+    @Override
+    public void onItemDialogClick(View view, int id) {
+        switch (id){
+
+            case R.string.mostHelpful:
+                setSortReviews(R.string.mostHelpful, ReviewModel.mostHelpfulComparator);
+                break;
+            case R.string.mostRecent:
+                setSortReviews(R.string.mostRecent, ReviewModel.mostRecentComparator);
+                break;
+            case R.string.highestRatings:
+                setSortReviews(R.string.highestRatings, ReviewModel.highestRatingComparator);
+                break;
+            case R.string.lowestRatings:
+                setSortReviews(R.string.lowestRatings, ReviewModel.lowestRatingComparator);
+                break;
+
+            default:
+
+                break;
         }
     }
 }

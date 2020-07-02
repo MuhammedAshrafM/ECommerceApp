@@ -259,16 +259,6 @@ public class ProductModel implements Parcelable {
             return p2.compareTo(p1);
         }
     };
-    public static Comparator<ProductModel> topOfferComparator = new Comparator<ProductModel>() {
-        @Override
-        public int compare(ProductModel m1, ProductModel m2) {
-            String offer1 = String.valueOf(m1.getOffer());
-            String offer2 = String.valueOf(m2.getOffer());
-
-            return offer2.compareTo(offer1);
-        }
-    };
-
 
     @Override
     public int describeContents() {

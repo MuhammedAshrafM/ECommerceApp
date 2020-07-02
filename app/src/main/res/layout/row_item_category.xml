@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
-    android:elevation="2dp"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="2dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
@@ -18,23 +19,22 @@
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:scaleType="fitXY"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/background_style"
-        android:src="@drawable/background_style"/>
+        android:contentDescription="item category image"
+        app:layout_constraintTop_toTopOf="parent"/>
 
         <TextView
             android:id="@+id/category_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="2dp"
-            android:lines="1"
-            android:maxLines="1"
+            android:minLines="1"
+            android:maxLines="2"
             android:background="@color/transparentColor"
             android:gravity="center"
             android:padding="10dp"
             android:text="@string/title_cart"
             android:textColor="@color/whiteColor"
-            android:textSize="15dp"
+            android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

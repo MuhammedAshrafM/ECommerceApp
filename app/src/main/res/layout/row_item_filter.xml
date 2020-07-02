@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/whiteColor"
+    android:elevation="2dp">
+
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            android:button="@android:color/transparent"
+            android:background="@drawable/background_radio_button"
+            android:gravity="start|center"
+            android:layoutDirection="rtl"
+            android:padding="15dp"
+            android:layout_margin="5dp"
+            android:text="@string/bestMatches"
+            android:textColor="@color/color_text_view" />
+
+
+</RelativeLayout>

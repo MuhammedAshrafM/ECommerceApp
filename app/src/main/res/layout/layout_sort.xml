@@ -1,120 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/background_style"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/logoApp_iv"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:background="@mipmap/ic_launcher_app_icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    </data>
 
-
-    <LinearLayout
-        android:id="@+id/linearLayout3"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logoApp_iv">
+        android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:background="@color/whiteColor">
 
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/sortBy_tv"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:background="@drawable/background_simple_button2"
+            android:elevation="2dp"
             android:gravity="center"
-            android:padding="15dp"
+            android:padding="10dp"
+            android:textColor="@color/blackColor"
+            android:textSize="20sp"
             android:text="@string/sortBy"
-            android:textColor="@color/blackColor" />
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <CheckedTextView
-            android:id="@+id/sort_best_matches"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checkMarkTint="@color/whiteColor"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="@string/bestMatches"
-            android:textColor="@color/blackColor" />
-
-        <CheckedTextView
-            android:id="@+id/sort_price_low"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checkMarkTint="@color/whiteColor"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="@string/lowToHighPrice"
-            android:textColor="@color/blackColor" />
-
-        <CheckedTextView
-            android:id="@+id/sort_price_high"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checkMarkTint="@color/whiteColor"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="@string/highToLowPrice"
-            android:textColor="@color/blackColor" />
-
-        <CheckedTextView
-            android:id="@+id/sort_offer_low"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checkMarkTint="@color/whiteColor"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="@string/lowToHighOffer"
-            android:textColor="@color/blackColor" />
-
-        <CheckedTextView
-            android:id="@+id/sort_offer_high"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checkMarkTint="@color/whiteColor"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="@string/highToLowOffer"
-            android:textColor="@color/blackColor" />
+            android:layout_height="250dp"
+            android:layout_marginTop="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sortBy_tv">
 
 
-        <CheckedTextView
-            android:id="@+id/sort_top_rated"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checkMarkTint="@color/whiteColor"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="@string/topRated"
-            android:textColor="@color/blackColor" />
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp">
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/sort_best_matches"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="2dp"
+                    android:checked="true"
+                    android:button="@android:color/transparent"
+                    android:background="@drawable/background_radio_button"
+                    android:gravity="start|center"
+                    android:layoutDirection="rtl"
+                    android:padding="15dp"
+                    android:layout_margin="5dp"
+                    android:text="@string/bestMatches"
+                    android:textColor="@color/color_text_view" />
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/sort_price_low"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="2dp"
+                    android:button="@android:color/transparent"
+                    android:background="@drawable/background_radio_button"
+                    android:gravity="start|center"
+                    android:layoutDirection="rtl"
+                    android:padding="15dp"
+                    android:layout_margin="5dp"
+                    android:text="@string/lowToHighPrice"
+                    android:textColor="@color/color_text_view"/>
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/sort_price_high"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="2dp"
+                    android:button="@android:color/transparent"
+                    android:background="@drawable/background_radio_button"
+                    android:gravity="start|center"
+                    android:layoutDirection="rtl"
+                    android:padding="15dp"
+                    android:layout_margin="5dp"
+                    android:text="@string/highToLowPrice"
+                    android:textColor="@color/color_text_view" />
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/sort_offer_low"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="2dp"
+                    android:button="@android:color/transparent"
+                    android:background="@drawable/background_radio_button"
+                    android:gravity="start|center"
+                    android:layoutDirection="rtl"
+                    android:padding="15dp"
+                    android:layout_margin="5dp"
+                    android:text="@string/lowToHighOffer"
+                    android:textColor="@color/color_text_view" />
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/sort_offer_high"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="2dp"
+                    android:button="@android:color/transparent"
+                    android:background="@drawable/background_radio_button"
+                    android:gravity="start|center"
+                    android:layoutDirection="rtl"
+                    android:padding="15dp"
+                    android:layout_margin="5dp"
+                    android:text="@string/highToLowOffer"
+                    android:textColor="@color/color_text_view" />
+
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/sort_top_rated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="2dp"
+                    android:button="@android:color/transparent"
+                    android:background="@drawable/background_radio_button"
+                    android:gravity="start|center"
+                    android:layoutDirection="rtl"
+                    android:padding="15dp"
+                    android:layout_margin="5dp"
+                    android:text="@string/topRated"
+                    android:textColor="@color/color_text_view" />
 
 
-        <CheckedTextView
-            android:id="@+id/sort_new"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:checkMarkTint="@color/whiteColor"
-            android:gravity="center"
-            android:padding="15dp"
-            android:text="@string/newArrivals"
-            android:textColor="@color/blackColor" />
+                <androidx.appcompat.widget.AppCompatRadioButton
+                    android:id="@+id/sort_new"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="2dp"
+                    android:button="@android:color/transparent"
+                    android:background="@drawable/background_radio_button"
+                    android:gravity="start|center"
+                    android:layoutDirection="rtl"
+                    android:padding="15dp"
+                    android:layout_margin="5dp"
+                    android:text="@string/newArrivals"
+                    android:textColor="@color/color_text_view" />
+            </RadioGroup>
 
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userPicture_iv"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/ic_launcher_app_icon_round" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
+</layout>

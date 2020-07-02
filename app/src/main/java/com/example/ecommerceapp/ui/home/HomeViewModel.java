@@ -387,7 +387,7 @@ public class HomeViewModel extends ViewModel {
     }
 
 
-    public void getSpecialProducts(String subCategoryId, String productId) {
+    public void getSpecialProducts(String subCategoryId, String productId, String userId) {
 
         suggestedProductModels = new ArrayList<>();
         boughtProductModels = new ArrayList<>();
@@ -398,7 +398,7 @@ public class HomeViewModel extends ViewModel {
 
 
         Single<ArrayList<ProductModel>> observablePB = EcoClient.getINSTANCE()
-                .getLimitBoughtProducts(subCategoryId, productId);
+                .getLimitBoughtProducts(subCategoryId, productId, userId);
 
 
         compositeDisposable.add(Single.zip(observablePS, observablePB, new BiFunction<ArrayList<ProductModel>

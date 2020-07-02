@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.AccountInterface;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.MyApplication;
-import com.example.ecommerceapp.data.PicassoClient;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.data.Utils;
 import com.example.ecommerceapp.databinding.FragmentProfileBinding;
@@ -102,7 +102,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         binding.nameEt.setText(name);
         binding.usernameEt.setText(userName);
         binding.emailEt.setText(email);
-        PicassoClient.loadProfileImage(getContext(), imagePath, binding.userPictureIv);
+        GlideClient.loadProfileImage(getContext(), imagePath, binding.userPictureIv);
 
         if(validated == 1){
             binding.unvalidatedTv.setVisibility(View.GONE);
@@ -153,18 +153,23 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
 
     private void responseData(String response){
         String message = "";
-        if(response.equals("Success")){
-            message = getString(R.string.validateAccountSuccess);
-            Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).validateAccountUser(userUpdated);
-            updateUI();
-        }
-        else if(response.equals("Failed")){
-            message = getString(R.string.validateAccountField);
-        }
-        else if(response.equals("RepeatedEmail")){
-            message = getString(R.string.validateAccountRepeated);
-        }
+        switch (response){
+            case "Success":
+                message = getString(R.string.validateAccountSuccess);
+                Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).validateAccountUser(userUpdated);
+                updateUI();
+                break;
+            case "Failed":
+                message = getString(R.string.validateAccountField);
+                break;
+            case "RepeatedEmail":
+                message = getString(R.string.validateAccountRepeated);
+                break;
 
+            default:
+
+                break;
+        }
         displaySnackBar(true, message, -2);
     }
 
@@ -180,7 +185,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         binding.nameEt.setText(name);
         binding.usernameEt.setText(userName);
         binding.emailEt.setText(email);
-        PicassoClient.loadProfileImage(getContext(), imagePath, binding.userPictureIv);
+        GlideClient.loadProfileImage(getContext(), imagePath, binding.userPictureIv);
 
         binding.unvalidatedTv.setVisibility(View.GONE);
         binding.validatedLila.setVisibility(View.GONE);
@@ -217,13 +222,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-        switch (item.getItemId()){
-            case R.id.edit:
-                editProfile();
-                break;
-            default:
-
-                break;
+        if(item.getItemId() == R.id.edit){
+            editProfile();
         }
 
         return super.onOptionsItemSelected(item);

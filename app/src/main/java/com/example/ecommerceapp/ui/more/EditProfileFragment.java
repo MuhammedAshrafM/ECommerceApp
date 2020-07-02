@@ -18,8 +18,8 @@ import android.widget.Button;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.MyApplication;
-import com.example.ecommerceapp.data.PicassoClient;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.data.Utils;
 import com.example.ecommerceapp.databinding.FragmentEditProfileBinding;
@@ -104,7 +104,7 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
         binding.editUsernameEt.setText(userName);
         binding.editEmailEt.setText(email);
         binding.editPasswordEt.setText(passwordOld);
-        PicassoClient.loadProfileImage(getContext(), imagePath, binding.editUserPictureIv);
+        GlideClient.loadProfileImage(getContext(), imagePath, binding.editUserPictureIv);
 
         binding.editEmailEt.setFocusable(false);
         binding.editPasswordEt.setFocusable(false);
@@ -173,9 +173,9 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
 
     private void setViewEditPasswordDialog(){
         View view = getLayoutInflater().inflate(R.layout.layout_edit_password, null);
-        oldPasswordEt = (TextInputEditText) view.findViewById(R.id.old_password_et);
-        newPasswordEt = (TextInputEditText) view.findViewById(R.id.new_password_et);
-        editPasswordBt = (Button) view.findViewById(R.id.edit_password_bt);
+        oldPasswordEt = view.findViewById(R.id.old_password_et);
+        newPasswordEt = view.findViewById(R.id.new_password_et);
+        editPasswordBt = view.findViewById(R.id.edit_password_bt);
         editPasswordBt.setOnClickListener(this);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

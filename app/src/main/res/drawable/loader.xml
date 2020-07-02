@@ -1,0 +1,90 @@
+<animated-rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromDegrees="0"
+    android:toDegrees="360"
+    android:pivotX="50%"
+    android:pivotY="50%">
+    <layer-list>
+
+    <item
+        android:id="@android:id/progress"
+        android:width="100dp"
+        android:height="100dp"
+        android:bottom="15dp"
+        android:gravity="center"
+        android:left="15dp"
+        android:right="15dp"
+        android:top="15dp">
+
+        <rotate
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <layer-list>
+
+                <item
+                    android:width="40dp"
+                    android:height="40dp"
+                    android:gravity="center">
+
+                    <shape
+                        android:gravity="center"
+                        android:shape="oval">
+                        <size
+                            android:width="80dp"
+                            android:height="80dp" />
+                        <stroke
+                            android:dashGap="10dp"
+                            android:dashWidth="10dp"
+                            android:width="2dp"
+                            android:color="@color/colorAccent2" />
+
+                        <solid
+                            android:color="@color/whiteColor" />
+                    </shape>
+                </item>
+            </layer-list>
+        </rotate>
+    </item>
+
+
+    <item
+        android:id="@android:id/progress"
+        android:width="100dp"
+        android:height="100dp"
+        android:bottom="15dp"
+        android:gravity="center"
+        android:left="15dp"
+        android:right="15dp"
+        android:top="15dp">
+
+        <rotate
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <layer-list>
+                <item
+                    android:width="20dp"
+                    android:height="20dp"
+                    android:gravity="center">
+
+                    <shape
+                        android:gravity="center"
+                        android:shape="oval">
+                        <size
+                            android:width="80dp"
+                            android:height="80dp" />
+                        <stroke
+                            android:dashGap="10dp"
+                            android:dashWidth="10dp"
+                            android:width="2dp"
+                            android:color="@color/colorAccent3" />
+
+                        <solid
+                            android:color="@color/whiteColor" />
+                    </shape>
+                </item>
+
+
+            </layer-list>
+        </rotate>
+    </item>
+    </layer-list>
+</animated-rotate>

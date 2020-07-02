@@ -13,13 +13,14 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.ecommerceapp.R;
+import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.ItemClickListener;
-import com.example.ecommerceapp.data.PicassoClient;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.pojo.ProductModel;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -55,12 +56,12 @@ public class ProductWishedAdapter extends RecyclerView.Adapter<ProductWishedAdap
         float offer = products.get(position).getOffer();
         int quantity = products.get(position).getQuantity();
 
-        PicassoClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
-        holder.productOfferTV.setText(String.format("%.0f%s",offer, context.getString(R.string.off_percent)));
+        GlideClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
+        holder.productOfferTV.setText(String.format(Locale.getDefault(),"%.0f%s",offer, context.getString(R.string.off_percent)));
         holder.productTitleTV.setText(products.get(position).getTitle());
-        holder.productRateNumTV.setText(String.format("(%d)",products.get(position).getReviewsCount()));
+        holder.productRateNumTV.setText(String.format(Locale.getDefault(),"(%d)",products.get(position).getReviewsCount()));
         holder.productPriceTV.setText(decimalFormat.format(price) + " " + context.getString(R.string.egp));
-        holder.productCountTV.setText(String.format("%d%s",quantity," in stock"));
+        holder.productCountTV.setText(String.format(Locale.getDefault(),"%d %s",quantity,context.getString(R.string.stock)));
         holder.productPriceWithoutOfferTV.setText(decimalFormat.format(products.get(position).getPrice()) + " "
                 + context.getString(R.string.egp));
         holder.productRateBar.setRating(products.get(position).getReviewsRateAverage());
@@ -170,7 +171,7 @@ public class ProductWishedAdapter extends RecyclerView.Adapter<ProductWishedAdap
 
         private ItemClickListener itemClickListener;
 
-        public ProductViewHolder(@NonNull View itemView) {
+        private ProductViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.product_image);
             productOfferTV = itemView.findViewById(R.id.product_offer);
@@ -187,7 +188,7 @@ public class ProductWishedAdapter extends RecyclerView.Adapter<ProductWishedAdap
             itemView.setOnClickListener(this);
         }
 
-        public void setItemClickListener(ItemClickListener itemClickListener){
+        private void setItemClickListener(ItemClickListener itemClickListener){
             this.itemClickListener=itemClickListener;
         }
 
