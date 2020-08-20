@@ -19,6 +19,8 @@ public class UserModel {
     private String password;
     @SerializedName("imagePath")
     private String imagePath;
+    @SerializedName("token")
+    private String token;
     @SerializedName("validated")
     private int validated;
 
@@ -29,16 +31,18 @@ public class UserModel {
         this.email = "";
         this.password = "";
         this.imagePath = "";
+        this.token = "";
         this.validated = 0;
     }
 
-    public UserModel(String id, String name, String userName, String email, String password, String imagePath, int validated) {
+    public UserModel(String id, String name, String userName, String email, String password, String imagePath, String token, int validated) {
         this.id = id;
         this.name = name;
         this.userName = userName;
         this.email = email;
         this.password = password;
         this.imagePath = imagePath;
+        this.token = token;
         this.validated = validated;
     }
 
@@ -90,6 +94,14 @@ public class UserModel {
         this.imagePath = imagePath;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public int getValidated() {
         return validated;
     }
@@ -108,6 +120,7 @@ public class UserModel {
         map.put("email",email);
         map.put("password",password);
         map.put("imagePath",imagePath);
+        map.put("token",token);
         map.put("validated",validated);
 
         return map;

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +36,8 @@ implements View.OnClickListener {
     private Context context;
     private ItemClickListener listener;
     private DecimalFormat decimalFormat = new DecimalFormat();
+    private ArrayList<Integer> countProducts;
+    private ArrayList<String> sellersId;
 
     private static final String PREFERENCES_PRODUCTS_WISHED = "PRODUCTS_WISHED";
 
@@ -52,6 +56,8 @@ implements View.OnClickListener {
 
     @Override
     public void onBindViewHolder(@NonNull ProductCartedViewHolder holder, int position) {
+        holder.containerCV.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale));
+
         double price = products.get(position).getPrice() * ((100 - products.get(position).getOffer())/100);
         float offer = products.get(position).getOffer();
         int quantity = products.get(position).getQuantity();
@@ -84,12 +90,15 @@ implements View.OnClickListener {
             holder.saveInWishListBt.setChecked(false);
         }
 
+        countProducts.add(position, count);
+        sellersId.add(position, products.get(position).getSellerId());
+
         holder.saveInCartBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                countProducts.remove(products.get(position));
                 listener.onCartView(0, false);
                 listener.onCartClick(view, products.get(position), false, 0);
-
             }
         });
         holder.saveInWishListBt.setOnClickListener(new View.OnClickListener() {
@@ -110,9 +119,15 @@ implements View.OnClickListener {
             public void onClick(View view) {
                 int count = Integer.parseInt(String.valueOf(holder.quantityTV.getText()));
                 if(count < 99){
-                    count ++;
-                    holder.quantityTV.setText(String.valueOf(count));
-                    listener.onCartView(price, true);
+                    if(count < quantity) {
+                        count++;
+                        holder.quantityTV.setText(String.valueOf(count));
+                        listener.onCartView(price, true);
+                        countProducts.remove(position);
+                        countProducts.add(position, count);
+                    }else {
+                        listener.onCartView(-1, false);
+                    }
                 }
             }
         });
@@ -124,6 +139,8 @@ implements View.OnClickListener {
                     count --;
                     holder.quantityTV.setText(String.valueOf(count));
                     listener.onCartView(price, false);
+                    countProducts.remove(position);
+                    countProducts.add(position, count);
                 }
             }
         });
@@ -161,6 +178,8 @@ implements View.OnClickListener {
 
     public void setList(ArrayList<ProductModel> productModels) {
         this.products = productModels;
+        countProducts = new ArrayList<>();
+        sellersId = new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -169,17 +188,28 @@ implements View.OnClickListener {
 
     }
 
+    public ArrayList<Integer> getCountProductsCarted(){
+        return countProducts;
+    }
+
+    public ArrayList<String> getSellersId(){
+        return sellersId;
+    }
+
+
     public class ProductCartedViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        private CardView containerCV;
         private ImageView imageView;
         private TextView productOfferTV, productTitleTV, productPriceTV, productPriceWithoutOfferTV, quantityTV;
-        ToggleButton saveInCartBt, saveInWishListBt;
-        ImageButton increaseIBt, decreaseIBt;
+        private ToggleButton saveInCartBt, saveInWishListBt;
+        private ImageButton increaseIBt, decreaseIBt;
 
         private ItemClickListener itemClickListener;
 
         private ProductCartedViewHolder(@NonNull View itemView) {
             super(itemView);
+            containerCV = itemView.findViewById(R.id.container_item_product_carted);
             imageView = itemView.findViewById(R.id.product_image);
             productOfferTV = itemView.findViewById(R.id.product_offer);
             productTitleTV = itemView.findViewById(R.id.product_title);

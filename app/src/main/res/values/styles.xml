@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -20,6 +20,19 @@
         <item name="android:indeterminateDrawable">@drawable/custom_progress</item>
         <item name="android:minHeight">100dp</item>
         <item name="android:minWidth">100dp</item>
+    </style>
+
+    <style name="CustomProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressBackgroundTint" tools:targetApi="lollipop">@color/backgroundColor</item>
+        <item name="android:progressTint" tools:targetApi="lollipop">@color/greenColor3</item>
+        <item name="android:minWidth">200dp</item>
+        <item name="android:progressDrawable">@drawable/custom_progressbar_horizontal</item>
+    </style>
+    <style name="CustomProgressBar2" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressBackgroundTint" tools:targetApi="lollipop">@color/backgroundColor</item>
+        <item name="android:progressTint" tools:targetApi="lollipop">@color/redColor</item>
+        <item name="android:minWidth">200dp</item>
+        <item name="android:progressDrawable">@drawable/custom_progressbar_horizontal</item>
     </style>
 
     <style name="RatingBar" parent="Theme.AppCompat">

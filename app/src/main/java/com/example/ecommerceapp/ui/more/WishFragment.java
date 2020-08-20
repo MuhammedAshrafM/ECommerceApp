@@ -1,10 +1,13 @@
 package com.example.ecommerceapp.ui.more;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,13 +34,15 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class WishFragment extends Fragment implements View.OnClickListener, ItemClickListener,
-        SearchView.OnQueryTextListener, ConnectivityReceiver.ConnectivityReceiveListener {
+        SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener, ConnectivityReceiver.ConnectivityReceiveListener {
 
     private NavController navController;
     private MoreViewModel moreViewModel;
@@ -47,9 +52,10 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
     private View root;
     private Menu menu;
     private SearchView searchView;
-    private String[] productIds;
     private ProductWishedAdapter adapter;
     private Utils utils;
+    private Context context;
+    private Activity activity;
 
     private static final String PREFERENCES_PRODUCTS_WISHED = "PRODUCTS_WISHED";
     private static final String PREFERENCES_PRODUCTS_CARTED = "PRODUCTS_CARTED";
@@ -62,7 +68,10 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        activity = getActivity();
+        context = getContext();
+
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
     }
 
@@ -92,31 +101,63 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
         binding.toolbar.setNavigationOnClickListener(this);
 
         moreViewModel =
-                ViewModelProviders.of(this).get(MoreViewModel.class);
+                new ViewModelProvider(this).get(MoreViewModel.class);
 
-        binding.recyclerViewProductsWished.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ProductWishedAdapter(getContext(), this);
-        binding.recyclerViewProductsWished.setAdapter(adapter);
-
-        productsWishedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_WISHED).getProductsWished();
-
-        if (ConnectivityReceiver.isConnected()) {
-            if(productsWishedId.size() > 0) {
-                displayProgressDialog(true);
-                productIds = new String[productsWishedId.size()];
-                moreViewModel.getProductsWished(productsWishedId);
-            }
-        }else {
-            displaySnackBar(true, null, 0);
-        }
+        selectActivity();
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
+
         menu = null;
 
+        binding.recyclerViewProductsWished.setLayoutManager(new LinearLayoutManager(context));
+        adapter = new ProductWishedAdapter(context, this);
+        binding.recyclerViewProductsWished.setAdapter(adapter);
+
+        binding.swipeRefresh.setColorSchemeColors(Color.rgb(3,169,244),
+                Color.rgb(3,169,244),
+                Color.rgb(13,179,163));
+        binding.swipeRefresh.setOnRefreshListener(this);
+
+        productsWishedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_WISHED).getProductsWished();
+
+        if (ConnectivityReceiver.isConnected()) {
+            if(productsWishedId.size() > 0) {
+                displayProgressDialog(true);
+                moreViewModel.getProductsWished(productsWishedId);
+            }
+        }else {
+            displaySnackBar(true, null, 0);
+        }
+
+       observeLiveData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // register intent filter
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
+        context.registerReceiver(connectivityReceiver, intentFilter);
+
+        MyApplication.getInstance().setConnectivityReceiveListener(this);
+
+    }
+
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
+        }
+    }
+
+    private void observeLiveData(){
         moreViewModel.getProductsWished().observe(getViewLifecycleOwner(), new Observer<ArrayList<ProductModel>>() {
             @Override
             public void onChanged(ArrayList<ProductModel> productModels) {
@@ -124,7 +165,6 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
                 if (productModels != null && productModels.size() > 0) {
                     productsWished = productModels;
                     adapter.setList(productsWished);
-                    displaySnackBar(false, null, 0);
 
                 }
             }
@@ -138,42 +178,22 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
             }
         });
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // register intent filter
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
-        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
-
-        MyApplication.getInstance().setConnectivityReceiveListener(this);
-
-    }
-
     private void displayProgressDialog(boolean show){
-        if(show){
-            binding.progressBar.setVisibility(View.VISIBLE);
-        }else {
-            binding.progressBar.setVisibility(View.GONE);
-        }
+        binding.setVisibleProgress(show);
     }
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null) {
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(root.findViewById(R.id.containerProductsWished), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(root.findViewById(R.id.containerProductsWished), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
 
     @Override
     public void onClick(View view) {
-        getActivity().onBackPressed();
+        activity.onBackPressed();
     }
 
     @Override
@@ -184,16 +204,16 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
     @Override
     public void onCartClick(View view, ProductModel productModel, boolean carted, int newSize) {
         if(carted){
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).setProductCarted(productModel);
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).setProductCarted(productModel);
 
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
 
 
             displaySnackBar(true, getString(R.string.carted), -1);
 
         }else {
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).removeProductCarted(productModel);
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).removeProductCarted(productModel);
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
 
             displaySnackBar(true, getString(R.string.unCarted), -1);
 
@@ -209,7 +229,7 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
     @Override
     public void onWishClick(View view, ProductModel productModel, boolean wished) {
         if(!wished){
-            productsWishedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_WISHED).removeProductWished(productModel);
+            productsWishedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_WISHED).removeProductWished(productModel);
             productsWished.remove(productModel);
             adapter.setList(productsWished);
         }
@@ -233,16 +253,16 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
             searchMenuItem = this.menu.findItem(R.id.search);
 
             SearchManager searchManager = (SearchManager)
-                    getActivity().getSystemService(Context.SEARCH_SERVICE);
+                    activity.getSystemService(Context.SEARCH_SERVICE);
             searchView = (SearchView) searchMenuItem.getActionView();
 
             searchView.setSearchableInfo(searchManager.
-                    getSearchableInfo(getActivity().getComponentName()));
+                    getSearchableInfo(activity.getComponentName()));
             searchView.setSubmitButtonEnabled(true);
             searchView.setOnQueryTextListener(this);
 
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(), productsCartedId.size(),R.drawable.ic_cart));
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context, productsCartedId.size(),R.drawable.ic_cart));
         }
     }
 
@@ -268,6 +288,25 @@ public class WishFragment extends Fragment implements View.OnClickListener, Item
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         if(!isConnected) {
+            displaySnackBar(true, null, 0);
+        }
+    }
+
+    @Override
+    public void onRefresh() {
+        if (ConnectivityReceiver.isConnected()) {
+            binding.swipeRefresh.setRefreshing(true);
+            menu = null;
+            (new Handler()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.swipeRefresh.setRefreshing(false);
+                    displayProgressDialog(true);
+                    moreViewModel.getProductsWished(productsWishedId);
+                }}, 3000);
+
+        }else {
+            binding.swipeRefresh.setRefreshing(false);
             displaySnackBar(true, null, 0);
         }
     }

@@ -102,23 +102,22 @@ public class MoreViewModel extends ViewModel {
 //        compositeDisposable.add(observable.subscribe(d-> mutableLiveDataLogIn.setValue(d.get("resultArray"))));
     }
 
-
     public void editAccount(UserModel userModel){
 
-        Single<Map<String,ArrayList<UserModel>>> observable = EcoClient.getINSTANCE()
+        Single<ArrayList<UserModel>> observable = EcoClient.getINSTANCE()
                 .editAccount(userModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
 
-        SingleObserver<Map<String, ArrayList<UserModel>>> observer = new SingleObserver<Map<String, ArrayList<UserModel>>>() {
+        SingleObserver<ArrayList<UserModel>> observer = new SingleObserver<ArrayList<UserModel>>() {
             @Override
             public void onSubscribe(@NonNull Disposable d) {
 
             }
 
             @Override
-            public void onSuccess(@NonNull Map<String, ArrayList<UserModel>> stringArrayListMap) {
-                mutableLiveDataEditAccount.setValue(stringArrayListMap.get("resultArray"));
+            public void onSuccess(@NonNull ArrayList<UserModel> userModels) {
+                mutableLiveDataEditAccount.setValue(userModels);
             }
 
             @Override
@@ -127,6 +126,5 @@ public class MoreViewModel extends ViewModel {
             }
         };
         observable.subscribe(observer);
-//        compositeDisposable.add(observable.subscribe(d-> mutableLiveDataLogIn.setValue(d.get("resultArray"))));
     }
 }

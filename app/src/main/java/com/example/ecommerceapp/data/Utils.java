@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,17 +18,25 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+import java.util.Map;
+
+import static com.facebook.internal.FacebookDialogFragment.TAG;
 
 public class Utils {
 
     private Context context;
     private Snackbar snackbar;
+    private SnackBarActionListener listener = null;
 
     public Utils(Context context) {
         this.context = context;
     }
+    public Utils(Context context, SnackBarActionListener listener) {
+        this.context = context;
+        this.listener = listener;
+    }
 
-    public void snackBar(View view, String msg, int duration) {
+    public void snackBar(View view, String msg, int actionResource, int duration) {
         snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_INDEFINITE).setAction("Action", null);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 //            snackbar.getView()
@@ -51,11 +60,14 @@ public class Utils {
                 break;
         }
 
-        snackbar.setAction(android.R.string.ok, new View.OnClickListener() {
+        snackbar.setAction(actionResource, new View.OnClickListener() {
             @Override
             @TargetApi(Build.VERSION_CODES.M)
             public void onClick(View v) {
                 snackbar.dismiss();
+                if(listener != null) {
+                    listener.onActionListener(v, actionResource);
+                }
             }
         });
     }
@@ -80,7 +92,7 @@ public class Utils {
             counterTextPanel.setVisibility(View.GONE);
         } else {
             TextView textView = (TextView) view.findViewById(R.id.count);
-            textView.setText("" + count);
+            textView.setText(String.valueOf(count));
         }
 
         view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
@@ -110,14 +122,66 @@ public class Utils {
         for(ProductModel model: productModels){
             final String title = model.getTitle().toLowerCase();
             if(title.contains(query)){
-                try {
-                    filterModelsList.add(model);
-
-                }catch (Exception e){
-                }
+                filterModelsList.add(model);
             }
         }
 
         return filterModelsList;
     }
+    public static ArrayList<ProductModel> filterProducts(ArrayList<ProductModel> productModels,
+                                                         ArrayList<String> categories,
+                                                         Double minPrice, Double maxPrice,
+                                                         ArrayList<String> brands){
+
+        ArrayList<ProductModel> filterModelsList = productModels;
+
+        if(categories.size() > 0) {
+            filterModelsList = filterBySubCategories(filterModelsList, categories);
+        }
+        filterModelsList = filterByPriceRange(filterModelsList, minPrice, maxPrice);
+        if(brands.size() > 0) {
+            filterModelsList = filterByBrands(filterModelsList, brands);
+        }
+
+        return filterModelsList;
+    }
+
+    public static ArrayList<ProductModel> filterBySubCategories(ArrayList<ProductModel> productModels,
+                                                                ArrayList<String> categories){
+        ArrayList<ProductModel> filterModelsList = new ArrayList<>();
+        for(ProductModel model: productModels){
+            for(String id: categories){
+                final String idSC = model.getSubCategoryId();
+                if(id.equals(idSC)){
+                    filterModelsList.add(model);
+                }
+            }
+        }
+        return filterModelsList;
+    }
+    public static ArrayList<ProductModel> filterByPriceRange(ArrayList<ProductModel> productModels,
+                                                             Double minPrice, Double maxPrice){
+        ArrayList<ProductModel> filterModelsList = new ArrayList<>();
+        for(ProductModel model: productModels){
+            double price = model.getPrice() * ((100 - model.getOffer())/100);
+            if(price >= minPrice && price <= maxPrice){
+                filterModelsList.add(model);
+            }
+        }
+        return filterModelsList;
+    }
+    public static ArrayList<ProductModel> filterByBrands(ArrayList<ProductModel> productModels,
+                                                         ArrayList<String> brands){
+        ArrayList<ProductModel> filterModelsList = new ArrayList<>();
+        for(ProductModel model: productModels){
+            for(String id: brands){
+                final String idB = model.getBrandId();
+                if(id.equals(idB)){
+                    filterModelsList.add(model);
+                }
+            }
+        }
+        return filterModelsList;
+    }
+
 }

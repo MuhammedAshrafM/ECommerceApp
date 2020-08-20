@@ -10,7 +10,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="210dp"
+        android:layout_height="260dp"
         android:background="@color/whiteColor"
         android:baselineAligned="false"
         android:orientation="horizontal">
@@ -166,12 +166,43 @@
                 android:textSize="12sp"
                 android:textStyle="normal" />
 
+            <TextView
+                android:id="@+id/product_shippingFee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/product_price_without_offer"
+                android:gravity="start|center"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:lines="1"
+                android:maxLines="1"
+                android:text="@string/freeShipping"
+                android:textColor="@color/blackColor"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/product_seller"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/product_shippingFee"
+                android:gravity="start|center"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginLeft="5dp"
+                android:lines="1"
+                android:maxLines="1"
+                android:background="@color/colorPrimaryDark"
+                android:text="@string/fulfilled"
+                android:textColor="@color/whiteColor"
+                android:textSize="15sp"
+                android:textStyle="bold" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="5dp"
-                android:layout_below="@id/product_price_without_offer">
+                android:layout_below="@id/product_seller">
 
 
                 <Button
@@ -186,7 +217,7 @@
                     android:minLines="1"
                     android:maxLines="2"
                     android:text="@string/addCart"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:textColor="@color/whiteColor"
                     android:textAllCaps="true"
                     android:background="@color/greenColor"/>

@@ -46,11 +46,33 @@
         android:id="@+id/loginFragment"
         android:name="com.example.ecommerceapp.ui.main.LoginFragment"
         android:label="LoginFragment"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_resetPasswordFragment"
+            app:destination="@id/resetPasswordFragment"
+            app:popEnterAnim="@anim/slide_in_top"
+            app:popExitAnim="@anim/slide_out_bottom"
+            app:enterAnim="@anim/slide_in_bottom"
+            app:exitAnim="@anim/slide_out_top" />
+    </fragment>
     <fragment
         android:id="@+id/registerFragment"
         android:name="com.example.ecommerceapp.ui.main.RegisterFragment"
         android:label="RegisterFragment"
         tools:layout="@layout/fragment_register" />
+    <fragment
+        android:id="@+id/resetPasswordFragment"
+        android:name="com.example.ecommerceapp.ui.main.ResetPasswordFragment"
+        android:label="fragment_reset_password"
+        tools:layout="@layout/fragment_reset_password">
+
+        <argument
+            android:name="email"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="verificationCode"
+            app:argType="integer" />
+    </fragment>
 
 </navigation>

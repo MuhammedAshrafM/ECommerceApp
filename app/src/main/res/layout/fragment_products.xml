@@ -4,14 +4,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable name="padding" type="Boolean"/>
+        <variable name="parentFragment" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
     </data>
 
-    <RelativeLayout
+
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/containerProducts"
         android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
+        android:paddingBottom="@{padding ? @dimen/margin_navigate : @dimen/margin_cart}"
         android:background="@color/gray"
         tools:context=".ui.home.ProductsFragment">
 
@@ -20,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:visibility="@{parentFragment ? View.VISIBLE : View.GONE}"
             android:theme="@style/AppTheme.AppBarOverlay">
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -46,7 +54,7 @@
                 android:layout_centerInParent="true"
                 android:layout_alignParentStart="true"
                 android:textColor="@color/basicColor"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:padding="5dp"
                 android:background="@drawable/background_button2"
                 android:layout_alignParentLeft="true" />
@@ -62,7 +70,7 @@
                 android:background="@drawable/background_simple_button2"
                 android:text="@string/bestMatches"
                 android:textColor="@color/cardview_dark_background"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:padding="5dp"
                 android:layout_toLeftOf="@id/sortBy_bt" />
 
@@ -72,6 +80,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:elevation="2dp"
+                android:contentDescription="sort by image button"
                 android:layout_centerInParent="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
@@ -92,6 +101,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:visibility="gone" />
+            android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}" />
+
     </RelativeLayout>
+    </androidx.core.widget.NestedScrollView>
 </layout>

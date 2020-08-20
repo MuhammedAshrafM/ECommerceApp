@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable name="padding" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/containerCompleteOrder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@{padding ? @dimen/margin_navigate : @dimen/margin_cart}"
+        tools:context=".ui.cart.CompleteOrderFragment">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="2dp"
+            android:layout_below="@id/appBarLayout">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/linearLayout1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:orientation="vertical"
+                    android:layout_margin="10dp"
+                    android:padding="10dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="start"
+                            android:layout_gravity="center"
+                            android:text="@string/subTotal"
+                            android:textColor="@color/gray2"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/subTotalPrice"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="end"
+                            android:layout_gravity="center"
+                            android:textColor="@color/blackColor"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="start"
+                            android:layout_gravity="center"
+                            android:text="@string/shippingPlus"
+                            android:textColor="@color/gray2"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/shippingPrice"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="end"
+                            android:layout_gravity="center"
+                            android:textColor="@color/blackColor"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/linearLayout2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/linearLayout1"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:padding="10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="start"
+                        android:text="@string/grandTotal"
+                        android:textColor="@color/gray2"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/grandTotalPrice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/blackColor"
+                        android:textSize="20sp" />
+                </LinearLayout>
+
+
+                <Button
+                    android:id="@+id/completeOrder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/linearLayout2"
+                    android:layout_centerInParent="true"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/background_button"
+                    android:elevation="2dp"
+                    android:text="@string/title_Complete_Order"
+                    android:textColor="@color/whiteColor"
+                    android:textSize="15sp" />
+            </RelativeLayout>
+
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="@style/ProgressTheme2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}"
+                android:layout_gravity="center" />
+        </androidx.cardview.widget.CardView>
+
+
+    </RelativeLayout>
+</layout>

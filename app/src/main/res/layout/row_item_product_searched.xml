@@ -9,7 +9,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="380dp"
         android:background="@color/whiteColor"
         android:orientation="vertical">
 
@@ -110,10 +110,42 @@
             android:textSize="12sp"
             android:textStyle="normal" />
 
+
+        <TextView
+            android:id="@+id/product_shippingFee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/product_price_without_offer"
+            android:gravity="start|center"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:lines="1"
+            android:maxLines="1"
+            android:text="@string/freeShipping"
+            android:textColor="@color/blackColor"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/product_seller"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/product_shippingFee"
+            android:gravity="start|center"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:lines="1"
+            android:maxLines="1"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/fulfilled"
+            android:textColor="@color/whiteColor"
+            android:textSize="15sp"
+            android:textStyle="bold" />
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/product_price_without_offer"
+        android:layout_below="@id/product_seller"
         android:layout_marginTop="5dp">
 
         <ToggleButton

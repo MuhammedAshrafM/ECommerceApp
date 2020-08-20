@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable name="orderPrepared" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
+    </data>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/containerOrderDetails"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/margin_navigate"
+            tools:context=".ui.orders.OrderDetailsFragment">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appBarLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:theme="@style/AppTheme.AppBarOverlay">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:popupTheme="@style/AppTheme.PopupOverlay" />
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/order_status_cola"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/appBarLayout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/totalPrice_lila"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/order_prepared_pb"
+                    style="@style/Widget.AppCompat.ProgressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    app:layout_constraintEnd_toStartOf="@+id/order_status_tv"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:visibility="@{orderPrepared ? View.VISIBLE : View.INVISIBLE}"
+                    android:layout_margin="10dp" />
+
+                <ImageButton
+                    android:id="@+id/order_delivered_ibt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    app:layout_constraintEnd_toStartOf="@+id/order_status_tv"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:visibility="@{orderPrepared ? View.INVISIBLE : View.VISIBLE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_margin="10dp"
+                    android:background="@mipmap/ic_done" />
+
+
+                <TextView
+                    android:id="@+id/order_status_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/linearLayout"
+                    app:layout_constraintStart_toEndOf="@+id/order_delivered_ibt"
+                    android:gravity="start|center"
+                    android:padding="5dp"
+                    android:minLines="1"
+                    android:maxLines="3"
+                    android:textColor="@color/blackColor"
+                    android:textSize="18sp"
+                    android:textStyle="normal" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:padding="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/order_status_cola"
+                    app:layout_constraintBottom_toTopOf="@id/order_receipt_time_tv"
+                    app:layout_constraintStart_toEndOf="@+id/order_delivered_ibt">
+
+                <TextView
+                    android:id="@+id/order_time_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="start|center"
+                    android:layout_weight="1"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:textColor="@color/com_facebook_likeview_text_color"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+                    <View
+                        android:id="@+id/view"
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/gray2"
+                        android:layout_margin="5dp">
+                    </View>
+                <TextView
+                    android:id="@+id/order_code_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:textColor="@color/com_facebook_likeview_text_color"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/order_receipt_time_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="start|center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/linearLayout"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/order_delivered_ibt"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:padding="5dp"
+                    android:visibility="@{orderPrepared ? View.GONE : View.VISIBLE}"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:textColor="@color/com_facebook_likeview_text_color"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/totalPrice_lila"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:background="@drawable/background_button2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/paymentOption_lila"
+                app:layout_constraintTop_toBottomOf="@id/order_status_cola">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/totalPrice"
+                    android:textColor="@color/com_facebook_likeview_text_color"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+                <TextView
+                    android:id="@+id/totalPrice_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/basicColor"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/paymentOption_lila"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:background="@drawable/background_button2"
+                app:layout_constraintEnd_toStartOf="@id/shippingFee_lila"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/numItems"
+                app:layout_constraintTop_toBottomOf="@id/totalPrice_lila">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/paymentOption"
+                    android:textColor="@color/com_facebook_likeview_text_color"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+                <TextView
+                    android:id="@+id/paymentOption_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/basicColor"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/shippingFee_lila"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:padding="10dp"
+                android:background="@drawable/background_button2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/paymentOption_lila"
+                app:layout_constraintBottom_toTopOf="@+id/numItems"
+                app:layout_constraintTop_toBottomOf="@id/totalPrice_lila">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/shippingFee"
+                    android:textColor="@color/com_facebook_likeview_text_color"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+                <TextView
+                    android:id="@+id/shipping_fee_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/basicColor"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/numItems"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="2dp"
+                android:gravity="center"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/shippingFee_lila"
+                app:layout_constraintBottom_toTopOf="@id/recyclerViewProductsOrder"
+                android:textColor="@color/basicColor"
+                android:textSize="20sp"
+                android:padding="5dp"
+                android:background="@drawable/background_button2" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewProductsOrder"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/numItems"
+                app:layout_constraintBottom_toTopOf="@id/address_lila" />
+
+
+            <LinearLayout
+                android:id="@+id/address_lila"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:padding="10dp"
+                android:background="@drawable/background_button2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerViewProductsOrder">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:maxLines="2"
+                    android:minLines="1"
+                    android:text="@string/address"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@color/com_facebook_likeview_text_color"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+                <TextView
+                    android:id="@+id/address_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="3"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/basicColor"
+                    android:textSize="18sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start|center"
+                    android:minLines="1"
+                    android:maxLines="2"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/mobileNumber"
+                    android:textColor="@color/com_facebook_likeview_text_color"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp">
+                    <com.hbb20.CountryCodePicker
+                        android:id="@+id/key_country_cp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/mobileNumber_tv"
+                        app:ccp_textSize="18sp"
+                        app:ccp_contentColor="@color/basicColor"
+                        app:ccp_clickable="false"
+                        app:ccp_defaultLanguage="ARABIC"
+                        app:ccp_defaultNameCode="EG"
+                        app:ccp_showNameCode="false"
+                        app:ccp_showFlag="false"
+                        app:ccp_showArrow="false"
+                        android:gravity="start"/>
+
+                    <TextView
+                        android:id="@+id/mobileNumber_tv"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/key_country_cp"
+                        android:minLines="1"
+                        android:maxLines="3"
+                        android:textColor="@color/basicColor"
+                        android:textSize="18sp"
+                        android:textStyle="normal" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="@style/ProgressTheme2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_below="@+id/numItems"
+                android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+</layout>

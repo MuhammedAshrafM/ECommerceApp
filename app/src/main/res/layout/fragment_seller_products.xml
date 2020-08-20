@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable name="visibleBrand" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
+    </data>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.home.SellerProductsFragment">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/containerSellerProducts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/gray">
+
+            <HorizontalScrollView
+                android:id="@+id/horizontal_scrollView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="10dp"
+                android:fillViewport="true"
+                android:measureAllChildren="false"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+
+                    <TextView
+                        android:id="@+id/sellerName_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:elevation="2dp"
+                        android:gravity="start|center"
+                        android:layout_gravity="start|center"
+                        android:textColor="@color/blackColor"
+                        android:textSize="20sp"
+                        android:padding="10dp"
+                        android:background="@drawable/background_button2" />
+
+                    <TextView
+                        android:id="@+id/category_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:elevation="2dp"
+                        android:background="@drawable/background_button2"
+                        android:drawableEnd="@drawable/ic_arrow"
+                        android:drawableRight="@drawable/ic_arrow"
+                        android:padding="10dp"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:textAllCaps="false"
+                        android:text="@string/category"
+                        android:textColor="@color/blackColor"
+                        android:textSize="15sp"/>
+
+                    <TextView
+                        android:id="@+id/priceRange_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:elevation="2dp"
+                        android:background="@drawable/background_button2"
+                        android:drawableEnd="@drawable/ic_arrow"
+                        android:drawableRight="@drawable/ic_arrow"
+                        android:padding="10dp"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:textAllCaps="false"
+                        android:text="@string/priceRange"
+                        android:textColor="@color/blackColor"
+                        android:textSize="15sp"/>
+
+
+                    <TextView
+                        android:id="@+id/brand_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:elevation="2dp"
+                        android:background="@drawable/background_button2"
+                        android:drawableEnd="@drawable/ic_arrow"
+                        android:drawableRight="@drawable/ic_arrow"
+                        android:padding="10dp"
+                        android:gravity="center"
+                        android:visibility="@{visibleBrand ? View.VISIBLE : View.GONE}"
+                        android:layout_gravity="center"
+                        android:textAllCaps="false"
+                        android:text="@string/brand"
+                        android:textColor="@color/blackColor"
+                        android:textSize="15sp"/>
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:layout_below="@+id/horizontal_scrollView">
+
+                <TextView
+                    android:id="@+id/numItems"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentStart="true"
+                    android:textColor="@color/basicColor"
+                    android:textSize="20sp"
+                    android:padding="5dp"
+                    android:background="@drawable/background_button2"
+                    android:layout_alignParentLeft="true" />
+
+                <TextView
+                    android:id="@+id/sortBy_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elevation="2dp"
+                    android:gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layout_toStartOf="@id/sortBy_bt"
+                    android:background="@drawable/background_simple_button2"
+                    android:text="@string/bestMatches"
+                    android:textColor="@color/blackColor"
+                    android:textSize="20sp"
+                    android:padding="5dp"
+                    android:layout_toLeftOf="@id/sortBy_bt" />
+
+
+                <ImageButton
+                    android:id="@+id/sortBy_bt"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:elevation="2dp"
+                    android:contentDescription="sort products image"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:background="@mipmap/ic_sort" />
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewSellerProducts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/relativeLayout"
+                android:layout_margin="5dp"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@style/ProgressTheme2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/relativeLayout"
+                android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}" />
+
+        </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</layout>

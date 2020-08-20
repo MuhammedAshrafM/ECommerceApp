@@ -1,5 +1,6 @@
 package com.example.ecommerceapp.ui.more;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -22,6 +23,7 @@ import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
 import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.MyApplication;
+import com.example.ecommerceapp.data.MyNotification;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.data.Utils;
 import com.example.ecommerceapp.databinding.FragmentMoreBinding;
@@ -34,8 +36,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -55,22 +59,28 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
     private SearchView searchView;
     private Menu menu;
     private MenuItem searchMenuItem, cartMenuItem;
+    private Context context;
+    private Activity activity;
 
     private static final String PREFERENCES_PRODUCTS_WISHED = "PRODUCTS_WISHED";
     private static final String PREFERENCES_PRODUCTS_CARTED = "PRODUCTS_CARTED";
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
+    private static final String PREFERENCES_ADDRESSES_SAVED = "ADDRESSES_SAVED";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        activity = getActivity();
+        context = getContext();
+
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         moreViewModel =
-                ViewModelProviders.of(this).get(MoreViewModel.class);
+                new ViewModelProvider(this).get(MoreViewModel.class);
 
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_more,container,false);
         root = binding.getRoot();
@@ -89,14 +99,18 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
         super.onActivityCreated(savedInstanceState);
 
         binding.toolbar.setTitle(getString(R.string.title_menu));
-        binding.toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_navigation_back_up));
-        binding.toolbar.setNavigationOnClickListener(this);
+    }
 
-        productsWishedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_WISHED).getProductsWished();
-        user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        productsWishedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_WISHED).getProductsWished();
+        user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
 
         binding.userNameTv.setText(user.getName());
-        GlideClient.loadProfileImage(getContext(), user.getImagePath(), binding.userPictureIv);
+        GlideClient.loadProfileImage(context, user.getImagePath(), binding.userPictureIv);
 
         binding.userProfileLila.setOnClickListener(this);
         binding.wishListBt.setOnClickListener(this);
@@ -104,7 +118,6 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
 
         setAlertDialog();
     }
-
 
     @Override
     public void onResume() {
@@ -115,7 +128,7 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
         ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
+        context.registerReceiver(connectivityReceiver, intentFilter);
 
         MyApplication.getInstance().setConnectivityReceiveListener(this);
     }
@@ -128,27 +141,27 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
         logOutBt.setOnClickListener(this);
         cancelLogOutBt.setOnClickListener(this);
 
-        dialog = new Dialog(getContext(), R.style.MaterialDialogSheet);
+        dialog = new Dialog(context, R.style.MaterialDialogSheet);
         dialog.setContentView(view);
         dialog.setCancelable(true);
         dialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.setCanceledOnTouchOutside(false);
     }
     private void logOut(){
-        Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).removeDataUser();
-        Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).removeProductsCarted();
-        Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_WISHED).removeProductsWished();
-        startActivity(new Intent(getContext(), MainActivity.class));
-        getActivity().finish();
+        Preferences.getINSTANCE(context, PREFERENCES_ADDRESSES_SAVED).deleteSharedPreferencesData();
+        MyNotification.getINSTANCE(context).cancelAllNotification();
+        startActivity(new Intent(context, MainActivity.class));
+        activity.finish();
     }
 
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null){
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(getActivity().findViewById(R.id.containerMore), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(activity.findViewById(R.id.containerMore), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
@@ -177,7 +190,6 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
                 break;
 
             default:
-                getActivity().onBackPressed();
                 break;
         }
     }
@@ -197,17 +209,17 @@ public class MoreFragment extends Fragment implements View.OnClickListener, Sear
         this.menu = binding.toolbar.getMenu();
         cartMenuItem = this.menu.findItem(R.id.myCart);
         SearchManager searchManager = (SearchManager)
-                getActivity().getSystemService(Context.SEARCH_SERVICE);
+                activity.getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = this.menu.findItem(R.id.search);
         searchView = (SearchView) searchMenuItem.getActionView();
 
         searchView.setSearchableInfo(searchManager.
-                getSearchableInfo(getActivity().getComponentName()));
+                getSearchableInfo(activity.getComponentName()));
         searchView.setSubmitButtonEnabled(true);
         searchView.setOnQueryTextListener(this);
 
-        productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
-        cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+        productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
+        cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
 
     }
 

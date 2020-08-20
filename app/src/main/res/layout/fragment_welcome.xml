@@ -14,14 +14,13 @@
         tools:context=".ui.main.WelcomeFragment">
 
 
-        <ImageView
-            android:id="@+id/app_logo"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/app_logo_iv"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="100dp"
-            android:src="@mipmap/ic_cart" />
-
+            android:src="@mipmap/ic_cart"/>
         <TextView
             android:id="@+id/welcome_tv"
             android:layout_width="match_parent"

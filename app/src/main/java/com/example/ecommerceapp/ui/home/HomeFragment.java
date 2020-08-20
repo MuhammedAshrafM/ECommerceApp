@@ -1,11 +1,14 @@
 package com.example.ecommerceapp.ui.home;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +28,10 @@ import com.example.ecommerceapp.pojo.CategoryModel;
 import com.example.ecommerceapp.pojo.ProductModel;
 import com.example.ecommerceapp.pojo.SubCategoryModel;
 import com.example.ecommerceapp.pojo.UserModel;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -38,13 +45,17 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
-public class HomeFragment extends Fragment implements SearchView.OnQueryTextListener,
+import static com.facebook.internal.FacebookDialogFragment.TAG;
+
+public class HomeFragment extends Fragment implements SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener,
         ConnectivityReceiver.ConnectivityReceiveListener, ItemClickListener, ViewPager.OnPageChangeListener{
 
     private NavController navController;
@@ -68,6 +79,8 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
     private Runnable runnable;
     private int pageNumber;
     private int delay = 2000;
+    private Context context;
+    private Activity activity;
 
     private static final String PREFERENCES_PRODUCTS_CARTED = "PRODUCTS_CARTED";
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
@@ -75,7 +88,9 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        activity = getActivity();
+        context = getContext();
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
     }
 
@@ -99,17 +114,23 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
 
         binding.toolbar.setTitle(getString(R.string.title_home));
         homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
+                new ViewModelProvider(this).get(HomeViewModel.class);
 
+        selectActivity();
+    }
 
-        gridLayoutManager = new GridLayoutManager(getContext(),2);
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        gridLayoutManager = new GridLayoutManager(context,2);
         binding.recyclerViewCategories.setHasFixedSize(true);
         binding.recyclerViewCategories.setLayoutManager(gridLayoutManager);
 
-        adapter = new CategoryAdapter(getContext());
+        adapter = new CategoryAdapter(context);
         binding.recyclerViewCategories.setAdapter(adapter);
 
-        user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
+        user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
 
         if(categories == null) {
             if (ConnectivityReceiver.isConnected()) {
@@ -121,11 +142,6 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
             }
         }
         binding.viewPager.setOnPageChangeListener(this);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
 
         handler = new Handler();
         pageNumber = 0;
@@ -143,9 +159,46 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
         };
 
         subCategories = new ArrayList<>();
-        sCPAdapter = new SubCategoryPagerAdapter(getContext(), subCategories);
+        sCPAdapter = new SubCategoryPagerAdapter(context, subCategories);
         binding.viewPager.setAdapter(sCPAdapter);
 
+        binding.swipeRefresh.setColorSchemeColors(Color.rgb(3,169,244),
+                Color.rgb(3,169,244),
+                Color.rgb(13,179,163));
+        binding.swipeRefresh.setOnRefreshListener(this);
+
+       observeLiveData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // register intent filter
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
+        context.registerReceiver(connectivityReceiver, intentFilter);
+
+        MyApplication.getInstance().setConnectivityReceiveListener(this);
+
+        handler.postDelayed(runnable, delay);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        handler.removeCallbacks(runnable);
+    }
+
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
+        }
+    }
+
+    private void observeLiveData(){
         homeViewModel.getProducts().observe(getViewLifecycleOwner(), new Observer<ArrayList<ProductModel>>() {
             @Override
             public void onChanged(ArrayList<ProductModel> productModels) {
@@ -196,29 +249,6 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
             }
         });
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // register intent filter
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
-        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
-
-        MyApplication.getInstance().setConnectivityReceiveListener(this);
-
-        handler.postDelayed(runnable, delay);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        handler.removeCallbacks(runnable);
-    }
-
     private void displayProducts(ArrayList<ProductModel> productModels){
         if(manager == null){
             manager = getChildFragmentManager();
@@ -229,18 +259,14 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
     }
 
     private void displayProgressDialog(boolean show) {
-        if (show) {
-            binding.progressBar.setVisibility(View.VISIBLE);
-        } else {
-            binding.progressBar.setVisibility(View.GONE);
-        }
+        binding.setVisibleProgress(show);
 
     }
     private void displaySnackBar(boolean show){
         if(utils == null){
             String message = getString(R.string.checkConnection);
-            utils = new Utils(getContext());
-            utils.snackBar(root.findViewById(R.id.containerHome), message, 0);
+            utils = new Utils(context);
+            utils.snackBar(root.findViewById(R.id.containerHome), message, R.string.ok, 0);
         }
         utils.displaySnackBar(show);
     }
@@ -260,17 +286,17 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
         this.menu = binding.toolbar.getMenu();
         cartMenuItem = this.menu.findItem(R.id.myCart);
         SearchManager searchManager = (SearchManager)
-                getActivity().getSystemService(Context.SEARCH_SERVICE);
+                activity.getSystemService(Context.SEARCH_SERVICE);
         searchMenuItem = this.menu.findItem(R.id.search);
         searchView = (SearchView) searchMenuItem.getActionView();
 
         searchView.setSearchableInfo(searchManager.
-                getSearchableInfo(getActivity().getComponentName()));
+                getSearchableInfo(activity.getComponentName()));
         searchView.setSubmitButtonEnabled(true);
         searchView.setOnQueryTextListener(this);
 
-        productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
-        cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+        productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
+        cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
 
     }
 
@@ -309,7 +335,7 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
 
     @Override
     public void onCartClick(View view, ProductModel productModel, boolean carted, int newSize) {
-        cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(), newSize, R.drawable.ic_cart));
+        cartMenuItem.setIcon(Utils.convertLayoutToImage(context, newSize, R.drawable.ic_cart));
     }
 
     @Override
@@ -336,5 +362,31 @@ public class HomeFragment extends Fragment implements SearchView.OnQueryTextList
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    @Override
+    public void onRefresh() {
+
+        if (ConnectivityReceiver.isConnected()) {
+            handler = new Handler();
+            pageNumber = 0;
+            manager = null;
+            binding.swipeRefresh.setRefreshing(true);
+            (new Handler()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+
+                    binding.swipeRefresh.setRefreshing(false);
+                    displayProgressDialog(true);
+
+                    homeViewModel.getMainCategories(user.getId());
+                    homeViewModel.getSubCategoriesOffer();
+                }
+
+                }, 3000);
+        }else {
+            binding.swipeRefresh.setRefreshing(false);
+            displaySnackBar(true);
+        }
     }
 }

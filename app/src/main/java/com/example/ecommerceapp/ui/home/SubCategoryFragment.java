@@ -1,5 +1,7 @@
 package com.example.ecommerceapp.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -34,6 +36,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -42,11 +45,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import static com.example.ecommerceapp.data.Utils.filter;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SubCategoryFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
         View.OnClickListener, SearchView.OnQueryTextListener, ItemClickListener,
         ConnectivityReceiver.ConnectivityReceiveListener {
@@ -66,6 +64,8 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
     private Menu menu;
     private SearchView searchView;
     private MenuItem searchMenuItem, cartMenuItem;
+    private Context context;
+    private Activity activity;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -82,29 +82,14 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SubCategoryFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SubCategoryFragment newInstance(String param1, String param2) {
-        SubCategoryFragment fragment = new SubCategoryFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        activity = getActivity();
+        context = getContext();
+
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
@@ -136,20 +121,20 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
         binding.toolbar.setTitle(categoryName);
         binding.toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_navigation_back_up));
         binding.toolbar.setNavigationOnClickListener(this);
+
         homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
+                new ViewModelProvider(this).get(HomeViewModel.class);
+    }
 
-        layoutManagerRecycler = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        binding.recyclerViewSubCategories.setHasFixedSize(true);
-        binding.recyclerViewSubCategories.setLayoutManager(layoutManagerRecycler);
-        adapter = new SubCategoryAdapter(getContext());
-        binding.recyclerViewSubCategories.setAdapter(adapter);
 
-        binding.swipeRefresh.setColorSchemeColors(Color.rgb(3,169,244),
-                Color.rgb(3,169,244),
-                Color.rgb(13,179,163));
-        binding.swipeRefresh.setOnRefreshListener(this);
+    @Override
+    public void onStart() {
+        super.onStart();
 
+        menu = null;
+        manager = null;
+
+        handleUi();
 
         if (ConnectivityReceiver.isConnected()) {
             displayProgressDialog(true);
@@ -159,17 +144,26 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
         } else {
             displaySnackBar(true, null);
         }
+        observeLiveData();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // register intent filter
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
+        context.registerReceiver(connectivityReceiver, intentFilter);
+
+        MyApplication.getInstance().setConnectivityReceiveListener(this);
 
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        menu = null;
-        manager = null;
-
+    private void observeLiveData(){
 
         homeViewModel.getSubCategories().observe(getViewLifecycleOwner(), new Observer<ArrayList<SubCategoryModel>>() {
             @Override
@@ -177,7 +171,6 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
                 if (subCategoryModels != null && subCategoryModels.size() > 0) {
                     categories = subCategoryModels;
                     adapter.setSubCategoryList(categories);
-                    displaySnackBar(false, null);
                 }
 
             }
@@ -203,22 +196,18 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private void handleUi(){
+        layoutManagerRecycler = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+        binding.recyclerViewSubCategories.setHasFixedSize(true);
+        binding.recyclerViewSubCategories.setLayoutManager(layoutManagerRecycler);
+        adapter = new SubCategoryAdapter(context);
+        binding.recyclerViewSubCategories.setAdapter(adapter);
 
-        // register intent filter
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
-        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
-
-        MyApplication.getInstance().setConnectivityReceiveListener(this);
-
+        binding.swipeRefresh.setColorSchemeColors(Color.rgb(3,169,244),
+                Color.rgb(3,169,244),
+                Color.rgb(13,179,163));
+        binding.swipeRefresh.setOnRefreshListener(this);
     }
-
-
     private void displayProducts(ArrayList<ProductModel> productModels, boolean search){
         if(manager == null || search){
             manager = getChildFragmentManager();
@@ -229,19 +218,15 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
     }
 
     private void displayProgressDialog(boolean show){
-        if(show){
-            binding.progressBar.setVisibility(View.VISIBLE);
-        }else {
-            binding.progressBar.setVisibility(View.GONE);
-        }
+        binding.setVisibleProgress(show);
     }
 
     private void displaySnackBar(boolean show, String msg){
         if(msg == null) {
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(root.findViewById(R.id.containerSubCategories), msg, 0);
+        utils = new Utils(context);
+        utils.snackBar(root.findViewById(R.id.containerSubCategories), msg, R.string.ok, 0);
         utils.displaySnackBar(show);
     }
 
@@ -286,8 +271,8 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
             searchView.setQueryHint("");
             searchView.setOnQueryTextListener(this);
 
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
         }
     }
 
@@ -301,7 +286,7 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
 
     @Override
     public void onClick(View view) {
-        getActivity().onBackPressed();
+        activity.onBackPressed();
     }
 
 
@@ -337,7 +322,7 @@ public class SubCategoryFragment extends Fragment implements SwipeRefreshLayout.
 
     @Override
     public void onCartClick(View view, ProductModel productModel, boolean carted, int newSize) {
-        cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(), newSize, R.drawable.ic_cart));
+        cartMenuItem.setIcon(Utils.convertLayoutToImage(context, newSize, R.drawable.ic_cart));
 
     }
 

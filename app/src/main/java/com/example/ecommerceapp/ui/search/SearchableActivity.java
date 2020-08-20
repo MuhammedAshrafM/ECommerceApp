@@ -7,6 +7,7 @@ import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 
 import com.example.ecommerceapp.R;
+import com.example.ecommerceapp.data.BackPressedListener;
 import com.example.ecommerceapp.data.MySuggestionProvider;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,8 @@ public class SearchableActivity extends AppCompatActivity{
 
     private static final String TAG = "SearchableActivity";
     private NavController navController;
+    private BackPressedListener listener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,5 +46,17 @@ public class SearchableActivity extends AppCompatActivity{
         }
     }
 
+    public void setOnBackPressedListener(BackPressedListener listener) {
+        this.listener = listener;
+    }
 
+    @Override
+    public void onBackPressed() {
+        if (listener != null) {
+            listener.OnBackPressed();
+        }
+        else {
+            super.onBackPressed();
+        }
+    }
 }

@@ -1,5 +1,7 @@
 package com.example.ecommerceapp.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -33,19 +35,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PdfFileFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class PdfFileFragment extends Fragment implements View.OnClickListener,
         ConnectivityReceiver.ConnectivityReceiveListener{
 
     private FragmentPdfFileBinding binding;
     private View root;
     private Utils utils;
-    private FileInputStream fileInputStream;
-    StringBuffer stringBuffer;
+    private Context context;
+    private Activity activity;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,29 +56,14 @@ public class PdfFileFragment extends Fragment implements View.OnClickListener,
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PdfFileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PdfFileFragment newInstance(String param1, String param2) {
-        PdfFileFragment fragment = new PdfFileFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = getActivity();
+        context = getContext();
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
@@ -105,16 +87,21 @@ public class PdfFileFragment extends Fragment implements View.OnClickListener,
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        stringBuffer = new StringBuffer();
-        fileInputStream = null;
-        data = null;
-
         binding.toolbar.setTitle(typeDetails);
         binding.toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_navigation_back_up));
         binding.toolbar.setNavigationOnClickListener(this);
 
+        selectActivity();
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        data = null;
+
         displayProgressDialog(true);
-        FileLoader.with(getContext())
+        FileLoader.with(context)
                 .load(productDetailsPath, true)
                 .fromDirectory("PdfFile", FileLoader.DIR_CACHE)
                 .asFile(new FileRequestListener<File>() {
@@ -122,7 +109,7 @@ public class PdfFileFragment extends Fragment implements View.OnClickListener,
                     public void onLoad(FileLoadRequest request, FileResponse<File> response) {
                         displayProgressDialog(false);
                         File loadedFile = response.getBody();
-                        
+
 
                         binding.pdfViewer.fromFile(loadedFile)
                                 .password(null)
@@ -176,10 +163,7 @@ public class PdfFileFragment extends Fragment implements View.OnClickListener,
                     }
                 });
 
-
-
     }
-
 
     @Override
     public void onResume() {
@@ -190,33 +174,35 @@ public class PdfFileFragment extends Fragment implements View.OnClickListener,
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
         ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
+        context.registerReceiver(connectivityReceiver, intentFilter);
 
         MyApplication.getInstance().setConnectivityReceiveListener(this);
 
     }
 
 
-    private void displayProgressDialog(boolean show){
-        if(show){
-            binding.progressBar.setVisibility(View.VISIBLE);
-        }else {
-            binding.progressBar.setVisibility(View.GONE);
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
         }
+    }
+
+    private void displayProgressDialog(boolean show){
+        binding.setVisibleProgress(show);
     }
 
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null) {
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(root.findViewById(R.id.containerPdfFile), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(root.findViewById(R.id.containerPdfFile), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
     @Override
     public void onClick(View view) {
-        getActivity().onBackPressed();
+        activity.onBackPressed();
     }
 
     @Override

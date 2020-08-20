@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,9 +54,15 @@ public class ProductWishedAdapter extends RecyclerView.Adapter<ProductWishedAdap
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
+
+        holder.containerCV.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale));
+
         double price = products.get(position).getPrice() * ((100 - products.get(position).getOffer())/100);
         float offer = products.get(position).getOffer();
         int quantity = products.get(position).getQuantity();
+
+        int shippingFee = products.get(position).getShippingFee();
+        String sellerId = products.get(position).getSellerId();
 
         GlideClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
         holder.productOfferTV.setText(String.format(Locale.getDefault(),"%.0f%s",offer, context.getString(R.string.off_percent)));
@@ -82,6 +90,18 @@ public class ProductWishedAdapter extends RecyclerView.Adapter<ProductWishedAdap
             holder.productCountTV.setVisibility(View.VISIBLE);
         }else {
             holder.productCountTV.setVisibility(View.INVISIBLE);
+        }
+
+        if(shippingFee == 0){
+            holder.productShippingFeeTv.setVisibility(View.VISIBLE);
+        }else {
+            holder.productShippingFeeTv.setVisibility(View.INVISIBLE);
+        }
+
+        if(sellerId.equals("1")){
+            holder.productSellerTv.setVisibility(View.VISIBLE);
+        }else {
+            holder.productSellerTv.setVisibility(View.INVISIBLE);
         }
 
 
@@ -162,9 +182,10 @@ public class ProductWishedAdapter extends RecyclerView.Adapter<ProductWishedAdap
 
     public class ProductViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener  {
 
+        private CardView containerCV;
         private ImageView imageView;
         private TextView productOfferTV, productTitleTV, productRateNumTV, productPriceTV, productCountTV,
-                productPriceWithoutOfferTV;
+                productPriceWithoutOfferTV, productShippingFeeTv, productSellerTv;
         private RatingBar productRateBar;
         Button addToCartBt;
         ToggleButton saveInCartBt, saveInWishListBt;
@@ -173,6 +194,7 @@ public class ProductWishedAdapter extends RecyclerView.Adapter<ProductWishedAdap
 
         private ProductViewHolder(@NonNull View itemView) {
             super(itemView);
+            containerCV = itemView.findViewById(R.id.container_item_product);
             imageView = itemView.findViewById(R.id.product_image);
             productOfferTV = itemView.findViewById(R.id.product_offer);
             productTitleTV = itemView.findViewById(R.id.product_title);
@@ -180,6 +202,8 @@ public class ProductWishedAdapter extends RecyclerView.Adapter<ProductWishedAdap
             productPriceTV = itemView.findViewById(R.id.product_price);
             productCountTV = itemView.findViewById(R.id.product_count);
             productPriceWithoutOfferTV = itemView.findViewById(R.id.product_price_without_offer);
+            productShippingFeeTv = itemView.findViewById(R.id.product_shippingFee);
+            productSellerTv = itemView.findViewById(R.id.product_seller);
             productRateBar = itemView.findViewById(R.id.product_rate);
             addToCartBt = itemView.findViewById(R.id.addToCart_bt);
             saveInCartBt = itemView.findViewById(R.id.saveInCart_bt);

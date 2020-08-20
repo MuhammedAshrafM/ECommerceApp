@@ -7,8 +7,19 @@
         <item quantity="one">%d review</item>
         <item quantity="other">%d reviews</item>
     </plurals>
+    <plurals name="numberOfOrdersAvailable">
+        <item quantity="one">%d order</item>
+        <item quantity="other">%d orders</item>
+    </plurals>
 
     <string name="app_name">EcoApp</string>
+
+    <string name="success">1907</string>
+    <string name="failed">1911</string>
+    <string name="repeatedAccount">1111</string>
+    <string name="repeatedEmail">2222</string>
+    <string name="failedEmail">2020</string>
+    <string name="unvalidatedAccount">2000</string>
 
     <string name="facebook_app_id">518140535531488</string>
     <string name="fb_login_protocol_scheme">fb518140535531488</string>
@@ -18,6 +29,7 @@
     <string name="accountExist">Already have an account</string>
     <string name="join">Join Now</string>
     <string name="userName">UserName</string>
+    <string name="userName_email">UserName/Email</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="rememberMe">Remember Me</string>
@@ -40,7 +52,11 @@
     <string name="incorrectPassword">The Password you entered is incorrect.</string>
     <string name="nameField">You must add a name</string>
     <string name="userNameField">You must add an userName</string>
-    <string name="pictureField">You must select image profile</string>
+    <string name="userNamePatternField">Don\'t use these punctuation marks</string>
+    <string name="passwordPatternField">Your password must contain at least one of each (a-z, A-Z, 0-9, marks:(@#$%^&amp;+=-_))</string>
+    <string name="userName_emailField">You must add an userName or email</string>
+    <string name="pictureField">You must select profile picture</string>
+    <string name="cropPictureField">You must crop your profile picture</string>
 
     <string name="emailField">You must add an email</string>
     <string name="passwordField">You must add a password</string>
@@ -52,11 +68,13 @@
     <string name="createAccountRepeated">This username is already used by another user.</string>
 
     <string name="loginSuccess">Login Successfully</string>
-    <string name="logInField">Login failed! the userName or password you entered is incorrect or your email used is incorrect.</string>
+    <string name="logInField">Login failed! the (userName/email) or password you entered is incorrect or your email used is incorrect.</string>
     <string name="validateAccountSuccess">Your account is validated now.</string>
     <string name="validateAccountField">An error occurred, please try again later.</string>
     <string name="validateAccountRepeated">Validate Account failed! This email is already used by another user!
         please use another an email.</string>
+    <string name="user_account_not_validated_info">Validate your account first to take advantage of the application\'s features</string>
+
     <string name="editAccountSuccess">Your account is updated.</string>
     <string name="editAccountField">An error occurred, please try again later.</string>
     <string name="editAccountRepeated">Update Account failed! This userName is already used by another user!
@@ -73,6 +91,8 @@
     <string name="title_orders">Orders</string>
     <string name="title_notifications">Notifications</string>
     <string name="addCart">Add To Cart</string>
+    <string name="freeShipping">FREE Shipping</string>
+    <string name="fulfilled">Fulfilled by Eco</string>
     <string name="title_welcome">Welcome</string>
     <string name="title_menu">Menu</string>
     <string name="title_profile">Profile</string>
@@ -150,6 +170,8 @@
 
     <string name="upTo">Up to</string>
 
+    <string name="price">Price</string>
+    <string name="offer">Offer</string>
     <string name="category">Category</string>
     <string name="priceRange">Price Range</string>
     <string name="brand">Brand</string>
@@ -168,7 +190,121 @@
 
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="locationPermission">You must enable location permissions to select your address.</string>
 
+    <string name="title_Address">Add New Address</string>
+    <string name="title_edit_Address">Edit Address</string>
+    <string name="title_selectAddress">Select Address</string>
+    <string name="selectAddress">Select an address</string>
+    <string name="selectCurrentPosition">Select current position</string>
+    <string name="recipientName">Recipient Name</string>
+    <string name="building">Building</string>
+    <string name="floor">Floor (Optional)</string>
+    <string name="apartment">Apartment (Optional)</string>
+    <string name="mobileNumber">Mobile Number</string>
+    <string name="saveAddress">Save Address</string>
+    <string name="addressSelected">Address Selected: </string>
+    <string name="searchAddress">Enter Address, City, Zip Code</string>
+    <string name="locationField">You must specify an address to receive your order at your address.</string>
+    <string name="characterPatternField">Use Character only</string>
+    <string name="buildingNumberField">You must add a building number</string>
+    <string name="buildingPatternField">Don\'t use these punctuation marks</string>
+    <string name="floorPatternField">Use numbers only</string>
+    <string name="apartmentPatternField">Don\'t use these punctuation marks</string>
+    <string name="mobileNumberField">You must add a mobile number</string>
+    <string name="mobileNumberIncorrect">Your mobile number must be at least 10 digits.</string>
+    <string name="mobilePatternField">Use numbers only</string>
+    <string name="nameRecipientField">You must add a recipient name</string>
 
+    <string name="myLocation">My Location</string>
+
+    <string name="title_verification_mobile">Verification</string>
+    <string name="send_verification_code">We will send a verification code for the below number:</string>
+    <string name="edit_mobile">(Edit)</string>
+    <string name="send_verification">Send Verification SMS</string>
+    <string name="message_code">A message has been sent to:</string>
+    <string name="verification_code">Enter verification code</string>
+    <string name="incorrect_code">Incorrect code</string>
+    <string name="resend_code">Resend code</string>
+
+    <string name="title_order">Order summary</string>
+    <string name="standardDomestic">Standard Domestic Shipping Service</string>
+    <string name="soldBy">Sold by: </string>
+    <string name="locationSelected">Location Selected</string>
+    <string name="changeAddress">Change address</string>
+    <string name="shippingPlus">+ Shipping</string>
+    <string name="grandTotal">Grand Total:</string>
+    <string name="payment">CONTINUE TO PAYMENT</string>
+
+    <string name="verificationRequired">Verification is required</string>
+    <string name="verificationRequiredNote">Please note that verifying your mobile number is required to place this order.</string>
+    <string name="verify">OK, I will verify my number</string>
+    <string name="cancelVerify">I can\'t verify my number</string>
+
+    <string name="verificationRequireMessage">Your Mobile is not verified, please verify your number</string>
+    <string name="undo">Undo</string>
+    <string name="retry">Retry</string>
+    <string name="delete">Delete</string>
+    <string name="removed">removed</string>
+    <string name="removeLastAddressMessage">This the only address, Please add a new address before remove it.</string>
+    <string name="addressField">An error occurred, please try again later.</string>
+
+    <string name="title_Payment_Options">Payment Options</string>
+    <string name="card_title">Credit or Debit Cards</string>
+    <string name="card_message">Installment are available for eligible banks</string>
+    <string name="cash_title">Cash On Delivery (COD)</string>
+    <string name="cash_message">Pay online for contactless delivery</string>
+    <string name="card">Card</string>
+    <string name="cash">Cash</string>
+    <string name="title_Complete_Order">Complete Order</string>
+    <string name="over_quantity">Sorry, you can\'t increase quantity for this product more than that</string>
+    <string name="allOrderFailed">Oops! 😮 Your all order is failed, selected quantity not available</string>
+    <string name="someOrderFailed">Oops! 😮 Your some order products are failed, selected quantity not available</string>
+    <string name="orderSuccess">Done ☺ Your request has been sent and is currently under implementation</string>
+    <string name="privateCode">Private Code</string>
+    <string name="privateCodeMessage">Please save this code to use when receiving the order</string>
+    <string name="code">Code: </string>
+    <string name="copy">Copy</string>
+    <string name="copied">Copied</string>
+
+    <string name="totalRating">Total Rating:</string>
+    <string name="info">info</string>
+    <string name="positive">Positive</string>
+    <string name="negative">Negative</string>
+    <string name="recentFeedback">Recent feedback</string>
+    <string name="title_seller">Seller Info</string>
+    <string name="map">Map</string>
+    <string name="address">Address</string>
+    <string name="title_forget">Forget Password</string>
+    <string name="emailFailed">Forget password failed! the userName or email you entered is incorrect</string>
+    <string name="send_verification_code_email">We will send a verification code for the below email:</string>
+    <string name="send_code">Sending code for your email</string>
+    <string name="message_sent">Message Sent</string>
+    <string name="subject_email">Verify email address to reset your password</string>
+    <string name="message_email">Your verification code is</string>
+    <string name="code_verification">Verification Code</string>
+    <string name="email_code">A Verification Code has been sent to your email address:</string>
+    <string name="title_reset_password">Reset Password</string>
+    <string name="resetPasswordField">An error occurred, please try again later.</string>
+    <string name="resetPasswordSuccess">Your password is updated, you can log in now by new password.</string>
+    <string name="viewDetails">View Details</string>
+    <string name="orderCode">Order Code:</string>
+    <string name="orderPrepared">Your order is being prepared</string>
+    <string name="orderDelivered">Your order delivered by</string>
+    <string name="title_order_details">Order Details</string>
+    <string name="totalPrice">Total Price</string>
+    <string name="paymentOption">Payment Option</string>
+    <string name="shippingFee">Shipping Fee</string>
+    <string name="receiptTime">Time of receipt:</string>
+
+    <string name="registrationSuccessfully">Registration Successfully</string>
+    <string name="welcome">Welcome</string>
+    <string name="order_done">Your order is done</string>
+    <string name="order_completed">Your order has been successfully completed</string>
+    <string name="newProduct">New Product Added</string>
+    <string name="newProductDetails">You can check this product and buy it now</string>
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyA2ngfqsrHmst41dA_hin0DnyfTy4pbruw</string>
+    <string name="google_places_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDWIUt_5x9CoESFuEhoY2JNuS0TzZiUpVY</string>
     <!--    &amp;-->
 </resources>

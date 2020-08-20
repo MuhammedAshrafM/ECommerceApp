@@ -54,6 +54,7 @@ public class FilterPriceDialog extends Dialog implements View.OnClickListener, T
                     LinearLayout.LayoutParams.WRAP_CONTENT);
             INSTANCE.getWindow().setGravity(Gravity.BOTTOM);
             INSTANCE.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            INSTANCE.setCanceledOnTouchOutside(false);
 
         return INSTANCE;
     }
@@ -71,6 +72,10 @@ public class FilterPriceDialog extends Dialog implements View.OnClickListener, T
 
         minPrice = infoProducts.get(minPriceKey);
         maxPrice = infoProducts.get(maxPriceKey);
+
+        minValue = (Double) minPrice;
+        maxValue = (Double) maxPrice;
+
         binding.priceRangeRsb.setRangeValues(minPrice, maxPrice);
         binding.priceRangeRsb.setTextAboveThumbsColorResource(R.color.blackColor);
         binding.minPriceEt.setText(String.valueOf(minPrice));

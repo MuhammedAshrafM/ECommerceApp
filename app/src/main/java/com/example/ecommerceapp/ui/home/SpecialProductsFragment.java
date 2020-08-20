@@ -1,5 +1,7 @@
 package com.example.ecommerceapp.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
@@ -36,6 +38,8 @@ public class SpecialProductsFragment extends Fragment implements ItemClickListen
     private Utils utils;
     private View root;
     private ItemClickListener listener;
+    private Context context;
+    private Activity activity;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -44,7 +48,6 @@ public class SpecialProductsFragment extends Fragment implements ItemClickListen
     private static final String PREFERENCES_PRODUCTS_CARTED = "PRODUCTS_CARTED";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
     private String typeView;
 
     public SpecialProductsFragment() {
@@ -76,8 +79,10 @@ public class SpecialProductsFragment extends Fragment implements ItemClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
-//        setHasOptionsMenu(true);
+        activity = getActivity();
+        context = getContext();
+
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
 
         if (getArguments() != null) {
             products = getArguments().getParcelableArrayList(ARG_PARAM1);
@@ -102,12 +107,18 @@ public class SpecialProductsFragment extends Fragment implements ItemClickListen
 
         binding.typeView.setText(typeView);
 
+    }
 
-        layoutManagerRecycler = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+    @Override
+    public void onStart() {
+        super.onStart();
+
+
+        layoutManagerRecycler = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
         binding.recyclerViewSpecialProducts.setHasFixedSize(true);
         binding.recyclerViewSpecialProducts.setLayoutManager(layoutManagerRecycler);
 
-        adapter = new SpecialProductsAdapter(getContext(), this);
+        adapter = new SpecialProductsAdapter(context, this);
         binding.recyclerViewSpecialProducts.setAdapter(adapter);
 
         if(typeView.equals(getString(R.string.recentlyViewed))){
@@ -115,15 +126,14 @@ public class SpecialProductsFragment extends Fragment implements ItemClickListen
         }else {
             adapter.setList(products, false);
         }
-
     }
 
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null) {
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(root.findViewById(R.id.containerSpecialProducts), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(root.findViewById(R.id.containerSpecialProducts), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
@@ -135,12 +145,12 @@ public class SpecialProductsFragment extends Fragment implements ItemClickListen
     @Override
     public void onCartClick(View view, ProductModel productModel, boolean carted, int newSize) {
         if(carted){
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).setProductCarted(productModel);
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).setProductCarted(productModel);
             listener.onCartClick(view, productModel, true, productsCartedId.size());
             displaySnackBar(true, getString(R.string.carted), -1);
 
         }else {
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).removeProductCarted(productModel);
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).removeProductCarted(productModel);
             listener.onCartClick(view, productModel, false, productsCartedId.size());
             displaySnackBar(true, getString(R.string.unCarted), -1);
         }

@@ -1,5 +1,7 @@
 package com.example.ecommerceapp.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -7,6 +9,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +29,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddReviewFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.Locale;
+
+import static com.facebook.internal.FacebookDialogFragment.TAG;
+
 public class AddReviewFragment extends Fragment implements View.OnClickListener, TextWatcher,
         ConnectivityReceiver.ConnectivityReceiveListener, RatingBar.OnRatingBarChangeListener {
 
@@ -43,48 +46,33 @@ public class AddReviewFragment extends Fragment implements View.OnClickListener,
     private UserModel user;
     private float reviewRate = 0;
     private String reviewComment;
+    private Context context;
+    private Activity activity;
+    private int lengthComment = 500;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "productId";
-    private static final String ARG_PARAM2 = "param2";
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
 
     // TODO: Rename and change types of parameters
     private String productId;
-    private String mParam2;
 
     public AddReviewFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddReviewFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AddReviewFragment newInstance(String param1, String param2) {
-        AddReviewFragment fragment = new AddReviewFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        activity = getActivity();
+        context = getContext();
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
             productId = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -108,31 +96,24 @@ public class AddReviewFragment extends Fragment implements View.OnClickListener,
         binding.toolbar.setNavigationOnClickListener(this);
 
         homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
-
-        user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
-
-        binding.reviewRateBar.setOnRatingBarChangeListener(this);
-        binding.addReviewBt.setOnClickListener(this);
-
-        binding.reviewCommentEt.addTextChangedListener(this);
+                new ViewModelProvider(this).get(HomeViewModel.class);
+        selectActivity();
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        homeViewModel.addReview().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                displayProgressDialog(false);
-                if(s != null) {
-                    responseData(s);
-                }else {
-                    displaySnackBar(true, null, 0);
-                }
-            }
-        });
+        user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
+
+        binding.charNumTv.setText(String.format(Locale.getDefault(),"%d/%d", 0, lengthComment));
+
+        binding.reviewRateBar.setOnRatingBarChangeListener(this);
+        binding.addReviewBt.setOnClickListener(this);
+
+        binding.reviewCommentEt.addTextChangedListener(this);
+
+        observeLiveData();
     }
 
     @Override
@@ -144,20 +125,48 @@ public class AddReviewFragment extends Fragment implements View.OnClickListener,
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
         ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
+        context.registerReceiver(connectivityReceiver, intentFilter);
 
         MyApplication.getInstance().setConnectivityReceiveListener(this);
 
     }
 
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
+        }
+    }
+
+    private void observeLiveData(){
+        homeViewModel.addReview().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                displayProgressDialog(false);
+                if(s != null) {
+                    responseData(s);
+                }else {
+                    displaySnackBar(true, null, 0);
+                }
+            }
+        });
+
+        homeViewModel.getErrorMessage().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                displayProgressDialog(false);
+                displaySnackBar(true, null, 0);
+            }
+        });
+    }
+
     private void responseData(String response){
         String message = "";
-        if(response.equals("Success")){
+        if(response.equals(getString(R.string.success))){
             message = getString(R.string.reviewAdded);
             displaySnackBar(true, message, 0);
-            getActivity().onBackPressed();
+            activity.onBackPressed();
         }
-        else if(response.equals("Failed")){
+        else if(response.equals(getString(R.string.failed))){
             message = getString(R.string.reviewField);
             displaySnackBar(true, message, -2);
         }
@@ -210,11 +219,7 @@ public class AddReviewFragment extends Fragment implements View.OnClickListener,
     }
 
     private void displayProgressDialog(boolean show) {
-        if (show) {
-            binding.progressBar.setVisibility(View.VISIBLE);
-        } else {
-            binding.progressBar.setVisibility(View.GONE);
-        }
+        binding.setVisibleProgress(show);
 
     }
 
@@ -222,22 +227,17 @@ public class AddReviewFragment extends Fragment implements View.OnClickListener,
         if(msg == null) {
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(root.findViewById(R.id.containerAddReview), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(root.findViewById(R.id.containerAddReview), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
     @Override
     public void onClick(View view) {
-
-        switch (view.getId()){
-            case R.id.add_review_bt:
-                addReview();
-                break;
-
-            default:
-                getActivity().onBackPressed();
-                break;
+        if(view.getId() == R.id.add_review_bt){
+            addReview();
+        }else {
+            activity.onBackPressed();
         }
     }
 
@@ -261,7 +261,7 @@ public class AddReviewFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         int length = binding.reviewCommentEt.getText().length();
-        binding.charNumTv.setText(length + "/500");
+        binding.charNumTv.setText(String.format(Locale.getDefault(),"%d/%d", length, lengthComment));
     }
 
     @Override

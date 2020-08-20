@@ -16,12 +16,16 @@ import com.example.ecommerceapp.data.GlideClient;
 import com.example.ecommerceapp.data.ItemClickListener;
 import com.example.ecommerceapp.data.Preferences;
 import com.example.ecommerceapp.pojo.ProductModel;
+import com.example.ecommerceapp.ui.home.InfoProductsViewModel;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,14 +36,18 @@ public class ProductsSearchedAdapter extends RecyclerView.Adapter<ProductsSearch
     private ArrayList<ProductModel> products = new ArrayList<>();
     private Context context;
     private ItemClickListener listener;
+    private InfoProductsViewModel infoProductsViewModel;
     private DecimalFormat decimalFormat = new DecimalFormat();
+    private ArrayList<Double> prices;
+    private boolean filter;
 
     private static final String PREFERENCES_PRODUCTS_CARTED = "PRODUCTS_CARTED";
     private static final String PREFERENCES_PRODUCTS_WISHED = "PRODUCTS_WISHED";
 
-    public ProductsSearchedAdapter(Context context, ItemClickListener listener) {
+    public ProductsSearchedAdapter(Context context, ItemClickListener listener, ViewModelStoreOwner owner) {
         this.context = context;
         this.listener = listener;
+        infoProductsViewModel = new ViewModelProvider(owner).get(InfoProductsViewModel.class);
         decimalFormat.applyPattern("#,###,###,###.##");
     }
 
@@ -54,12 +62,22 @@ public class ProductsSearchedAdapter extends RecyclerView.Adapter<ProductsSearch
         double price = products.get(position).getPrice() * ((100 - products.get(position).getOffer())/100);
         float offer = products.get(position).getOffer();
 
+        int shippingFee = products.get(position).getShippingFee();
+        String sellerId = products.get(position).getSellerId();
+
         GlideClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
         holder.productOfferTV.setText(String.format(Locale.getDefault(),"%.0f%s",offer, context.getString(R.string.off_percent)));
         holder.productTitleTV.setText(products.get(position).getTitle());
         holder.productPriceTV.setText(decimalFormat.format(price) + " " + context.getString(R.string.egp));
         holder.productPriceWithoutOfferTV.setText(decimalFormat.format(products.get(position).getPrice()) + " "
                 + context.getString(R.string.egp));
+
+        if(!filter){
+            prices.add(Double.valueOf(String.format(Locale.ENGLISH,"%.02f", price)));
+            if(prices.size() == products.size()){
+                infoProductsViewModel.setMutableLiveProductsInfo(prices);
+            }
+        }
 
         if(offer > 0){
             holder.productOfferTV.setVisibility(View.VISIBLE);
@@ -70,6 +88,18 @@ public class ProductsSearchedAdapter extends RecyclerView.Adapter<ProductsSearch
             holder.productPriceWithoutOfferTV.setVisibility(View.INVISIBLE);
         }
 
+
+        if(shippingFee == 0){
+            holder.productShippingFeeTv.setVisibility(View.VISIBLE);
+        }else {
+            holder.productShippingFeeTv.setVisibility(View.INVISIBLE);
+        }
+
+        if(sellerId.equals("1")){
+            holder.productSellerTv.setVisibility(View.VISIBLE);
+        }else {
+            holder.productSellerTv.setVisibility(View.INVISIBLE);
+        }
 
         if(Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).isProductCarted(products.get(position))){
             holder.saveInCartBt.setBackgroundResource(R.mipmap.ic_launcher_cart_added);
@@ -157,7 +187,18 @@ public class ProductsSearchedAdapter extends RecyclerView.Adapter<ProductsSearch
         return products.size();
     }
 
+    public LiveData<ArrayList<Double>> getProductsInfo() {
+        return infoProductsViewModel.getMutableLiveProductsInfo();
+    }
+
     public void setList(ArrayList<ProductModel> productModels) {
+        filter = false;
+        prices = new ArrayList<>();
+        this.products = productModels;
+        notifyDataSetChanged();
+    }
+    public void filter(ArrayList<ProductModel> productModels) {
+        filter = true;
         this.products = productModels;
         notifyDataSetChanged();
     }
@@ -166,7 +207,7 @@ public class ProductsSearchedAdapter extends RecyclerView.Adapter<ProductsSearch
 
         private ImageView imageView;
         private TextView productOfferTV, productTitleTV, productPriceTV,
-                productPriceWithoutOfferTV;
+                productPriceWithoutOfferTV, productShippingFeeTv, productSellerTv;
         private ToggleButton saveInCartBt, saveInWishListBt;
         private Button addToCartBt;
 
@@ -179,6 +220,8 @@ public class ProductsSearchedAdapter extends RecyclerView.Adapter<ProductsSearch
             productTitleTV = itemView.findViewById(R.id.product_title);
             productPriceTV = itemView.findViewById(R.id.product_price);
             productPriceWithoutOfferTV = itemView.findViewById(R.id.product_price_without_offer);
+            productShippingFeeTv = itemView.findViewById(R.id.product_shippingFee);
+            productSellerTv = itemView.findViewById(R.id.product_seller);
             saveInCartBt = itemView.findViewById(R.id.saveInCart_bt);
             saveInWishListBt = itemView.findViewById(R.id.saveInWishList_bt);
             addToCartBt = itemView.findViewById(R.id.addToCart_bt);

@@ -1,7 +1,10 @@
 package com.example.ecommerceapp.ui.more;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -11,16 +14,21 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
 import com.example.ecommerceapp.data.GlideClient;
+import com.example.ecommerceapp.data.ItemDialogClickListener;
 import com.example.ecommerceapp.data.MyApplication;
+import com.example.ecommerceapp.data.PasswordDialog;
 import com.example.ecommerceapp.data.Preferences;
+import com.example.ecommerceapp.data.SortDialog;
 import com.example.ecommerceapp.data.Utils;
 import com.example.ecommerceapp.databinding.FragmentEditProfileBinding;
 import com.example.ecommerceapp.pojo.UserModel;
@@ -34,24 +42,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import static android.app.Activity.RESULT_OK;
 
-public class EditProfileFragment extends Fragment implements View.OnClickListener,
+public class EditProfileFragment extends Fragment implements View.OnClickListener, ItemDialogClickListener,
         ConnectivityReceiver.ConnectivityReceiveListener{
 
     private MoreViewModel moreViewModel;
     private FragmentEditProfileBinding binding;
     private View root;
-    private UserModel user, userUpdated;
-    private String id, name, userName, email, passwordOld, passwordNew, imagePath, imageProfilePath;
+    private UserModel user;
+    private String id, name, userName, email, password, imagePath, imageProfilePath, token, userNamePattern, passwordPattern;
     private int validated;
     private Utils utils;
-    private AlertDialog alertDialog;
-    private TextInputEditText oldPasswordEt, newPasswordEt;
-    private Button editPasswordBt;
+    private PasswordDialog dialog;
     private Uri imageUri;
+    private Context context;
+    private Activity activity;
 
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
     private static final int SELECTED_PICTURE = 22, CROP_PICTURE = 55;
@@ -63,7 +72,10 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        activity = getActivity();
+        context = getContext();
+
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
 
     }
@@ -86,61 +98,26 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
         binding.toolbar.setTitle(getString(R.string.title_profile_edit));
         binding.toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_navigation_back_up));
         binding.toolbar.setNavigationOnClickListener(this);
-
+        binding.setVisibleEditPassword(false);
         moreViewModel =
-                ViewModelProviders.of(this).get(MoreViewModel.class);
-
-        user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
-
-        id = user.getId();
-        name = user.getName();
-        userName = user.getUserName();
-        email = user.getEmail();
-        passwordOld = user.getPassword();
-        imagePath = user.getImagePath();
-        validated = user.getValidated();
-
-        binding.editNameEt.setText(name);
-        binding.editUsernameEt.setText(userName);
-        binding.editEmailEt.setText(email);
-        binding.editPasswordEt.setText(passwordOld);
-        GlideClient.loadProfileImage(getContext(), imagePath, binding.editUserPictureIv);
-
-        binding.editEmailEt.setFocusable(false);
-        binding.editPasswordEt.setFocusable(false);
-
-        if(!userName.isEmpty()){
-            binding.editUsernameEt.setFocusable(false);
-            binding.textInputAddPassword.setVisibility(View.GONE);
-            binding.textInputEditPassword.setVisibility(View.VISIBLE);
-        }
-
-        binding.editBt.setOnClickListener(this);
-        binding.editPasswordEt.setOnClickListener(this);
-        binding.editUserPictureIv.setOnClickListener(this);
+                new ViewModelProvider(this).get(MoreViewModel.class);
+        selectActivity();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        moreViewModel.getEditAccount().observe(this, new Observer<ArrayList<UserModel>>() {
-            @Override
-            public void onChanged(ArrayList<UserModel> userModels) {
-                displayProgressDialog(false);
-                if(userModels != null && userModels.size() > 0) {
-                    responseData(userModels);
-                }
-            }
-        });
 
+        userNamePattern = "(\\w)*";
+        passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=-_])(?=\\S).*";
 
-        moreViewModel.getErrorMessage().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                displayProgressDialog(false);
-                displaySnackBar(true, null, 0);
-            }
-        });
+        updateUi();
+
+        setOnClickListener();
+
+        observeLiveData();
+
+        setViewEditPasswordDialog();
     }
 
 
@@ -153,17 +130,76 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
         ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
+        context.registerReceiver(connectivityReceiver, intentFilter);
 
         MyApplication.getInstance().setConnectivityReceiveListener(this);
 
     }
 
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
+        }
+    }
+
+    private void observeLiveData(){
+        moreViewModel.getEditAccount().observe(this, new Observer<ArrayList<UserModel>>() {
+            @Override
+            public void onChanged(ArrayList<UserModel> userModels) {
+                displayProgressDialog(false);
+                if(userModels != null && userModels.size() > 0) {
+                    responseData(userModels);
+                }
+            }
+        });
+
+        moreViewModel.getErrorMessage().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                displayProgressDialog(false);
+                displaySnackBar(true, null, 0);
+            }
+        });
+    }
+
+    private void setOnClickListener(){
+        binding.editBt.setOnClickListener(this);
+        binding.editPasswordIbt.setOnClickListener(this);
+        binding.editUserPictureIv.setOnClickListener(this);
+        binding.editUserPictureIbt.setOnClickListener(this);
+    }
+
+    private void updateUi(){
+        user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
+
+        id = user.getId();
+        name = user.getName();
+        userName = user.getUserName();
+        email = user.getEmail();
+        password = user.getPassword();
+        imagePath = user.getImagePath();
+        token = user.getToken();
+        validated = user.getValidated();
+
+        binding.editNameEt.setText(name);
+        binding.editUsernameEt.setText(userName);
+        binding.editEmailEt.setText(email);
+        binding.editPasswordEt.setText(password);
+        GlideClient.loadProfileImage(context, imagePath, binding.editUserPictureIv);
+
+        binding.editEmailEt.setFocusable(false);
+        binding.editPasswordEt.setFocusable(false);
+
+        if(!userName.isEmpty()){
+            binding.editUsernameEt.setFocusable(false);
+            binding.setVisibleEditPassword(true);
+        }
+    }
     private void responseData(ArrayList<UserModel> userModels){
         if(userModels.size() > 0){
 
-            Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).setDataUser(userModels.get(0));
-            user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
+            Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).setDataUser(userModels.get(0));
+            user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
             displaySnackBar(true, getString(R.string.editAccountSuccess), 0);
         }
         else {
@@ -171,68 +207,9 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
         }
     }
 
+
     private void setViewEditPasswordDialog(){
-        View view = getLayoutInflater().inflate(R.layout.layout_edit_password, null);
-        oldPasswordEt = view.findViewById(R.id.old_password_et);
-        newPasswordEt = view.findViewById(R.id.new_password_et);
-        editPasswordBt = view.findViewById(R.id.edit_password_bt);
-        editPasswordBt.setOnClickListener(this);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setView(view);
-        alertDialog = builder.create();
-
-        alertDialog.show();
-    }
-
-    private void editPassword(){
-        if(validateEditPassword()){
-            alertDialog.dismiss();
-            binding.editPasswordEt.setText(passwordNew);
-        }else {
-            passwordOld = user.getPassword();
-        }
-    }
-    private void getPasswordData(){
-        oldPasswordEt.setError(null);
-        newPasswordEt.setError(null);
-
-        passwordOld = oldPasswordEt.getText().toString().trim();
-        passwordNew = newPasswordEt.getText().toString().trim();
-    }
-
-    private boolean validateEditPassword() {
-        boolean cancel = false;
-        View focusView = null;
-
-        getPasswordData();
-
-        if(TextUtils.isEmpty(passwordOld)){
-            oldPasswordEt.setError(getString(R.string.passwordField));
-            focusView = oldPasswordEt;
-            cancel = true;
-        }
-        else if(TextUtils.isEmpty(passwordNew)){
-            newPasswordEt.setError(getString(R.string.passwordField));
-            focusView = newPasswordEt;
-            cancel = true;
-        }
-        else if(TextUtils.getTrimmedLength(passwordNew) < 6){
-            newPasswordEt.setError(getString(R.string.infoPassword));
-            focusView = newPasswordEt;
-            cancel = true;
-        }
-        else if(!passwordOld.equals(user.getPassword())){
-            oldPasswordEt.setError(getString(R.string.incorrectPassword));
-            focusView = oldPasswordEt;
-            cancel = true;
-        }
-
-        if (cancel) {
-            focusView.requestFocus();
-            return false;
-        }
-        return true;
+        dialog = dialog.getINSTANCE(context, activity, R.style.MaterialDialogSheet, this::onItemDialogClick, user);
     }
 
     private void editProfile(){
@@ -241,7 +218,7 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
                 if(!TextUtils.isEmpty(imageProfilePath)){
                     imagePath = imageProfilePath;
                 }
-                UserModel user = new UserModel(id, name, userName, email, passwordOld, imagePath, validated);
+                UserModel user = new UserModel(id, name, userName, email, password, imagePath, token, validated);
                 displayProgressDialog(true);
                 moreViewModel.editAccount(user);
             }else {
@@ -257,13 +234,10 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
 
         name = binding.editNameEt.getText().toString().trim();
         userName = binding.editUsernameEt.getText().toString().trim();
-        if(binding.textInputAddPassword.getVisibility() == View.VISIBLE){
-            passwordOld = binding.addPasswordEt.getText().toString().trim();
-
+        if(binding.getVisibleEditPassword()){
+            password = binding.editPasswordEt.getText().toString().trim();
         }else {
-
-            passwordOld = binding.editPasswordEt.getText().toString().trim();
-
+            password = binding.addPasswordEt.getText().toString().trim();
         }
     }
 
@@ -286,13 +260,23 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
             focusView = binding.editUsernameEt;
             cancel = true;
         }
-        else if(TextUtils.isEmpty(passwordOld)){
+        else if(!userName.matches(userNamePattern)){
+            binding.editUsernameEt.setError(getString(R.string.userNamePatternField));
+            focusView = binding.editUsernameEt;
+            cancel = true;
+        }
+        else if(TextUtils.isEmpty(password)){
             binding.addPasswordEt.setError(getString(R.string.passwordField));
             focusView = binding.addPasswordEt;
             cancel = true;
         }
-        else if(TextUtils.getTrimmedLength(passwordOld) < 6){
+        else if(TextUtils.getTrimmedLength(password) < 6){
             binding.addPasswordEt.setError(getString(R.string.infoPassword));
+            focusView = binding.addPasswordEt;
+            cancel = true;
+        }
+        else if(!password.matches(passwordPattern)){
+            binding.addPasswordEt.setError(getString(R.string.passwordPatternField));
             focusView = binding.addPasswordEt;
             cancel = true;
         }
@@ -313,21 +297,16 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
         imageProfilePath = Base64.encodeToString(byteArrayVar, Base64.DEFAULT);
     }
 
-
     private void displayProgressDialog(boolean show){
-        if(show){
-            binding.progressBar.setVisibility(View.VISIBLE);
-        }else {
-            binding.progressBar.setVisibility(View.GONE);
-        }
+        binding.setVisibleProgress(show);
 
     }
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null){
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(getActivity().findViewById(R.id.containerEditProfile), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(activity.findViewById(R.id.containerEditProfile), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
@@ -338,21 +317,17 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
                 editProfile();
                 break;
 
-            case R.id.edit_userPicture_iv:
+            case R.id.edit_userPicture_iv: case R.id.edit_userPicture_ibt:
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(Intent.createChooser(intent,getString(R.string.selectImage)), SELECTED_PICTURE);
                 break;
 
-            case R.id.edit_password_et:
-                setViewEditPasswordDialog();
-                break;
-
-            case R.id.edit_password_bt:
-                editPassword();
+            case R.id.edit_password_ibt:
+                dialog.show();
                 break;
 
             default:
-                getActivity().onBackPressed();
+                activity.onBackPressed();
                 break;
         }
     }
@@ -384,9 +359,9 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
 
                 }
             }
-//            else {
-//                Toast.makeText(getContext(),  getString(R.string.notSelectedPicture), Toast.LENGTH_LONG).show();
-//            }
+            else {
+                displaySnackBar(true, getString(R.string.pictureField),-2);
+            }
         }
 
         else if(requestCode == CROP_PICTURE){
@@ -397,9 +372,9 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
                 compressImage(selectedImage);
 
             }
-//            else {
-//                Toast.makeText(EditProfileActivity.this,  getString(R.string.notCropPicture), Toast.LENGTH_LONG).show();
-//            }
+            else {
+                displaySnackBar(true, getString(R.string.cropPictureField),-2);
+            }
         }
 
     }
@@ -408,6 +383,13 @@ public class EditProfileFragment extends Fragment implements View.OnClickListene
     public void onNetworkConnectionChanged(boolean isConnected) {
         if(!isConnected) {
             displaySnackBar(true, null, 0);
+        }
+    }
+
+    @Override
+    public void onItemDialogClick(View view, int id) {
+        if(id == R.string.editPassword){
+            binding.editPasswordEt.setText(dialog.getPassword());
         }
     }
 }

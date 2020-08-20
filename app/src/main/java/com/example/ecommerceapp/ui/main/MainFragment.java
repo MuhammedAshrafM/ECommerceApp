@@ -56,8 +56,14 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
         Animation animation = AnimationUtils.loadAnimation(getContext(),R.anim.translate_from_top);
-        binding.appLogo.startAnimation(animation);
+        binding.appLogoIv.startAnimation(animation);
 
         binding.joinAppButton.setOnClickListener(this);
         binding.openAppButton.setOnClickListener(this);

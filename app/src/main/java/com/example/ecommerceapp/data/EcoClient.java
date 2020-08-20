@@ -1,10 +1,13 @@
 package com.example.ecommerceapp.data;
 
+import com.example.ecommerceapp.pojo.AddressModel;
 import com.example.ecommerceapp.pojo.BrandModel;
 import com.example.ecommerceapp.pojo.CategoryModel;
 import com.example.ecommerceapp.pojo.ImageProductModel;
+import com.example.ecommerceapp.pojo.OrderModel;
 import com.example.ecommerceapp.pojo.ProductModel;
 import com.example.ecommerceapp.pojo.ReviewModel;
+import com.example.ecommerceapp.pojo.SellerModel;
 import com.example.ecommerceapp.pojo.SubCategoryModel;
 import com.example.ecommerceapp.pojo.UserModel;
 import com.google.gson.Gson;
@@ -76,16 +79,16 @@ public class EcoClient {
     public Single<String> signUp(UserModel userModel){
         return ecoInterface.createAccount("signUp", userModel.toMap());
     }
-    public Single<Map<String,ArrayList<UserModel>>> logInAccount(UserModel userModel){
+    public Single<ArrayList<UserModel>> logInAccount(UserModel userModel){
         return ecoInterface.logIn("logInAccount", userModel.toMap());
     }
-    public Single<Map<String,ArrayList<UserModel>>> logIn(UserModel userModel){
+    public Single<ArrayList<UserModel>> logIn(UserModel userModel){
         return ecoInterface.logIn("logIn", userModel.toMap());
     }
     public Single<String> validateAccount(UserModel userModel){
         return ecoInterface.validateAccount("validateAccount", userModel.toMap());
     }
-    public Single<Map<String,ArrayList<UserModel>>> editAccount(UserModel userModel){
+    public Single<ArrayList<UserModel>> editAccount(UserModel userModel){
         return ecoInterface.editAccount("editAccount", userModel.toMap());
     }
 
@@ -134,9 +137,6 @@ public class EcoClient {
     public Single<ArrayList<ProductModel>> getProductsSearched(String query){
         return ecoInterface.getProductsSearched("getProductsSearched", query);
     }
-    public Single<Map<String,Double>> getInfoProductsSearched(String query){
-        return ecoInterface.getInfoProductsSearched("getInfoProductsSearched", query);
-    }
     public Single<ArrayList<ReviewModel>> getLimitReviews(String productId){
         return ecoInterface.getLimitReviews("getLimitReviews", productId);
     }
@@ -149,9 +149,6 @@ public class EcoClient {
     public Single<ArrayList<ReviewModel>> getReviews(String productId){
         return ecoInterface.getReviews("getReviews", productId);
     }
-    public Single<Map<String, Object>> getInfoReviews(String productId){
-        return ecoInterface.getInfoReviews("getInfoReviews", productId);
-    }
     public Single<String> addReview(ReviewModel reviewModel, String productId){
         return ecoInterface.addReview("addReview", reviewModel.toMap(productId));
     }
@@ -159,10 +156,71 @@ public class EcoClient {
     public Single<ArrayList<BrandModel>> getBrandsSearched(String query){
         return ecoInterface.getBrandsSearched("getBrandsSearched", query);
     }
-    public Single<ArrayList<ProductModel>> getProductsFiltered(String query,
-                                                               ArrayList<String> subCategoryIds,
-                                                               Map<String, Double> priceRange,
-                                                               ArrayList<String> brandsIds){
-        return ecoInterface.getProductsFiltered("getProductsFiltered", query, subCategoryIds, priceRange, brandsIds);
+    public Single<ArrayList<SellerModel>> getSelectedSellers(ArrayList<String> sellerIds){
+        return ecoInterface.getSelectedSellers("getSelectedSellers", sellerIds);
+    }
+
+    public Single<String> addAddress(AddressModel addressModel){
+        return ecoInterface.setAddress("addAddress", addressModel.toMap());
+    }
+
+    public Single<String> editAddress(AddressModel addressModel){
+        return ecoInterface.setAddress("editAddress", addressModel.toMap());
+    }
+
+    public Single<String> removeAddress(String addressId){
+        return ecoInterface.removeAddress("removeAddress", addressId);
+    }
+
+    public Single<ArrayList<AddressModel>> getAddresses(String userId){
+        return ecoInterface.getAddresses("getAddresses", userId);
+    }
+
+    public Single<String> validateMobileNumber(String countryCodeName, String mobileNumber, String userId){
+        return ecoInterface.validateMobileNumber("validateMobileNumber", countryCodeName, mobileNumber, userId);
+    }
+
+    public Single<ArrayList<String>> sendOrder(String orderId, ArrayList<String> productsId, String userId,
+                                               String userToken, String addressId, ArrayList<Integer> productsCount,
+                                               String paymentOption, double subTotal, double shippingFee){
+
+        return ecoInterface.sendOrder("sendOrder", orderId, productsId, userId, userToken, addressId, productsCount,
+                paymentOption, subTotal, shippingFee);
+    }
+    public Single<ArrayList<SellerModel>> getSeller(String sellerId){
+        return ecoInterface.getSeller("getSeller", sellerId);
+    }
+
+    public Single<ArrayList<ProductModel>> getSellerProducts(String sellerId){
+        return ecoInterface.getSellerProducts("getSellerProducts", sellerId);
+    }
+    public Single<ArrayList<SubCategoryModel>> getSellerSubCategories(String sellerId){
+        return ecoInterface.getSellerSubCategories("getSellerSubCategories", sellerId);
+    }
+    public Single<ArrayList<BrandModel>> getSellerBrands(String sellerId){
+        return ecoInterface.getSellerBrands("getSellerBrands", sellerId);
+    }
+    public Single<ArrayList<ReviewModel>> getSellerReviews(String sellerId){
+        return ecoInterface.getSellerReviews("getSellerReviews", sellerId);
+    }
+
+    public Single<String> getEmail(String userName){
+        return ecoInterface.getEmail("getEmail", userName);
+    }
+    public Single<String> editPassword(String email, String password){
+        return ecoInterface.editPassword("editPassword", email, password);
+    }
+
+    public Single<ArrayList<OrderModel>> getOrders(String userId){
+        return ecoInterface.getOrders("getOrders", userId);
+    }
+    public Single<ArrayList<OrderModel>> getOrder(String orderId){
+        return ecoInterface.getOrder("getOrder", orderId);
+    }
+    public Single<ArrayList<ProductModel>> getProductsOrder(String orderId){
+        return ecoInterface.getProductsOrder("getProductsOrder", orderId);
+    }
+    public Single<ArrayList<AddressModel>> getAddressOrder(String orderId){
+        return ecoInterface.getAddressOrder("getAddressOrder", orderId);
     }
 }

@@ -4,15 +4,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable name="padding" type="Boolean"/>
+        <variable name="visibleOffer" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
     </data>
 
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.home.ProductFragment">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="60dp"
-        android:background="@color/gray"
-        tools:context=".ui.home.ProductFragment">
+        android:paddingBottom="@{padding ? @dimen/margin_navigate : @dimen/margin_cart}"
+        android:background="@color/gray">
 
 
         <RelativeLayout
@@ -95,13 +103,13 @@
                     android:textColor="@color/whiteColor"
                     android:textStyle="bold"
                     android:textSize="15sp"
+                    android:visibility="@{visibleOffer ? View.VISIBLE : View.INVISIBLE}"
                     android:minLines="1"
                     android:maxLines="2"
                     android:paddingTop="3dp"
                     android:paddingBottom="3dp"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:visibility="visible"
                     app:layout_constraintTop_toTopOf="@id/viewPager"
                     app:layout_constraintStart_toStartOf="@id/viewPager"
                     app:layout_constraintLeft_toLeftOf="@id/viewPager"/>
@@ -128,7 +136,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:visibility="gone" />
+                    android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <View
@@ -193,6 +201,7 @@
                     android:layout_weight="1"
                     android:gravity="start|center"
                     android:layout_gravity="center"
+                    android:visibility="@{visibleOffer ? View.VISIBLE : View.INVISIBLE}"
                     android:lines="1"
                     android:maxLines="1"
                     android:padding="5dp"
@@ -237,6 +246,63 @@
             </LinearLayout>
             </LinearLayout>
 
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/product_seller_cola"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:layout_marginTop="15dp"
+                android:padding="15dp"
+                android:background="@color/whiteColor"
+                android:layout_below="@id/linearLayout">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/seller_name_tv"
+                    android:gravity="start|center"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:text="@string/soldBy"
+                    android:textColor="@color/gray2"
+                    android:textSize="15sp"
+                    android:textStyle="normal" />
+                <TextView
+                    android:id="@+id/seller_name_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/textView"
+                    app:layout_constraintEnd_toStartOf="@+id/more_ibt"
+                    android:gravity="start|center"
+                    android:lines="1"
+                    android:maxLines="2"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textColor="@color/blackColor"
+                    android:textSize="20sp"
+                    android:textStyle="normal" />
+
+                <ImageButton
+                    android:id="@+id/more_ibt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_more"
+                    android:backgroundTint="@color/basicColor"
+                    android:contentDescription="more image button"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/seller_name_tv"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <LinearLayout
                 android:id="@+id/product_description_specifications_lila"
                 android:layout_width="match_parent"
@@ -249,7 +315,7 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:background="@color/whiteColor"
-                android:layout_below="@id/linearLayout">
+                android:layout_below="@id/product_seller_cola">
 
                 <Button
                     android:id="@+id/product_description_bt"
@@ -521,4 +587,5 @@
 
         </RelativeLayout>
     </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </layout>

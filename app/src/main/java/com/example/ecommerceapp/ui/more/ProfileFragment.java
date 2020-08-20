@@ -1,5 +1,7 @@
 package com.example.ecommerceapp.ui.more;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -34,6 +36,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -49,6 +52,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     private String id, name, userName, email, imagePath;
     private int validated;
     private Utils utils;
+    private Context context;
+    private Activity activity;
 
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
 
@@ -59,7 +64,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        activity = getActivity();
+        context = getContext();
+
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
     }
 
@@ -86,39 +94,50 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         binding.toolbar.setTitle(getString(R.string.title_profile));
         binding.toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_navigation_back_up));
         binding.toolbar.setNavigationOnClickListener(this);
+        binding.setVisibleUnvalidated(true);
 
         moreViewModel =
-                ViewModelProviders.of(this).get(MoreViewModel.class);
-
-        user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
-
-        id = user.getId();
-        name = user.getName();
-        userName = user.getUserName();
-        email = user.getEmail();
-        imagePath = user.getImagePath();
-        validated = user.getValidated();
-
-        binding.nameEt.setText(name);
-        binding.usernameEt.setText(userName);
-        binding.emailEt.setText(email);
-        GlideClient.loadProfileImage(getContext(), imagePath, binding.userPictureIv);
-
-        if(validated == 1){
-            binding.unvalidatedTv.setVisibility(View.GONE);
-            binding.validatedLila.setVisibility(View.GONE);
-        }
-
+                new ViewModelProvider(this).get(MoreViewModel.class);
+        selectActivity();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
+        updateUI();
+
+        observeLiveData();
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // register intent filter
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
+        context.registerReceiver(connectivityReceiver, intentFilter);
+
+        MyApplication.getInstance().setConnectivityReceiveListener(this);
+
+    }
+
+
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
+        }
+    }
+
+    private void observeLiveData(){
         moreViewModel.getValidateAccount().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 displayProgressDialog(false);
-
                 if(s != null) {
                     responseData(s);
                 }
@@ -136,27 +155,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     }
 
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // register intent filter
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
-        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
-
-        MyApplication.getInstance().setConnectivityReceiveListener(this);
-
-    }
-
     private void responseData(String response){
         String message = "";
         switch (response){
             case "Success":
                 message = getString(R.string.validateAccountSuccess);
-                Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).validateAccountUser(userUpdated);
+                Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).validateAccountUser(userUpdated);
                 updateUI();
                 break;
             case "Failed":
@@ -174,25 +178,29 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     }
 
     private void updateUI(){
-        user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
+        user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
 
+        id = user.getId();
         name = user.getName();
         userName = user.getUserName();
         email = user.getEmail();
         imagePath = user.getImagePath();
         validated = user.getValidated();
 
-        binding.nameEt.setText(name);
-        binding.usernameEt.setText(userName);
-        binding.emailEt.setText(email);
-        GlideClient.loadProfileImage(getContext(), imagePath, binding.userPictureIv);
+        binding.nameTv.setText(name);
+        binding.userNameTv.setText(userName);
+        binding.emailTv.setText(email);
+        GlideClient.loadProfileImage(context, imagePath, binding.userPictureIv);
 
-        binding.unvalidatedTv.setVisibility(View.GONE);
-        binding.validatedLila.setVisibility(View.GONE);
+        if(validated == 1){
+            binding.setVisibleUnvalidated(false);
+        }
+
+        binding.editProfileIbt.setOnClickListener(this::onClick);
     }
 
     private void editProfile(){
-        if(validated == 1) {
+        if(!binding.getVisibleUnvalidated()) {
             navController.navigate(R.id.action_profileFragment_to_editProfileFragment);
         }else {
             displaySnackBar(true, getString(R.string.account_not_validated_info),-2);
@@ -201,33 +209,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
 
     @Override
     public void onClick(View view) {
-        getActivity().onBackPressed();
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-
-        super.onCreateOptionsMenu(menu, inflater);
-
-        binding.toolbar.inflateMenu(R.menu.edit_menu);
-        binding.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return onOptionsItemSelected(item);
-            }
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if(item.getItemId() == R.id.edit){
+        if(view.getId() == R.id.edit_profile_ibt){
             editProfile();
+        }else {
+            activity.onBackPressed();
         }
-
-        return super.onOptionsItemSelected(item);
     }
+
     private void getFacebookData(JSONObject object){
         String name, email, imageProfilePath;
         if(object != null) {
@@ -254,7 +242,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
         userUpdated.setValidated(1);
 
         if (imagePath.isEmpty() ) {
-
             userUpdated.setImagePath(imageProfilePath);
         }else {
             userUpdated.setImagePath(imagePath);
@@ -265,19 +252,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, A
     }
 
     private void displayProgressDialog(boolean show){
-        if(show){
-            binding.progressBar.setVisibility(View.VISIBLE);
-        }else {
-            binding.progressBar.setVisibility(View.GONE);
-        }
-
+        binding.setVisibleProgress(show);
     }
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null){
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(getActivity().findViewById(R.id.containerProfile), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(activity.findViewById(R.id.containerProfile), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 

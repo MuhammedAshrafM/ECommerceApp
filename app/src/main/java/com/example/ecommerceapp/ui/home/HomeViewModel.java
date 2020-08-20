@@ -1,10 +1,12 @@
 package com.example.ecommerceapp.ui.home;
 
 import com.example.ecommerceapp.data.EcoClient;
+import com.example.ecommerceapp.pojo.BrandModel;
 import com.example.ecommerceapp.pojo.CategoryModel;
 import com.example.ecommerceapp.pojo.ImageProductModel;
 import com.example.ecommerceapp.pojo.ProductModel;
 import com.example.ecommerceapp.pojo.ReviewModel;
+import com.example.ecommerceapp.pojo.SellerModel;
 import com.example.ecommerceapp.pojo.SubCategoryModel;
 import com.example.ecommerceapp.pojo.UserModel;
 
@@ -23,6 +25,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.BiFunction;
 import io.reactivex.rxjava3.functions.Function3;
+import io.reactivex.rxjava3.functions.Function4;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class HomeViewModel extends ViewModel {
@@ -36,9 +39,10 @@ public class HomeViewModel extends ViewModel {
     private MutableLiveData<ArrayList<SubCategoryModel>> mutableLiveSubCategories;
     private MutableLiveData<ArrayList<ReviewModel>> mutableLiveReviews;
     private MutableLiveData<ArrayList<UserModel>> mutableLiveUsers;
+    private MutableLiveData<SellerModel> mutableLiveSeller;
     private MutableLiveData<String> mutableLiveAddReview;
-    private MutableLiveData<Map<String, Object>> mutableLiveInfoReviews;
     private MutableLiveData<ArrayList<Map<String,Float>>> mutableLiveInfoSubCategories;
+    private MutableLiveData<ArrayList<BrandModel>> mutableLiveBrands;
 
     private CompositeDisposable compositeDisposable;
 
@@ -48,10 +52,11 @@ public class HomeViewModel extends ViewModel {
     private ArrayList<ProductModel> productModels, suggestedProductModels, boughtProductModels;
     private ArrayList<ReviewModel> reviewModels;
     private ArrayList<UserModel> userModels;
+    private SellerModel sellerModel;
     private ProductModel productModel;
     private ArrayList<ImageProductModel> imagesProduct;
-    private Map<String, Object> infoReviews;
     private ArrayList<Map<String,Float>> infoSubCategories;
+    private ArrayList<BrandModel> brandModels;
 
     public HomeViewModel() {
         mutableLiveErrorMessage = new MutableLiveData<>();
@@ -63,10 +68,11 @@ public class HomeViewModel extends ViewModel {
         mutableLiveProduct = new MutableLiveData<>();
         mutableLiveReviews = new MutableLiveData<>();
         mutableLiveUsers = new MutableLiveData<>();
-        mutableLiveInfoReviews = new MutableLiveData<>();
+        mutableLiveSeller = new MutableLiveData<>();
         mutableLiveSuggestedProducts = new MutableLiveData<>();
         mutableLiveBoughtProducts = new MutableLiveData<>();
         mutableLiveInfoSubCategories = new MutableLiveData<>();
+        mutableLiveBrands = new MutableLiveData<>();
 
         compositeDisposable = new CompositeDisposable();
 
@@ -91,6 +97,9 @@ public class HomeViewModel extends ViewModel {
     public LiveData<ProductModel> getProduct() {
         return mutableLiveProduct;
     }
+    public LiveData<SellerModel> getSeller() {
+        return mutableLiveSeller;
+    }
     public LiveData<ArrayList<SubCategoryModel>> getSubCategories() {
         return mutableLiveSubCategories;
     }
@@ -103,11 +112,13 @@ public class HomeViewModel extends ViewModel {
     public LiveData<ArrayList<UserModel>> getUsers() {
         return mutableLiveUsers;
     }
-    public LiveData<Map<String, Object>> getInfoReviews() {
-        return mutableLiveInfoReviews;
-    }
+
     public LiveData<String> addReview() {
         return mutableLiveAddReview;
+    }
+
+    public LiveData<ArrayList<BrandModel>> getBrands() {
+        return mutableLiveBrands;
     }
 
 
@@ -257,10 +268,11 @@ public class HomeViewModel extends ViewModel {
         };
         observable.cache().subscribe(observer);
     }
-    public void getProduct(String productId, String userId) {
+    public void getProduct(String productId, String userId, String sellerId) {
 
         productModel = new ProductModel();
         imagesProduct = new ArrayList<>();
+        sellerModel = new SellerModel();
 
         Single<ArrayList<ProductModel>> observableP = EcoClient.getINSTANCE()
                 .getProduct(productId, userId);
@@ -268,13 +280,18 @@ public class HomeViewModel extends ViewModel {
         Single<ArrayList<ImageProductModel>> observableIP = EcoClient.getINSTANCE()
                 .getImagesProduct(productId);
 
-        compositeDisposable.add(Single.zip(observableP, observableIP, new BiFunction<ArrayList<ProductModel>
-                ,ArrayList<ImageProductModel>, Boolean>() {
+        Single<ArrayList<SellerModel>> observableS = EcoClient.getINSTANCE()
+                .getSeller(sellerId);
+
+
+        compositeDisposable.add(Single.zip(observableP, observableIP, observableS, new Function3<ArrayList<ProductModel>,
+                ArrayList<ImageProductModel>, ArrayList<SellerModel>, Boolean>() {
             @Override
-            public Boolean apply(ArrayList<ProductModel> t1, ArrayList<ImageProductModel> t2) throws Throwable {
+            public Boolean apply(ArrayList<ProductModel> t1, ArrayList<ImageProductModel> t2, ArrayList<SellerModel> t3) throws Throwable {
 
                 productModel = t1.get(0);
                 imagesProduct = t2;
+                sellerModel = t3.get(0);
                 return true;
             }
         }).subscribeOn(Schedulers.io())
@@ -286,9 +303,9 @@ public class HomeViewModel extends ViewModel {
     }
 
     private void setProduct(){
-
         productModel.setImagesPaths(imagesProduct);
         mutableLiveProduct.setValue(productModel);
+        mutableLiveSeller.setValue(sellerModel);
     }
 
 
@@ -328,7 +345,6 @@ public class HomeViewModel extends ViewModel {
 
         reviewModels = new ArrayList<>();
         userModels = new ArrayList<>();
-        infoReviews = new HashMap<>();
 
         Single<ArrayList<ReviewModel>> observableR = EcoClient.getINSTANCE()
                 .getReviews(productId);
@@ -336,15 +352,12 @@ public class HomeViewModel extends ViewModel {
         Single<ArrayList<UserModel>> observableU = EcoClient.getINSTANCE()
                 .getUsersReview(productId);
 
-        Single<Map<String, Object>> observableRI = EcoClient.getINSTANCE()
-                .getInfoReviews(productId);
-
-        compositeDisposable.add(Single.zip(observableR, observableU, observableRI, new Function3<ArrayList<ReviewModel>, ArrayList<UserModel>, Map<String, Object>, Boolean>() {
+        compositeDisposable.add(Single.zip(observableR, observableU, new BiFunction<ArrayList<ReviewModel>,
+                ArrayList<UserModel>, Boolean>() {
             @Override
-            public Boolean apply(ArrayList<ReviewModel> t1, ArrayList<UserModel> t2, Map<String, Object> t3) throws Throwable {
+            public Boolean apply(ArrayList<ReviewModel> t1, ArrayList<UserModel> t2) throws Throwable {
                 reviewModels = t1;
                 userModels = t2;
-                infoReviews = t3;
                 return true;
             }
         }).subscribeOn(Schedulers.io())
@@ -357,7 +370,6 @@ public class HomeViewModel extends ViewModel {
     private void setReviewsAndUsers(){
         mutableLiveReviews.setValue(reviewModels);
         mutableLiveUsers.setValue(userModels);
-        mutableLiveInfoReviews.setValue(infoReviews);
     }
 
     public void addReview(ReviewModel reviewModel, String productId){
@@ -423,6 +435,71 @@ public class HomeViewModel extends ViewModel {
         mutableLiveSuggestedProducts.setValue(suggestedProductModels);
         mutableLiveBoughtProducts.setValue(boughtProductModels);
     }
+
+    public void getSellerProducts(String sellerId){
+        productModels = new ArrayList<>();
+        subCategoryModels = new ArrayList<>();
+        brandModels = new ArrayList<>();
+
+        Single<ArrayList<ProductModel>> observableP = EcoClient.getINSTANCE()
+                .getSellerProducts(sellerId);
+
+        Single<ArrayList<SubCategoryModel>> observableSC = EcoClient.getINSTANCE()
+                .getSellerSubCategories(sellerId);
+
+        Single<ArrayList<BrandModel>> observableB = EcoClient.getINSTANCE()
+                .getSellerBrands(sellerId);
+
+
+        compositeDisposable.add(Single.zip(observableP, observableSC, observableB,
+                new Function3<ArrayList<ProductModel>, ArrayList<SubCategoryModel>, ArrayList<BrandModel>, Boolean>() {
+                    @Override
+                    public Boolean apply(ArrayList<ProductModel> t1, ArrayList<SubCategoryModel> t2, ArrayList<BrandModel> t3) throws Throwable {
+                        productModels = t1;
+                        subCategoryModels = t2;
+                        brandModels = t3;
+                        return true;
+                    }
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .cache()
+                .subscribe(result -> setSellerProducts(),
+                        error-> mutableLiveErrorMessage.setValue(error.getMessage())));
+
+    }
+
+    private void setSellerProducts(){
+        mutableLiveProducts.setValue(productModels);
+        mutableLiveSubCategories.setValue(subCategoryModels);
+        mutableLiveBrands.setValue(brandModels);
+    }
+
+    public void getSellerReviews(String sellerId){
+        Single<ArrayList<ReviewModel>> observable = EcoClient.getINSTANCE()
+                .getSellerReviews(sellerId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+        SingleObserver<ArrayList<ReviewModel>> observer = new SingleObserver<ArrayList<ReviewModel>>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+            @Override
+            public void onSuccess(@NonNull ArrayList<ReviewModel> reviewModels) {
+
+                mutableLiveReviews.setValue(reviewModels);
+            }
+            @Override
+            public void onError(@NonNull Throwable e) {
+
+                mutableLiveErrorMessage.setValue(e.getMessage());
+            }
+        };
+        observable.cache().subscribe(observer);
+    }
+
+
+
     // this is one of lifecycle of viewModel and call it when viewModel is killed
     @Override
     protected void onCleared() {

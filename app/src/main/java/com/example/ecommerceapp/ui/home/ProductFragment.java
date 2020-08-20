@@ -1,9 +1,13 @@
 package com.example.ecommerceapp.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +27,7 @@ import com.example.ecommerceapp.databinding.FragmentProductBinding;
 import com.example.ecommerceapp.pojo.ImageProductModel;
 import com.example.ecommerceapp.pojo.ProductModel;
 import com.example.ecommerceapp.pojo.ReviewModel;
+import com.example.ecommerceapp.pojo.SellerModel;
 import com.example.ecommerceapp.pojo.UserModel;
 
 import java.text.DecimalFormat;
@@ -39,19 +44,21 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ProductFragment#newInstance} factory method to
+ * Use the {@link ProductFragment} factory method to
  * create an instance of this fragment.
  */
 public class ProductFragment extends Fragment implements View.OnClickListener, ViewPager.OnPageChangeListener,
-        ItemClickListener, ConnectivityReceiver.ConnectivityReceiveListener{
+        ItemClickListener, SwipeRefreshLayout.OnRefreshListener, ConnectivityReceiver.ConnectivityReceiveListener{
 
     private NavController navController;
     private HomeViewModel homeViewModel;
@@ -74,51 +81,35 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     private UserModel user;
     private FragmentManager manager;
     private FragmentTransaction transaction;
+    private Context context;
+    private Activity activity;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "product";
-    private static final String ARG_PARAM2 = "param2";
     private static final String PREFERENCES_PRODUCTS_CARTED = "PRODUCTS_CARTED";
     private static final String PREFERENCES_PRODUCTS_WISHED = "PRODUCTS_WISHED";
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
 
     // TODO: Rename and change types of parameters
     private ProductModel product;
-    private String mParam2;
+    private SellerModel seller;
 
     public ProductFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProductFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ProductFragment newInstance(String param1, String param2) {
-        ProductFragment fragment = new ProductFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = getActivity();
+        context = getContext();
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
             product = getArguments().getParcelable(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -148,53 +139,65 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
         binding.toolbar.setNavigationOnClickListener(this);
 
         homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
-
-        layoutManagerRecycler = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        binding.recyclerViewProductReviews.setHasFixedSize(true);
-        binding.recyclerViewProductReviews.setLayoutManager(layoutManagerRecycler);
-
-        reviewAdapter = new ReviewAdapter(getContext());
-        binding.recyclerViewProductReviews.setAdapter(reviewAdapter);
-
-        user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
-
-        if (ConnectivityReceiver.isConnected()) {
-            displayProgressDialog(true);
-            homeViewModel.getProduct(product.getId(), user.getId());
-            homeViewModel.getLimitReviews(product.getId());
-            homeViewModel.getSpecialProducts(product.getSubCategoryId(), product.getId(), user.getId());
-        } else {
-            displaySnackBar(true, null, 0);
-        }
-
-        binding.viewPager.setOnPageChangeListener(this);
-        binding.saveInCartBt.setOnClickListener(this);
-        binding.saveInWishListBt.setOnClickListener(this);
-
-        binding.productDescriptionBt.setOnClickListener(this);
-        binding.productSpecificationsBt.setOnClickListener(this);
-        binding.productReviewsTv.setOnClickListener(this);
-        binding.productAddReviewLila.setOnClickListener(this);
+                new ViewModelProvider(this).get(HomeViewModel.class);
+        selectActivity();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+
         menu = null;
         manager = null;
 
         decimalFormat = new DecimalFormat();
         decimalFormat.applyPattern("#,###,###,###.##");
 
-        productImages = new ArrayList<>();
-        adapter = new ProductPagerAdapter(getContext(), productImages);
-        binding.viewPager.setAdapter(adapter);
-
+        handleUi();
+        user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
+        getData();
+        setOnClickListener();
         setInitialData();
         setData(product);
+        observeLiveData();
+
+    }
 
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // register intent filter
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
+        context.registerReceiver(connectivityReceiver, intentFilter);
+
+        MyApplication.getInstance().setConnectivityReceiveListener(this);
+
+    }
+
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
+        }
+    }
+
+    private void setOnClickListener(){
+        binding.viewPager.setOnPageChangeListener(this);
+
+        binding.saveInCartBt.setOnClickListener(this);
+        binding.saveInWishListBt.setOnClickListener(this);
+        binding.productDescriptionBt.setOnClickListener(this);
+        binding.productSpecificationsBt.setOnClickListener(this);
+        binding.productReviewsTv.setOnClickListener(this);
+        binding.productAddReviewLila.setOnClickListener(this);
+        binding.productSellerCola.setOnClickListener(this);
+    }
+
+    private void observeLiveData(){
         homeViewModel.getProduct().observe(getViewLifecycleOwner(), new Observer<ProductModel>() {
             @Override
             public void onChanged(ProductModel productModel) {
@@ -205,6 +208,15 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
             }
         });
 
+        homeViewModel.getSeller().observe(getViewLifecycleOwner(), new Observer<SellerModel>() {
+            @Override
+            public void onChanged(SellerModel sellerModel) {
+                if (sellerModel != null) {
+                    seller = sellerModel;
+                    binding.sellerNameTv.setText(seller.getName());
+                }
+            }
+        });
         homeViewModel.getReviews().observe(getViewLifecycleOwner(), new Observer<ArrayList<ReviewModel>>() {
             @Override
             public void onChanged(ArrayList<ReviewModel> reviewModels) {
@@ -249,23 +261,36 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
         });
     }
 
+    private void handleUi(){
+        layoutManagerRecycler = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+        binding.recyclerViewProductReviews.setHasFixedSize(true);
+        binding.recyclerViewProductReviews.setLayoutManager(layoutManagerRecycler);
 
-    @Override
-    public void onResume() {
-        super.onResume();
+        reviewAdapter = new ReviewAdapter(context);
+        binding.recyclerViewProductReviews.setAdapter(reviewAdapter);
 
-        // register intent filter
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        productImages = new ArrayList<>();
+        adapter = new ProductPagerAdapter(context, productImages);
+        binding.viewPager.setAdapter(adapter);
 
-        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
 
-        MyApplication.getInstance().setConnectivityReceiveListener(this);
+        binding.swipeRefresh.setColorSchemeColors(Color.rgb(3,169,244),
+                Color.rgb(3,169,244),
+                Color.rgb(13,179,163));
+        binding.swipeRefresh.setOnRefreshListener(this);
 
     }
 
-
+    private void getData(){
+        if (ConnectivityReceiver.isConnected()) {
+            displayProgressDialog(true);
+            homeViewModel.getProduct(product.getId(), user.getId(), product.getSellerId());
+            homeViewModel.getLimitReviews(product.getId());
+            homeViewModel.getSpecialProducts(product.getSubCategoryId(), product.getId(), user.getId());
+        } else {
+            displaySnackBar(true, null, 0);
+        }
+    }
     private void displayProducts(ArrayList<ProductModel> suggestedProductModels, ArrayList<ProductModel> boughtProductModels){
         if(manager == null){
             manager = getChildFragmentManager();
@@ -284,7 +309,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
 
     private void setInitialData(){
 
-        if(Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).isProductCarted(product)){
+        if(Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).isProductCarted(product)){
             binding.saveInCartBt.setBackgroundResource(R.mipmap.ic_launcher_cart_added);
             binding.saveInCartBt.setChecked(true);
         }else {
@@ -292,7 +317,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
             binding.saveInCartBt.setChecked(false);
         }
 
-        if(Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_WISHED).isProductWished(product)){
+        if(Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_WISHED).isProductWished(product)){
             binding.saveInWishListBt.setBackgroundResource(R.mipmap.ic_wished);
             binding.saveInWishListBt.setChecked(true);
         }else {
@@ -322,18 +347,16 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
         binding.productTitleTv.setText(product.getTitle());
         binding.productOfferTv.setText(String.format(Locale.getDefault(),"%.0f%s",offer,"% OFF"));
         binding.productRateNumTv.setText(String.format(Locale.getDefault(),"%d %s",product.getReviewsCount(), "Reviews"));
-        binding.productPriceTv.setText(decimalFormat.format(price) + getContext().getString(R.string.egp));
+        binding.productPriceTv.setText(decimalFormat.format(price) + context.getString(R.string.egp));
         binding.productPriceWithoutOfferTv.setText(decimalFormat.format(product.getPrice())
-                + getContext().getString(R.string.egp));
+                + context.getString(R.string.egp));
         binding.productRateBar.setRating(product.getReviewsRateAverage());
 
         if(offer > 0){
-            binding.productOfferTv.setVisibility(View.VISIBLE);
-            binding.productPriceWithoutOfferTv.setVisibility(View.VISIBLE);
+            binding.setVisibleOffer(true);
             binding.productPriceWithoutOfferTv.setPaintFlags(Paint.STRIKE_THRU_TEXT_FLAG);
         }else {
-            binding.productOfferTv.setVisibility(View.INVISIBLE);
-            binding.productPriceWithoutOfferTv.setVisibility(View.INVISIBLE);
+            binding.setVisibleOffer(false);
         }
     }
 
@@ -341,42 +364,38 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
         dotsIv = new ImageView[dotsCount];
         binding.slideDotsLila.removeAllViews();
         for(int i = 0; i < dotsCount; i++){
-            dotsIv[i] = new ImageView(getContext());
-            dotsIv[i].setImageDrawable(ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.background_dots_unactive));
+            dotsIv[i] = new ImageView(context);
+            dotsIv[i].setImageDrawable(ContextCompat.getDrawable(context.getApplicationContext(), R.drawable.background_dots_unactive));
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT
                     , ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(5,0,5,0);
             binding.slideDotsLila.addView(dotsIv[i], params);
         }
-        dotsIv[0].setImageDrawable(ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.background_dots_active));
+        dotsIv[0].setImageDrawable(ContextCompat.getDrawable(context.getApplicationContext(), R.drawable.background_dots_active));
     }
     private void setProductCart(boolean carted){
         if(carted){
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).setProductCarted(product);
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).setProductCarted(product);
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
             displaySnackBar(true, getString(R.string.carted), -1);
 
         }else {
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).removeProductCarted(product);
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).removeProductCarted(product);
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
             displaySnackBar(true, getString(R.string.unCarted), -1);
         }
 
     }
     private void displayProgressDialog(boolean show) {
-        if (show) {
-            binding.progressBar.setVisibility(View.VISIBLE);
-        } else {
-            binding.progressBar.setVisibility(View.GONE);
-        }
+        binding.setVisibleProgress(show);
     }
 
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null) {
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(root.findViewById(R.id.containerProduct), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(root.findViewById(R.id.containerProduct), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
@@ -391,10 +410,10 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     }
     private void saveInWishList(){
         if(binding.saveInWishListBt.isChecked()){
-            Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_WISHED).setProductWished(product);
+            Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_WISHED).setProductWished(product);
             binding.saveInWishListBt.setBackgroundResource(R.mipmap.ic_wished);
         }else {
-            Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_WISHED).removeProductWished(product);
+            Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_WISHED).removeProductWished(product);
             binding.saveInWishListBt.setBackgroundResource(R.mipmap.ic_wish);
         }
     }
@@ -416,6 +435,15 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
         bundle = new Bundle();
         bundle.putParcelable("product", product);
         navController.navigate(R.id.action_productFragment_to_reviewsFragment, bundle);
+    }
+
+    private void displaySellerInfo(){
+        if(seller != null) {
+            bundle = new Bundle();
+            bundle.putParcelable("seller", seller);
+
+            navController.navigate(R.id.action_productFragment_to_sellerInfoFragment, bundle);
+        }
     }
 
     private void addReview(){
@@ -458,8 +486,12 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
                 addReview();
                 break;
 
+            case R.id.product_seller_cola:
+                displaySellerInfo();
+                break;
+
             default:
-                getActivity().onBackPressed();
+                activity.onBackPressed();
                 break;
 
         }
@@ -481,8 +513,8 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
             this.menu = binding.toolbar.getMenu();
             cartMenuItem = this.menu.findItem(R.id.myCart);
 
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(), productsCartedId.size(),R.drawable.ic_cart));
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context, productsCartedId.size(),R.drawable.ic_cart));
         }
     }
 
@@ -501,9 +533,9 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     @Override
     public void onPageSelected(int position) {
         for(int i = 0; i < dotsCount; i++){
-            dotsIv[i].setImageDrawable(ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.background_dots_unactive));
+            dotsIv[i].setImageDrawable(ContextCompat.getDrawable(context.getApplicationContext(), R.drawable.background_dots_unactive));
         }
-        dotsIv[position].setImageDrawable(ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.background_dots_active));
+        dotsIv[position].setImageDrawable(ContextCompat.getDrawable(context.getApplicationContext(), R.drawable.background_dots_active));
 
     }
 
@@ -526,7 +558,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
 
     @Override
     public void onCartClick(View view, ProductModel productModel, boolean carted, int newSize) {
-        cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(), newSize, R.drawable.ic_cart));
+        cartMenuItem.setIcon(Utils.convertLayoutToImage(context, newSize, R.drawable.ic_cart));
     }
 
     @Override
@@ -537,5 +569,28 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     @Override
     public void onWishClick(View view, ProductModel productModel, boolean wished) {
 
+    }
+
+    @Override
+    public void onRefresh() {
+        if (ConnectivityReceiver.isConnected()) {
+            binding.swipeRefresh.setRefreshing(true);
+
+            menu = null;
+            manager = null;
+            (new Handler()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.swipeRefresh.setRefreshing(false);
+                    displayProgressDialog(true);
+                    homeViewModel.getProduct(product.getId(), user.getId(), product.getSellerId());
+                    homeViewModel.getLimitReviews(product.getId());
+                    homeViewModel.getSpecialProducts(product.getSubCategoryId(), product.getId(), user.getId());
+                }}, 3000);
+
+        }else {
+            binding.swipeRefresh.setRefreshing(false);
+            displaySnackBar(true, null, 0);
+        }
     }
 }

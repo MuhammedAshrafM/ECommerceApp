@@ -17,6 +17,13 @@ public class GlideClient {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(imageView);
     }
+    public static void loadResourceImage(Context context, int id, ImageView imageView) {
+        Glide.with(context)
+                .load(id)
+                .placeholder(id)
+                .error(id)
+                .into(imageView);
+    }
     public static void loadProfileImage(Context context, String url, ImageView imageView) {
         Glide.with(context)
                 .load(url)

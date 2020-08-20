@@ -83,6 +83,14 @@
             app:popExitAnim="@anim/slide_out_right"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left" />
+
+        <action
+            android:id="@+id/action_productFragment_to_sellerInfoFragment"
+            app:destination="@id/sellerInfoFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
     </fragment>
 
 
@@ -94,6 +102,30 @@
         <action
             android:id="@+id/action_navigation_cart_to_productFragment"
             app:destination="@id/productFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+
+        <action
+            android:id="@+id/action_navigation_cart_to_addAddressFragment"
+            app:destination="@id/addAddressFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_navigation_cart_to_orderFragment"
+            app:destination="@id/orderFragment"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_navigation_cart_to_navigation_search"
+            app:destination="@id/navigation_search"
+            app:launchSingleTop="true"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
             app:enterAnim="@anim/slide_in_right"
@@ -181,4 +213,192 @@
         android:name="com.example.ecommerceapp.ui.more.EditProfileFragment"
         android:label="EditProfileFragment"
         tools:layout="@layout/fragment_edit_profile"/>
+
+
+    <fragment
+        android:id="@+id/addAddressFragment"
+        android:name="com.example.ecommerceapp.ui.cart.AddAddressFragment"
+        android:label="AddAddressFragment"
+        tools:layout="@layout/fragment_add_address" >
+        <action
+            android:id="@+id/action_addAddressFragment_to_mapFragment"
+            app:destination="@id/mapFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+
+        <action
+            android:id="@+id/action_addAddressFragment_to_mobileVerificationFragment"
+            app:destination="@id/mobileVerificationFragment"
+            app:popUpTo="@id/addAddressFragment"
+            app:popUpToInclusive="true"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+
+        <argument
+            android:name="address"
+            app:argType="com.example.ecommerceapp.pojo.AddressModel"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.ecommerceapp.ui.cart.MapFragment"
+        android:label="MapFragment"
+        tools:layout="@layout/fragment_map">
+        <argument
+            android:name="MapClickListener"
+            app:argType="com.example.ecommerceapp.data.MapClickListener"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mobileVerificationFragment"
+        android:name="com.example.ecommerceapp.ui.cart.MobileVerificationFragment"
+        android:label="fragment_mobile_verification"
+        tools:layout="@layout/fragment_mobile_verification">
+
+        <action
+            android:id="@+id/action_mobileVerificationFragment_to_orderFragment_back"
+            app:destination="@id/orderFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/mobileVerificationFragment"
+            app:popUpToInclusive="true"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_mobileVerificationFragment_to_orderFragment"
+            app:destination="@id/orderFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/mobileVerificationFragment"
+            app:popUpToInclusive="true"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/orderFragment"
+        android:name="com.example.ecommerceapp.ui.cart.OrderFragment"
+        android:label="fragment_address_selected"
+        tools:layout="@layout/fragment_order">
+
+        <action
+            android:id="@+id/action_orderFragment_to_addressesSavedFragment"
+            app:destination="@id/addressesSavedFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_orderFragment_to_mobileVerificationFragment"
+            app:destination="@id/mobileVerificationFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_orderFragment_to_addAddressFragment"
+            app:destination="@id/addAddressFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+
+        <action
+            android:id="@+id/action_orderFragment_to_paymentMethodFragment"
+            app:destination="@id/paymentMethodFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/addressesSavedFragment"
+        android:name="com.example.ecommerceapp.ui.cart.AddressesSavedFragment"
+        android:label="AddressesSavedFragment"
+        tools:layout="@layout/fragment_addresses_saved">
+
+    <action
+        android:id="@+id/action_addressesSavedFragment_to_addAddressFragment"
+        app:destination="@id/addAddressFragment"
+        app:popEnterAnim="@anim/slide_in_left"
+        app:popExitAnim="@anim/slide_out_right"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/slide_out_left" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/paymentMethodFragment"
+        android:name="com.example.ecommerceapp.ui.cart.PaymentMethodFragment"
+        android:label="PaymentMethodFragment"
+        tools:layout="@layout/fragment_payment_method">
+        <action
+            android:id="@+id/action_paymentMethodFragment_to_completeOrderFragment"
+            app:destination="@id/completeOrderFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_paymentMethodFragment_to_paymentCardFragment"
+            app:destination="@id/paymentCardFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+    </fragment>
+    <fragment
+        android:id="@+id/paymentCardFragment"
+        android:name="com.example.ecommerceapp.ui.cart.PaymentCardFragment"
+        android:label="PaymentCardFragment" >
+        <action
+            android:id="@+id/action_paymentCardFragment_to_completeOrderFragment"
+            app:destination="@id/completeOrderFragment"
+            app:popUpTo="@id/paymentCardFragment"
+            app:popUpToInclusive="true"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/completeOrderFragment"
+        android:name="com.example.ecommerceapp.ui.cart.CompleteOrderFragment"
+        android:label="CompleteOrderFragment">
+
+    </fragment>
+    <fragment
+        android:id="@+id/sellerInfoFragment"
+        android:name="com.example.ecommerceapp.ui.home.SellerInfoFragment"
+        android:label="SellerInfoFragment"
+        tools:layout="@layout/fragment_seller_info">
+        <action
+            android:id="@+id/action_sellerInfoFragment_to_navigation_cart"
+            app:destination="@id/navigation_cart"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <action
+            android:id="@+id/action_sellerInfoFragment_to_productFragment"
+            app:destination="@id/productFragment"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left" />
+        <argument
+            android:name="seller"
+            app:argType="com.example.ecommerceapp.pojo.SellerModel"
+            app:nullable="true" />
+    </fragment>
 </navigation>

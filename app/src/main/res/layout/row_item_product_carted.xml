@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/container_item_product_carted"
     app:cardCornerRadius="4dp"
     app:cardElevation="2dp"
     android:layout_margin="5dp"

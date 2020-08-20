@@ -10,7 +10,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="350dp"
         android:background="@color/whiteColor"
         android:orientation="vertical">
 
@@ -97,11 +97,26 @@
             android:textSize="12sp"
             android:textStyle="normal" />
 
+        <TextView
+            android:id="@+id/product_shippingFee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/product_price_without_offer"
+            android:gravity="start|center"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:lines="1"
+            android:maxLines="1"
+            android:text="@string/freeShipping"
+            android:textColor="@color/blackColor"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_below="@id/product_price_without_offer"
+        android:layout_below="@id/product_shippingFee"
         android:layout_marginTop="5dp">
 
         <ToggleButton

@@ -4,14 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable name="padding" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
     </data>
 
     <RelativeLayout
         android:id="@+id/containerPdfFile"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
+        android:paddingBottom="@{padding ? @dimen/margin_navigate : @dimen/margin_cart}"
         tools:context=".ui.home.PdfFileFragment">
 
 
@@ -42,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:visibility="gone" />
+            android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}" />
 
     </RelativeLayout>
 </layout>

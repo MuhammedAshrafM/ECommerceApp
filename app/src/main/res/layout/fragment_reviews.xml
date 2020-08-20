@@ -4,14 +4,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable name="padding" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
     </data>
 
-    <RelativeLayout
-        android:id="@+id/containerReviews"
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
+        tools:context=".ui.home.ReviewsFragment">
+
+        <RelativeLayout
+            android:id="@+id/containerReviews"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@{padding ? @dimen/margin_navigate : @dimen/margin_cart}">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@color/gray"
         tools:context=".ui.home.ReviewsFragment">
 
@@ -70,7 +86,7 @@
                     android:maxLines="1"
                     android:padding="5dp"
                     android:textColor="@color/blackColor"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     android:textStyle="normal" />
 
                 <TextView
@@ -84,7 +100,7 @@
                     android:maxLines="1"
                     android:padding="5dp"
                     android:textColor="@color/com_facebook_likeview_text_color"
-                    android:textSize="10dp"
+                    android:textSize="10sp"
                     android:textStyle="normal" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -105,7 +121,7 @@
                 android:layout_alignParentStart="true"
                 android:elevation="2dp"
                 android:textColor="@color/basicColor"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:padding="5dp"
                 android:background="@drawable/background_button2"
                 android:layout_alignParentLeft="true" />
@@ -121,7 +137,7 @@
                 android:background="@drawable/background_simple_button2"
                 android:text="@string/mostHelpful"
                 android:textColor="@color/cardview_dark_background"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:padding="5dp"
                 android:layout_toLeftOf="@id/sortBy_bt" />
 
@@ -131,6 +147,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:elevation="2dp"
+                android:contentDescription="sort by image button"
                 android:layout_centerInParent="true"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
@@ -146,29 +163,33 @@
             android:layout_below="@id/relativeLayout"
             android:scrollbars="none"/>
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@style/ProgressTheme2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="gone" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_review_fAB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elevation="2dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="30dp"
-            android:layout_marginEnd="30dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginStart="30dp"
-            android:layout_marginTop="30dp"
-            android:clickable="true"
-            android:src="@drawable/ic_add" />
     </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@style/ProgressTheme2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/add_review_fAB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="2dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="30dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="30dp"
+                android:clickable="true"
+                android:src="@drawable/ic_add" />
+        </RelativeLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </layout>

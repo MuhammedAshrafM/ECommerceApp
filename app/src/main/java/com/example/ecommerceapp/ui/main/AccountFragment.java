@@ -53,6 +53,16 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_account,container,false);
 
         root = binding.getRoot();
+
+        return root;
+    }
+
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
         binding.signUpGoogleBt.setOnClickListener(this);
         binding.signUpFacebookBt.setFragment(this);
 
@@ -63,14 +73,11 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
 
         textView.setTextColor(Color.rgb(3,169,244));
 
-        return root;
     }
 
-
-
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onStart() {
+        super.onStart();
 
         accountInterface = (AccountInterface) getParentFragment();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -107,7 +114,6 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
                 accountInterface.onFacebookListener(null);
             }
         });
-
     }
 
     private void handleSignUpResult(Task<GoogleSignInAccount> completedTask) {
@@ -152,14 +158,8 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.sign_up_google_bt:
-                selectGoogleAccount();
-                break;
-
-            default:
-
-                break;
+        if(view.getId() == R.id.sign_up_google_bt){
+            selectGoogleAccount();
         }
     }
 }

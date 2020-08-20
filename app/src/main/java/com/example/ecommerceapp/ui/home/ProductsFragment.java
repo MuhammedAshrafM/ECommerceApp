@@ -1,8 +1,12 @@
 package com.example.ecommerceapp.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,11 +18,11 @@ import android.widget.SearchView;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
-import com.example.ecommerceapp.data.SortDialog;
 import com.example.ecommerceapp.data.ItemClickListener;
 import com.example.ecommerceapp.data.ItemDialogClickListener;
 import com.example.ecommerceapp.data.MyApplication;
 import com.example.ecommerceapp.data.Preferences;
+import com.example.ecommerceapp.data.SortDialog;
 import com.example.ecommerceapp.data.Utils;
 import com.example.ecommerceapp.databinding.FragmentProductsBinding;
 import com.example.ecommerceapp.pojo.ProductModel;
@@ -34,10 +38,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import static com.example.ecommerceapp.data.Utils.filter;
 
@@ -62,6 +68,8 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
     private SortDialog dialog = null;
     private MenuItem searchMenuItem, cartMenuItem;
     private ItemClickListener listener;
+    private Context context;
+    private Activity activity;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -107,7 +115,10 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+        activity = getActivity();
+        context = getContext();
+
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
@@ -143,37 +154,9 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
         binding.toolbar.setNavigationOnClickListener(this);
 
         homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
-        binding.recyclerViewProducts.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ProductsAdapter(getContext(), this);
-        binding.recyclerViewProducts.setAdapter(adapter);
-        binding.sortByBt.setOnClickListener(this);
-        binding.sortByTv.setOnClickListener(this);
+                new ViewModelProvider(this).get(HomeViewModel.class);
 
-        binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,0,0));
-
-        if (subCategoryId != null) {
-
-            products = new ArrayList<>();
-//            binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,products.size(),products.size()));
-//            adapter.setList(products, false);
-            if (ConnectivityReceiver.isConnected()) {
-                displayProgressDialog(true);
-                if(!offer) {
-                    homeViewModel.getProducts(subCategoryId);
-                }else {
-                    homeViewModel.getProductsOffer(subCategoryId);
-                }
-            } else {
-                displaySnackBar(true, null, 0);
-            }
-        }
-        else{
-            binding.toolbar.setVisibility(View.GONE);
-            binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,products.size(),products.size()));
-            adapter.setList(products, true);
-            setViewSortDialog();
-        }
+        selectActivity();
     }
 
     @Override
@@ -181,6 +164,35 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
         super.onStart();
         menu = null;
 
+        handleUi();
+
+        selectParentFragment();
+
+        observeLiveData();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // register intent filter
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
+        context.registerReceiver(connectivityReceiver, intentFilter);
+
+        MyApplication.getInstance().setConnectivityReceiveListener(this);
+
+    }
+
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
+        }
+    }
+
+    private void observeLiveData(){
         homeViewModel.getProducts().observe(getViewLifecycleOwner(), new Observer<ArrayList<ProductModel>>() {
             @Override
             public void onChanged(ArrayList<ProductModel> productModels) {
@@ -204,39 +216,51 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // register intent filter
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
-        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
-
-        MyApplication.getInstance().setConnectivityReceiveListener(this);
-
-    }
-
-    private void displayProgressDialog(boolean show){
-        if(show){
-            binding.progressBar.setVisibility(View.VISIBLE);
-        }else {
-            binding.progressBar.setVisibility(View.GONE);
+    private void selectParentFragment(){
+        if (subCategoryId != null) {
+            binding.setParentFragment(true);
+            products = new ArrayList<>();
+            if (ConnectivityReceiver.isConnected()) {
+                displayProgressDialog(true);
+                if(!offer) {
+                    homeViewModel.getProducts(subCategoryId);
+                }else {
+                    homeViewModel.getProductsOffer(subCategoryId);
+                }
+            } else {
+                displaySnackBar(true, null, 0);
+            }
+        } else{
+            binding.setParentFragment(false);
+//            binding.toolbar.setVisibility(View.GONE);
+            binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,products.size(),products.size()));
+            adapter.setList(products, true);
+            setViewSortDialog();
         }
+    }
+    private void handleUi(){
+        binding.recyclerViewProducts.setLayoutManager(new LinearLayoutManager(context));
+        adapter = new ProductsAdapter(context, this);
+        binding.recyclerViewProducts.setAdapter(adapter);
+        binding.sortByBt.setOnClickListener(this);
+        binding.sortByTv.setOnClickListener(this);
+
+        binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfProductsAvailable,0,0));
+    }
+    private void displayProgressDialog(boolean show){
+        binding.setVisibleProgress(show);
     }
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null) {
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(root.findViewById(R.id.containerProducts), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(root.findViewById(R.id.containerProducts), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
     private void setViewSortDialog(){
-        dialog = dialog.getINSTANCE(getContext(), getActivity(), R.style.MaterialDialogSheet, this, R.string.products);
+        dialog = dialog.getINSTANCE(context, activity, R.style.MaterialDialogSheet, this, R.string.products);
     }
 
     private void setSortProducts(int id, Comparator<ProductModel> comparator){
@@ -258,7 +282,7 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
                 break;
 
             default:
-                getActivity().onBackPressed();
+                activity.onBackPressed();
                 break;
         }
 
@@ -272,9 +296,9 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onCartClick(View view, ProductModel productModel, boolean carted, int newSize) {
         if(carted){
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).setProductCarted(productModel);
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).setProductCarted(productModel);
 
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
 
             if (subCategoryId == null) {
                 listener.onCartClick(view, productModel, true, productsCartedId.size());
@@ -282,8 +306,8 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
             displaySnackBar(true, getString(R.string.carted), -1);
 
         }else {
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).removeProductCarted(productModel);
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(),productsCartedId.size(),R.drawable.ic_cart));
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).removeProductCarted(productModel);
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context,productsCartedId.size(),R.drawable.ic_cart));
             if (subCategoryId == null) {
                 listener.onCartClick(view, productModel, false, productsCartedId.size());
             }
@@ -322,8 +346,8 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
             searchView.setQueryHint("");
             searchView.setOnQueryTextListener(this);
 
-            productsCartedId = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(), productsCartedId.size(),R.drawable.ic_cart));
+            productsCartedId = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).getProductsCarted();
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context, productsCartedId.size(),R.drawable.ic_cart));
         }
     }
 
@@ -399,4 +423,5 @@ public class ProductsFragment extends Fragment implements View.OnClickListener, 
                 break;
         }
     }
+
 }

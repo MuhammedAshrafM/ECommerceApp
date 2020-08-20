@@ -4,17 +4,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable name="padding" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
     </data>
 
-
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.more.MoreFragment">
     <RelativeLayout
         android:id="@+id/containerProductsWished"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="50dp"
-        android:background="@color/gray"
-        tools:context=".ui.more.MoreFragment">
+        android:paddingBottom="@{padding ? @dimen/margin_navigate : @dimen/margin_cart}"
+        android:background="@color/gray">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -46,7 +51,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:visibility="gone" />
+            android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}" />
 
     </RelativeLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </layout>

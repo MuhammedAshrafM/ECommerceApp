@@ -1,5 +1,7 @@
 package com.example.ecommerceapp.ui.main;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -31,6 +33,8 @@ public class WelcomeFragment extends Fragment {
     private Intent intent;
     private Animation animationTop, animationBottom;
     private NavController navController;
+    private Context context;
+    private Activity activity;
 
     public WelcomeFragment() {
         // Required empty public constructor
@@ -41,20 +45,8 @@ public class WelcomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                loginAuto();
-            }
-
-        });
-
-        thread.start();
+        activity = getActivity();
+        context = getContext();
     }
 
         @Override
@@ -62,12 +54,6 @@ public class WelcomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_welcome,container,false);
         root = binding.getRoot();
-
-        animationTop = AnimationUtils.loadAnimation(getContext(),R.anim.translate_from_top);
-        animationBottom = AnimationUtils.loadAnimation(getContext(),R.anim.translate_from_bottom);
-        binding.appLogo.startAnimation(animationTop);
-        binding.welcomeTv.startAnimation(animationBottom);
-
         // Inflate the layout for this fragment
         return root;
     }
@@ -84,23 +70,46 @@ public class WelcomeFragment extends Fragment {
         navController = Navigation.findNavController(view);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                loginAuto();
+            }
+
+        });
+
+        thread.start();
+
+        animationTop = AnimationUtils.loadAnimation(context,R.anim.translate_from_top);
+        animationBottom = AnimationUtils.loadAnimation(context,R.anim.translate_from_bottom);
+        binding.appLogoIv.startAnimation(animationTop);
+        binding.welcomeTv.startAnimation(animationBottom);
+
+        if(intent != null) {
+            loginAuto();
+        }
+    }
+
     private void loginAuto(){
-        if(Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).isDataUserExist()){
-            intent = new Intent(getContext(), HomeActivity.class);
+        if(Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).isDataUserExist()){
+            intent = new Intent(context, HomeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-            getActivity().finish();
+            activity.finish();
         }else {
             navController.navigate(R.id.action_navigation_welcome_to_mainFragment);
 
         }
     }
-    @Override
-    public void onStart() {
-        super.onStart();
-        if(intent != null) {
-            loginAuto();
-        }
-    }
+
 
 }

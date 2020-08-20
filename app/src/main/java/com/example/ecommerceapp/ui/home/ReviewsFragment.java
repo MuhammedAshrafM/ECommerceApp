@@ -1,8 +1,13 @@
 package com.example.ecommerceapp.ui.home;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,10 +17,10 @@ import android.view.ViewGroup;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
-import com.example.ecommerceapp.data.SortDialog;
 import com.example.ecommerceapp.data.ItemDialogClickListener;
 import com.example.ecommerceapp.data.MyApplication;
 import com.example.ecommerceapp.data.Preferences;
+import com.example.ecommerceapp.data.SortDialog;
 import com.example.ecommerceapp.data.Utils;
 import com.example.ecommerceapp.databinding.FragmentReviewsBinding;
 import com.example.ecommerceapp.pojo.ProductModel;
@@ -35,18 +40,22 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import static com.facebook.internal.FacebookDialogFragment.TAG;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ReviewsFragment#newInstance} factory method to
+ * Use the {@link ReviewsFragment#} factory method to
  * create an instance of this fragment.
  */
 public class ReviewsFragment extends Fragment implements View.OnClickListener, ItemDialogClickListener,
-        ConnectivityReceiver.ConnectivityReceiveListener{
+        SwipeRefreshLayout.OnRefreshListener, ConnectivityReceiver.ConnectivityReceiveListener {
 
     private NavController navController;
     private HomeViewModel homeViewModel;
@@ -60,49 +69,34 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
     private ReviewAdapter adapter;
     private Utils utils;
     private UserModel user;
+    private Context context;
+    private Activity activity;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "product";
-    private static final String ARG_PARAM2 = "param2";
     private static final String PREFERENCES_PRODUCTS_CARTED = "PRODUCTS_CARTED";
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
 
     // TODO: Rename and change types of parameters
     private ProductModel productModel;
-    private String mParam2;
 
     public ReviewsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ReviewsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ReviewsFragment newInstance(String param1, String param2) {
-        ReviewsFragment fragment = new ReviewsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
+        activity = getActivity();
+        context = getContext();
+
+        ((AppCompatActivity) activity).getSupportActionBar().hide();
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
             productModel = getArguments().getParcelable(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
@@ -131,28 +125,9 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
         binding.toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_navigation_back_up));
         binding.toolbar.setNavigationOnClickListener(this);
 
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
-        binding.recyclerViewReviews.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ReviewAdapter(getContext());
-        binding.recyclerViewReviews.setAdapter(adapter);
-
-        binding.sortByBt.setOnClickListener(this);
-        binding.sortByTv.setOnClickListener(this);
-        binding.addReviewFAB.setOnClickListener(this);
-
-        if (ConnectivityReceiver.isConnected()) {
-            displayProgressDialog(true);
-            homeViewModel.getReviews(productModel.getId());
-        } else {
-            displaySnackBar(true, null, 0);
-        }
-
-        user = Preferences.getINSTANCE(getContext(), PREFERENCES_DATA_USER).getDataUser();
-        binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfReviewsAvailable,0,0));
-        binding.reviewRateTv.setText(String.format(Locale.getDefault(),"%.1f %s",0.0, getString(R.string.stars)));
-        binding.reviewNumRateTv.setText(String.format(Locale.getDefault(), "(%d %s)",0, getString(R.string.ratings)));
+        selectActivity();
     }
 
 
@@ -161,6 +136,42 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
         super.onStart();
 
         menu = null;
+
+        handleUi();
+
+        if (ConnectivityReceiver.isConnected()) {
+            displayProgressDialog(true);
+            homeViewModel.getReviews(productModel.getId());
+        } else {
+            displaySnackBar(true, null, 0);
+        }
+
+        observeLiveData();
+        setOnClickListener();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // register intent filter
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
+        context.registerReceiver(connectivityReceiver, intentFilter);
+
+        MyApplication.getInstance().setConnectivityReceiveListener(this);
+
+    }
+
+    private void selectActivity(){
+        if(activity.getClass().getSimpleName().contains("HomeActivity")) {
+            binding.setPadding(true);
+        }
+    }
+
+    private void observeLiveData(){
 
         homeViewModel.getReviews().observe(getViewLifecycleOwner(), new Observer<ArrayList<ReviewModel>>() {
             @Override
@@ -174,6 +185,7 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
         homeViewModel.getUsers().observe(getViewLifecycleOwner(), new Observer<ArrayList<UserModel>>() {
             @Override
             public void onChanged(ArrayList<UserModel> userModels) {
+                displayProgressDialog(false);
                 if(userModels != null && userModels.size() > 0){
                     users = userModels;
                     adapter.setList(reviews, userModels);
@@ -181,15 +193,6 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
                 }
             }
         });
-        homeViewModel.getInfoReviews().observe(getViewLifecycleOwner(), new Observer<Map<String, Object>>() {
-            @Override
-            public void onChanged(Map<String, Object> map) {
-                displayProgressDialog(false);
-                setReviewRate(map);
-            }
-        });
-
-
         homeViewModel.getErrorMessage().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -197,42 +200,50 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
                 displaySnackBar(true, null, 0);
             }
         });
+
+        adapter.getReviewsInfo().observe(getViewLifecycleOwner(), new Observer<Map<String, Object>>() {
+            @Override
+            public void onChanged(Map<String, Object> stringObjectMap) {
+                setReviewRate(stringObjectMap);
+            }
+        });
     }
+    private void setOnClickListener(){
+        binding.sortByBt.setOnClickListener(this);
+        binding.sortByTv.setOnClickListener(this);
+        binding.addReviewFAB.setOnClickListener(this);
+    }
+    private void handleUi(){
+        binding.recyclerViewReviews.setLayoutManager(new LinearLayoutManager(context));
+        adapter = new ReviewAdapter(context, this);
+        binding.recyclerViewReviews.setAdapter(adapter);
 
-    @Override
-    public void onResume() {
-        super.onResume();
+        user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
+        binding.numItems.setText(getResources().getQuantityString(R.plurals.numberOfReviewsAvailable,0,0));
+        binding.reviewRateTv.setText(String.format(Locale.getDefault(),"%.1f %s",0.0, getString(R.string.stars)));
+        binding.reviewNumRateTv.setText(String.format(Locale.getDefault(), "(%d %s)",0, getString(R.string.ratings)));
 
-        // register intent filter
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 
-        ConnectivityReceiver connectivityReceiver = new ConnectivityReceiver();
-        getContext().registerReceiver(connectivityReceiver, intentFilter);
-
-        MyApplication.getInstance().setConnectivityReceiveListener(this);
-
+        binding.swipeRefresh.setColorSchemeColors(Color.rgb(3,169,244),
+                Color.rgb(3,169,244),
+                Color.rgb(13,179,163));
+        binding.swipeRefresh.setOnRefreshListener(this);
     }
     private void displayProgressDialog(boolean show) {
-        if (show) {
-            binding.progressBar.setVisibility(View.VISIBLE);
-        } else {
-            binding.progressBar.setVisibility(View.GONE);
-        }
-
+        binding.setVisibleProgress(show);
     }
 
     private void displaySnackBar(boolean show, String msg, int duration){
         if(msg == null) {
             msg = getString(R.string.checkConnection);
         }
-        utils = new Utils(getContext());
-        utils.snackBar(root.findViewById(R.id.containerReviews), msg, duration);
+        utils = new Utils(context);
+        utils.snackBar(root.findViewById(R.id.containerReviews), msg, R.string.ok, duration);
         utils.displaySnackBar(show);
     }
 
     private void setViewSortDialog(){
-        dialog = dialog.getINSTANCE(getContext(), getActivity(), R.style.MaterialDialogSheet, this, R.string.reviews);
+        dialog = dialog.getINSTANCE(context, activity, R.style.MaterialDialogSheet, this, R.string.reviews);
     }
 
     private void setReviewRate(Map<String, Object> infoReviews){
@@ -251,16 +262,6 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
         binding.sortByTv.setText(getString(id));
     }
 
-    private ArrayList<UserModel> getNewSort(ArrayList<ReviewModel> reviewModels, ArrayList<UserModel> userModels){
-        ArrayList<UserModel> newUserModels = new ArrayList<>();
-
-        for(int i=0; i<reviewModels.size(); i++){
-            int index = userModels.indexOf(reviewModels.get(i).getUserId());
-            newUserModels.set(i,userModels.get(index));
-        }
-
-        return newUserModels;
-    }
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -277,8 +278,8 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
             this.menu = binding.toolbar.getMenu();
             cartMenuItem = this.menu.findItem(R.id.myCart);
 
-            int sizeProductsCarted = Preferences.getINSTANCE(getContext(), PREFERENCES_PRODUCTS_CARTED).getProductsCarted().size();
-            cartMenuItem.setIcon(Utils.convertLayoutToImage(getContext(), sizeProductsCarted,R.drawable.ic_cart));
+            int sizeProductsCarted = Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).getProductsCarted().size();
+            cartMenuItem.setIcon(Utils.convertLayoutToImage(context, sizeProductsCarted,R.drawable.ic_cart));
         }
     }
 
@@ -312,7 +313,7 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
                 break;
 
             default:
-                getActivity().onBackPressed();
+                activity.onBackPressed();
                 break;
         }
 
@@ -347,4 +348,24 @@ public class ReviewsFragment extends Fragment implements View.OnClickListener, I
                 break;
         }
     }
+
+    @Override
+    public void onRefresh() {
+        if (ConnectivityReceiver.isConnected()) {
+            binding.swipeRefresh.setRefreshing(true);
+            menu = null;
+            (new Handler()).postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    binding.swipeRefresh.setRefreshing(false);
+                    displayProgressDialog(true);
+                    homeViewModel.getReviews(productModel.getId());
+                }}, 3000);
+
+        }else {
+            binding.swipeRefresh.setRefreshing(false);
+            displaySnackBar(true, null, 0);
+        }
+    }
+
 }

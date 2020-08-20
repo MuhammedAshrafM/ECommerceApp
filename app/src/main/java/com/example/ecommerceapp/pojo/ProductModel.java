@@ -28,8 +28,12 @@ public class ProductModel implements Parcelable {
     private int quantity;
     @SerializedName("brandId")
     private String brandId;
+    @SerializedName("sellerId")
+    private String sellerId;
     @SerializedName("subCategoryId")
     private String subCategoryId;
+    @SerializedName("shippingFee")
+    private int shippingFee;
     @SerializedName("available")
     private int available;
 
@@ -45,6 +49,89 @@ public class ProductModel implements Parcelable {
     public ProductModel() {
     }
 
+    public ProductModel(String id, String title, Double price, Float offer, String imagePath, String descriptionPath, String specificationPath, int quantity, String brandId, String sellerId, String subCategoryId, int shippingFee, int available, int reviewsCount, float reviewsRateAverage, ArrayList<ImageProductModel> imagesPaths) {
+        this.id = id;
+        this.title = title;
+        this.price = price;
+        this.offer = offer;
+        this.imagePath = imagePath;
+        this.descriptionPath = descriptionPath;
+        this.specificationPath = specificationPath;
+        this.quantity = quantity;
+        this.brandId = brandId;
+        this.sellerId = sellerId;
+        this.subCategoryId = subCategoryId;
+        this.shippingFee = shippingFee;
+        this.available = available;
+        this.reviewsCount = reviewsCount;
+        this.reviewsRateAverage = reviewsRateAverage;
+        this.imagesPaths = imagesPaths;
+    }
+
+    public static Comparator<ProductModel> bestMatchesComparator = new Comparator<ProductModel>() {
+        @Override
+        public int compare(ProductModel m1, ProductModel m2) {
+            String p1 = m1.getId();
+            String p2 = m2.getId();
+
+            return p1.compareTo(p2);
+        }
+    };
+
+    public static Comparator<ProductModel> priceLowComparator = new Comparator<ProductModel>() {
+        @Override
+        public int compare(ProductModel m1, ProductModel m2) {
+            Double price1 = m1.getPrice() * ((100 - m1.getOffer()) / 100);
+            Double price2 = m2.getPrice() * ((100 - m2.getOffer()) / 100);
+
+            return price1.compareTo(price2);
+        }
+    };
+    public static Comparator<ProductModel> priceHighComparator = new Comparator<ProductModel>() {
+        @Override
+        public int compare(ProductModel m1, ProductModel m2) {
+            Double price1 = m1.getPrice() * ((100 - m1.getOffer()) / 100);
+            Double price2 = m2.getPrice() * ((100 - m2.getOffer()) / 100);
+
+            return price2.compareTo(price1);
+        }
+    };
+    public static Comparator<ProductModel> offerLowComparator = new Comparator<ProductModel>() {
+        @Override
+        public int compare(ProductModel m1, ProductModel m2) {
+            String offer1 = String.valueOf(m1.getOffer());
+            String offer2 = String.valueOf(m2.getOffer());
+
+            return offer1.compareTo(offer2);
+        }
+    };
+    public static Comparator<ProductModel> offerHighComparator = new Comparator<ProductModel>() {
+        @Override
+        public int compare(ProductModel m1, ProductModel m2) {
+            String offer1 = String.valueOf(m1.getOffer());
+            String offer2 = String.valueOf(m2.getOffer());
+
+            return offer2.compareTo(offer1);
+        }
+    };
+    public static Comparator<ProductModel> topRatedComparator = new Comparator<ProductModel>() {
+        @Override
+        public int compare(ProductModel m1, ProductModel m2) {
+            String rate1 = String.valueOf(m1.getReviewsRateAverage());
+            String rate2 = String.valueOf(m2.getReviewsRateAverage());
+
+            return rate2.compareTo(rate1);
+        }
+    };
+    public static Comparator<ProductModel> newComparator = new Comparator<ProductModel>() {
+        @Override
+        public int compare(ProductModel m1, ProductModel m2) {
+            String p1 = m1.getId();
+            String p2 = m2.getId();
+
+            return p2.compareTo(p1);
+        }
+    };
 
     protected ProductModel(Parcel in) {
         id = in.readString();
@@ -64,11 +151,46 @@ public class ProductModel implements Parcelable {
         specificationPath = in.readString();
         quantity = in.readInt();
         brandId = in.readString();
+        sellerId = in.readString();
         subCategoryId = in.readString();
+        shippingFee = in.readInt();
         available = in.readInt();
         reviewsCount = in.readInt();
         reviewsRateAverage = in.readFloat();
-//        imagesPaths = (ArrayList<ImageProductModel>) in.readSerializable();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(title);
+        if (price == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeDouble(price);
+        }
+        if (offer == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeFloat(offer);
+        }
+        dest.writeString(imagePath);
+        dest.writeString(descriptionPath);
+        dest.writeString(specificationPath);
+        dest.writeInt(quantity);
+        dest.writeString(brandId);
+        dest.writeString(sellerId);
+        dest.writeString(subCategoryId);
+        dest.writeInt(shippingFee);
+        dest.writeInt(available);
+        dest.writeInt(reviewsCount);
+        dest.writeFloat(reviewsRateAverage);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<ProductModel> CREATOR = new Creator<ProductModel>() {
@@ -155,12 +277,28 @@ public class ProductModel implements Parcelable {
         this.brandId = brandId;
     }
 
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
+    }
+
     public String getSubCategoryId() {
         return subCategoryId;
     }
 
     public void setSubCategoryId(String subCategoryId) {
         this.subCategoryId = subCategoryId;
+    }
+
+    public int getShippingFee() {
+        return shippingFee;
+    }
+
+    public void setShippingFee(int shippingFee) {
+        this.shippingFee = shippingFee;
     }
 
     public int getAvailable() {
@@ -195,102 +333,59 @@ public class ProductModel implements Parcelable {
         this.imagesPaths = imagesPaths;
     }
 
-    public static Comparator<ProductModel> bestMatchesComparator = new Comparator<ProductModel>() {
-        @Override
-        public int compare(ProductModel m1, ProductModel m2) {
-            String p1 = m1.getId();
-            String p2 = m2.getId();
-
-            return p1.compareTo(p2);
-        }
-    };
-
-    public static Comparator<ProductModel> priceLowComparator = new Comparator<ProductModel>() {
-        @Override
-        public int compare(ProductModel m1, ProductModel m2) {
-            Double price1 = m1.getPrice() * ((100 - m1.getOffer())/100);
-            Double price2 = m2.getPrice() * ((100 - m2.getOffer())/100);
-
-            return price1.compareTo(price2);
-        }
-    };
-    public static Comparator<ProductModel> priceHighComparator = new Comparator<ProductModel>() {
-        @Override
-        public int compare(ProductModel m1, ProductModel m2) {
-            Double price1 = m1.getPrice() * ((100 - m1.getOffer())/100);
-            Double price2 = m2.getPrice() * ((100 - m2.getOffer())/100);
-
-            return price2.compareTo(price1);
-        }
-    };
-    public static Comparator<ProductModel> offerLowComparator = new Comparator<ProductModel>() {
-        @Override
-        public int compare(ProductModel m1, ProductModel m2) {
-            String offer1 = String.valueOf(m1.getOffer());
-            String offer2 = String.valueOf(m2.getOffer());
-
-            return offer1.compareTo(offer2);
-        }
-    };
-    public static Comparator<ProductModel> offerHighComparator = new Comparator<ProductModel>() {
-        @Override
-        public int compare(ProductModel m1, ProductModel m2) {
-            String offer1 = String.valueOf(m1.getOffer());
-            String offer2 = String.valueOf(m2.getOffer());
-
-            return offer2.compareTo(offer1);
-        }
-    };
-    public static Comparator<ProductModel> topRatedComparator = new Comparator<ProductModel>() {
-        @Override
-        public int compare(ProductModel m1, ProductModel m2) {
-            String rate1 = String.valueOf(m1.getReviewsRateAverage());
-            String rate2 = String.valueOf(m2.getReviewsRateAverage());
-
-            return rate2.compareTo(rate1);
-        }
-    };
-    public static Comparator<ProductModel> newComparator = new Comparator<ProductModel>() {
-        @Override
-        public int compare(ProductModel m1, ProductModel m2) {
-            String p1 = m1.getId();
-            String p2 = m2.getId();
-
-            return p2.compareTo(p1);
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
+    public static Comparator<ProductModel> getBestMatchesComparator() {
+        return bestMatchesComparator;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(id);
-        parcel.writeString(title);
-        if (price == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeDouble(price);
-        }
-        if (offer == null) {
-            parcel.writeByte((byte) 0);
-        } else {
-            parcel.writeByte((byte) 1);
-            parcel.writeFloat(offer);
-        }
-        parcel.writeString(imagePath);
-        parcel.writeString(descriptionPath);
-        parcel.writeString(specificationPath);
-        parcel.writeInt(quantity);
-        parcel.writeString(brandId);
-        parcel.writeString(subCategoryId);
-        parcel.writeInt(available);
-        parcel.writeInt(reviewsCount);
-        parcel.writeFloat(reviewsRateAverage);
-//        parcel.writeSerializable(imagesPaths);
+    public static void setBestMatchesComparator(Comparator<ProductModel> bestMatchesComparator) {
+        ProductModel.bestMatchesComparator = bestMatchesComparator;
+    }
+
+    public static Comparator<ProductModel> getPriceLowComparator() {
+        return priceLowComparator;
+    }
+
+    public static void setPriceLowComparator(Comparator<ProductModel> priceLowComparator) {
+        ProductModel.priceLowComparator = priceLowComparator;
+    }
+
+    public static Comparator<ProductModel> getPriceHighComparator() {
+        return priceHighComparator;
+    }
+
+    public static void setPriceHighComparator(Comparator<ProductModel> priceHighComparator) {
+        ProductModel.priceHighComparator = priceHighComparator;
+    }
+
+    public static Comparator<ProductModel> getOfferLowComparator() {
+        return offerLowComparator;
+    }
+
+    public static void setOfferLowComparator(Comparator<ProductModel> offerLowComparator) {
+        ProductModel.offerLowComparator = offerLowComparator;
+    }
+
+    public static Comparator<ProductModel> getOfferHighComparator() {
+        return offerHighComparator;
+    }
+
+    public static void setOfferHighComparator(Comparator<ProductModel> offerHighComparator) {
+        ProductModel.offerHighComparator = offerHighComparator;
+    }
+
+    public static Comparator<ProductModel> getTopRatedComparator() {
+        return topRatedComparator;
+    }
+
+    public static void setTopRatedComparator(Comparator<ProductModel> topRatedComparator) {
+        ProductModel.topRatedComparator = topRatedComparator;
+    }
+
+    public static Comparator<ProductModel> getNewComparator() {
+        return newComparator;
+    }
+
+    public static void setNewComparator(Comparator<ProductModel> newComparator) {
+        ProductModel.newComparator = newComparator;
     }
 }
-// category / price range / brand /

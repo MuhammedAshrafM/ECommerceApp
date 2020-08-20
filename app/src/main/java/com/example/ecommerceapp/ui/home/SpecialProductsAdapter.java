@@ -53,6 +53,8 @@ public class SpecialProductsAdapter extends RecyclerView.Adapter<SpecialProducts
         double price = products.get(position).getPrice() * ((100 - products.get(position).getOffer())/100);
         float offer = products.get(position).getOffer();
 
+        int shippingFee = products.get(position).getShippingFee();
+
         GlideClient.loadCategoryImage(context, products.get(position).getImagePath(), holder.imageView);
         holder.productOfferTV.setText(String.format(Locale.getDefault(),"%.0f%s",offer, context.getString(R.string.off_percent)));
         holder.productTitleTV.setText(products.get(position).getTitle());
@@ -69,6 +71,11 @@ public class SpecialProductsAdapter extends RecyclerView.Adapter<SpecialProducts
             holder.productPriceWithoutOfferTV.setVisibility(View.INVISIBLE);
         }
 
+        if(shippingFee == 0){
+            holder.productShippingFeeTv.setVisibility(View.VISIBLE);
+        }else {
+            holder.productShippingFeeTv.setVisibility(View.INVISIBLE);
+        }
 
         if(Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).isProductCarted(products.get(position))){
             holder.saveInCartBt.setBackgroundResource(R.mipmap.ic_launcher_cart_added);
@@ -157,7 +164,7 @@ public class SpecialProductsAdapter extends RecyclerView.Adapter<SpecialProducts
 
         private ImageView imageView;
         private TextView productOfferTV, productTitleTV, productPriceTV,
-                productPriceWithoutOfferTV;
+                productPriceWithoutOfferTV, productShippingFeeTv;
         private ToggleButton saveInCartBt, saveInWishListBt;
 
         private ItemClickListener itemClickListener;
@@ -169,6 +176,7 @@ public class SpecialProductsAdapter extends RecyclerView.Adapter<SpecialProducts
             productTitleTV = itemView.findViewById(R.id.product_title);
             productPriceTV = itemView.findViewById(R.id.product_price);
             productPriceWithoutOfferTV = itemView.findViewById(R.id.product_price_without_offer);
+            productShippingFeeTv = itemView.findViewById(R.id.product_shippingFee);
             saveInCartBt = itemView.findViewById(R.id.saveInCart_bt);
             saveInWishListBt = itemView.findViewById(R.id.saveInWishList_bt);
 

@@ -50,6 +50,7 @@ public class FilterCategoryDialog extends Dialog implements View.OnClickListener
                     LinearLayout.LayoutParams.WRAP_CONTENT);
             INSTANCE.getWindow().setGravity(Gravity.BOTTOM);
             INSTANCE.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            INSTANCE.setCanceledOnTouchOutside(false);
 
         return INSTANCE;
     }

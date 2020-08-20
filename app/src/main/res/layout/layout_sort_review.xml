@@ -14,8 +14,12 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingBottom="10dp"
         android:layout_marginTop="50dp"
-        android:background="@color/whiteColor">
+        android:layout_marginBottom="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/background_button2">
 
         <TextView
             android:id="@+id/sortBy_tv"
@@ -60,7 +64,6 @@
                     android:button="@android:color/transparent"
                     android:background="@drawable/background_radio_button"
                     android:gravity="start|center"
-                    android:layoutDirection="rtl"
                     android:padding="15dp"
                     android:layout_margin="5dp"
                     android:text="@string/mostHelpful"
@@ -75,7 +78,6 @@
                     android:button="@android:color/transparent"
                     android:background="@drawable/background_radio_button"
                     android:gravity="start|center"
-                    android:layoutDirection="rtl"
                     android:padding="15dp"
                     android:layout_margin="5dp"
                     android:text="@string/mostRecent"
@@ -90,7 +92,6 @@
                     android:button="@android:color/transparent"
                     android:background="@drawable/background_radio_button"
                     android:gravity="start|center"
-                    android:layoutDirection="rtl"
                     android:padding="15dp"
                     android:layout_margin="5dp"
                     android:text="@string/highestRatings"
@@ -105,7 +106,6 @@
                     android:button="@android:color/transparent"
                     android:background="@drawable/background_radio_button"
                     android:gravity="start|center"
-                    android:layoutDirection="rtl"
                     android:padding="15dp"
                     android:layout_margin="5dp"
                     android:text="@string/lowestRatings"

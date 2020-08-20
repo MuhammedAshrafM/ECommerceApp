@@ -3,20 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-
+        <import type="android.view.View"/>
+        <variable name="padding" type="Boolean"/>
+        <variable name="visibleProgress" type="Boolean"/>
     </data>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/containerSubCategories"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.home.HomeFragment">
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/containerSubCategories"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <RelativeLayout
         android:id="@+id/containerHome"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/gray"
-        android:layout_marginBottom="50dp">
+        android:paddingBottom="@{padding ? @dimen/margin_navigate : @dimen/margin_cart}">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -74,7 +80,8 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_below="@+id/appBarLayout"
-            android:visibility="gone" />
+            android:visibility="@{visibleProgress ? View.VISIBLE : View.GONE}" />
     </RelativeLayout>
     </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </layout>
