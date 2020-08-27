@@ -20,4 +20,7 @@ public class MyApplication extends Application {
     public void setConnectivityReceiveListener(ConnectivityReceiver.ConnectivityReceiveListener listener){
         ConnectivityReceiver.connectivityReceiveListener = listener;
     }
+    public void setNotificationReceiveListener(NotificationListener listener){
+        NotificationReceiver.notificationListener = listener;
+    }
 }

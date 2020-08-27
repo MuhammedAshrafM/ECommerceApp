@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.BackPressedListener;
@@ -28,6 +29,7 @@ import com.example.ecommerceapp.pojo.AddressModel;
 import com.example.ecommerceapp.pojo.UserModel;
 import com.example.ecommerceapp.ui.home.HomeActivity;
 import com.example.ecommerceapp.ui.search.SearchableActivity;
+import com.facebook.login.widget.ProfilePictureView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

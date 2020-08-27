@@ -1,24 +1,28 @@
 package com.example.ecommerceapp.data;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.view.Gravity;
-import android.widget.LinearLayout;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.ecommerceapp.R;
+
+import java.io.IOException;
+import java.net.URL;
+
+import static android.content.ContentValues.TAG;
 
 public class MyNotification {
 
@@ -39,7 +43,7 @@ public class MyNotification {
         return INSTANCE;
     }
 
-    public void notify(int idNotify, String title, String body, String ticker, String summaryText, PendingIntent pendingIntent){
+    public void notify(int idNotify, String title, String body, String largeIcon, String summaryText, PendingIntent pendingIntent){
 
         String notificationChannelId = "EcoNotify";
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -70,7 +74,6 @@ public class MyNotification {
                 .setSmallIcon(R.mipmap.ic_launcher_app_icon)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setSound(defaultSoundUri)
-                .setTicker(ticker)
                 .setAutoCancel(true)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setGroup(GROUP_KEY_WORK_EMAIL)
@@ -81,6 +84,17 @@ public class MyNotification {
 
         if(pendingIntent != null){
             builder.setContentIntent(pendingIntent);
+        }
+
+        if (largeIcon != null){
+            try {
+                URL url = new URL(largeIcon);
+                Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                builder.setLargeIcon(bitmap);
+            } catch(IOException e) {
+                Log.d(TAG, "Unique notify: " + e.toString());
+            }
+
         }
 
         NotificationManagerCompat manager = NotificationManagerCompat.from(context.getApplicationContext());

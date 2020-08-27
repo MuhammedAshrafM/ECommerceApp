@@ -32,6 +32,13 @@ public interface EcoInterface {
     @POST("ecommerce.php")
     Single<ArrayList<UserModel>> logIn(@Field("method") String funName,
                                                           @FieldMap Map<String, Object> mapUser);
+
+    @FormUrlEncoded
+    @POST("ecommerce.php")
+    Single<String> addToken(@Field("method") String funName,
+                            @Field("token") String token,
+                            @Field("userId") String userId);
+
     @FormUrlEncoded
     @POST("ecommerce.php")
     Single<String> validateAccount(@Field("method") String funName,

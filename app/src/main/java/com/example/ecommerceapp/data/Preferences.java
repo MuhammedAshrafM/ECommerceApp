@@ -85,6 +85,7 @@ public class Preferences {
         editor.commit();
     }
 
+
     public void validateAccountUser(UserModel user){
         editor.putString(EMAIL_USER, user.getEmail());
         editor.putString(IMAGE_PROFILE_USER, user.getImagePath());
@@ -102,7 +103,7 @@ public class Preferences {
         user.setEmail(preferences.getString(EMAIL_USER, ""));
         user.setPassword(preferences.getString(PASSWORD_USER, ""));
         user.setImagePath(preferences.getString(IMAGE_PROFILE_USER, ""));
-        user.setImagePath(preferences.getString(TOKEN_USER, ""));
+        user.setToken(preferences.getString(TOKEN_USER, ""));
         user.setValidated(preferences.getInt(VALIDATED_USER, 0));
 
         return user;
@@ -388,5 +389,6 @@ public class Preferences {
 
         return addressModel;
     }
+
 
 }

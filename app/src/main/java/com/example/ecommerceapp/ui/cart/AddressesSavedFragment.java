@@ -125,7 +125,7 @@ public class AddressesSavedFragment extends Fragment implements View.OnClickList
         adapter = new AddressesSavedAdapter(context, this);
         binding.recyclerViewAddressesSaved.setAdapter(adapter);
 
-        simpleCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        simpleCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.START, R.id.recyclerViewAddressesSaved, this);
         new ItemTouchHelper(simpleCallback).attachToRecyclerView(binding.recyclerViewAddressesSaved);
         adapter.setList(addressModels);
 

@@ -29,6 +29,12 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".data.NotificationReceiver" >
+            <intent-filter>
+                <action android:name="NEW_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+
 
         <service
             android:name=".data.NotificationService"

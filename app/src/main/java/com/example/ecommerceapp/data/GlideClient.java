@@ -32,4 +32,13 @@ public class GlideClient {
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .into(imageView);
     }
+
+    public static void loadNotificationImage(Context context, String url, ImageView imageView) {
+        Glide.with(context)
+                .load(url)
+                .placeholder(R.mipmap.ic_launcher_app_icon)
+                .error(R.mipmap.ic_launcher_app_icon)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(imageView);
+    }
 }

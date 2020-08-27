@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.ecommerceapp.R;
 import com.example.ecommerceapp.data.ConnectivityReceiver;
@@ -52,6 +54,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager.widget.ViewPager;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ProductFragment} factory method to
@@ -87,6 +91,10 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "product";
+    private static final String ARG_PARAM2 = "productId";
+    private static final String ARG_PARAM3 = "productTitle";
+    private static final String ARG_PARAM4 = "sellerId";
+    private static final String ARG_PARAM5 = "subCategoryId";
     private static final String PREFERENCES_PRODUCTS_CARTED = "PRODUCTS_CARTED";
     private static final String PREFERENCES_PRODUCTS_WISHED = "PRODUCTS_WISHED";
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
@@ -94,6 +102,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     // TODO: Rename and change types of parameters
     private ProductModel product;
     private SellerModel seller;
+    private String productId, productTitle, sellerId, subCategoryId;
 
     public ProductFragment() {
         // Required empty public constructor
@@ -110,6 +119,10 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
 
         if (getArguments() != null) {
             product = getArguments().getParcelable(ARG_PARAM1);
+            productId = getArguments().getString(ARG_PARAM2);
+            productTitle = getArguments().getString(ARG_PARAM3);
+            sellerId = getArguments().getString(ARG_PARAM4);
+            subCategoryId = getArguments().getString(ARG_PARAM5);
         }
     }
 
@@ -134,7 +147,11 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        binding.toolbar.setTitle(product.getTitle());
+        if(product != null){
+            binding.toolbar.setTitle(product.getTitle());
+        }else {
+            binding.toolbar.setTitle(productTitle);
+        }
         binding.toolbar.setNavigationIcon(getResources().getDrawable(R.drawable.ic_navigation_back_up));
         binding.toolbar.setNavigationOnClickListener(this);
 
@@ -155,10 +172,21 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
 
         handleUi();
         user = Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).getDataUser();
-        getData();
         setOnClickListener();
-        setInitialData();
-        setData(product);
+
+        if(product != null) {
+            setInitialData(product);
+            setData(product);
+            getData(product);
+        }else {
+            ProductModel productModel = new ProductModel();
+            productModel.setId(productId);
+            productModel.setTitle(productTitle);
+            productModel.setSellerId(sellerId);
+            productModel.setSubCategoryId(subCategoryId);
+            getData(productModel);
+            setInitialData(productModel);
+        }
         observeLiveData();
 
     }
@@ -203,7 +231,12 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
             public void onChanged(ProductModel productModel) {
                 if (productModel != null ) {
                     product = productModel;
-                    setData(product);
+                    try {
+                        setData(product);
+                    }catch (Exception e){
+                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Unique onStart: " + e.toString());
+                    }
                 }
             }
         });
@@ -250,8 +283,6 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
                 }
             }
         });
-
-
         homeViewModel.getErrorMessage().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -260,7 +291,6 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
             }
         });
     }
-
     private void handleUi(){
         layoutManagerRecycler = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
         binding.recyclerViewProductReviews.setHasFixedSize(true);
@@ -280,8 +310,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
         binding.swipeRefresh.setOnRefreshListener(this);
 
     }
-
-    private void getData(){
+    private void getData(ProductModel product){
         if (ConnectivityReceiver.isConnected()) {
             displayProgressDialog(true);
             homeViewModel.getProduct(product.getId(), user.getId(), product.getSellerId());
@@ -305,10 +334,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
             transaction.commit();
         }
     }
-
-
-    private void setInitialData(){
-
+    private void setInitialData(ProductModel product){
         if(Preferences.getINSTANCE(context, PREFERENCES_PRODUCTS_CARTED).isProductCarted(product)){
             binding.saveInCartBt.setBackgroundResource(R.mipmap.ic_launcher_cart_added);
             binding.saveInCartBt.setChecked(true);
@@ -329,7 +355,7 @@ public class ProductFragment extends Fragment implements View.OnClickListener, V
     private void setData(ProductModel product){
         productImages = new ArrayList<>();
 
-        if(product.getImagesPaths() != null){
+        if(product.getImagesPaths() != null && product.getImagesPaths().size() > 0){
             productImages.addAll(product.getImagesPaths());
         }else {
             ImageProductModel imageProductModel = new ImageProductModel();

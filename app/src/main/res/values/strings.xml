@@ -74,6 +74,7 @@
     <string name="validateAccountRepeated">Validate Account failed! This email is already used by another user!
         please use another an email.</string>
     <string name="user_account_not_validated_info">Validate your account first to take advantage of the application\'s features</string>
+    <string name="addTokenFailed">An error occurred when add token, please try again later.</string>
 
     <string name="editAccountSuccess">Your account is updated.</string>
     <string name="editAccountField">An error occurred, please try again later.</string>
@@ -303,6 +304,12 @@
     <string name="order_completed">Your order has been successfully completed</string>
     <string name="newProduct">New Product Added</string>
     <string name="newProductDetails">You can check this product and buy it now</string>
+    <string name="at">at</string>
+
+    <string name="deepLinkOrderDetailsFragment">android-app://androidx.navigation.app/orderDetailsFragment/{orderId}</string>
+    <string name="deepLinkOrderDetails">android-app://androidx.navigation.app/orderDetailsFragment/</string>
+    <string name="deepLinkProductFragment">android-app://androidx.navigation.app/productFragment/{productId}?productTitle={productTitle}&amp;sellerId={sellerId}&amp;subCategoryId={subCategoryId}</string>
+    <string name="deepLinkProduct">android-app://androidx.navigation.app/productFragment/</string>
 
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyA2ngfqsrHmst41dA_hin0DnyfTy4pbruw</string>
     <string name="google_places_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDWIUt_5x9CoESFuEhoY2JNuS0TzZiUpVY</string>

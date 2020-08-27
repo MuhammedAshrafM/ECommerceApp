@@ -27,6 +27,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -153,13 +154,14 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
                     "/picture?width=250&height=250").toString();
                 name = object.getString("first_name") + " " + object.getString("last_name");
                 email = object.getString("email");
-                subscribeToTopic(name, email, imageProfilePath);
+                subscribeToTopic(name, null, null, email, imageProfilePath);
             } catch (JSONException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
         }else {
+            displayProgressDialog(false);
             displaySnackBar(true,null, 0);
         }
     }
@@ -170,51 +172,62 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
         user.setEmail(email);
         user.setImagePath(imageProfilePath);
         user.setToken(token);
-        displayProgressDialog(true);
         viewModel.signUp(user);
     }
-    private void createAccount(){
-        if(validateRegister()){
-            if (ConnectivityReceiver.isConnected()) {
-                UserModel user = new UserModel();
-                user.setName(name);
-                user.setUserName(userName);
-                user.setPassword(password);
-                displayProgressDialog(true);
-                viewModel.createAccount(user);
-            }else {
-                displaySnackBar(true, null, 0);
-            }
-        }
+    private void createAccount(String name, String userName, String password, String token){
+        UserModel user = new UserModel();
+        user.setName(name);
+        user.setUserName(userName);
+        user.setPassword(password);
+        user.setToken(token);
+        viewModel.createAccount(user);
     }
 
-    private void subscribeToTopic(String name, String email, String imageProfilePath){
+    private void subscribeToTopic(String name, String userName, String password, String email, String imageProfilePath){
+        displayProgressDialog(true);
         FirebaseMessaging.getInstance().subscribeToTopic("User")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        getToken(name, email, imageProfilePath);
-//                        String msg = getString(R.string.msg_subscribed);
+                        if (ConnectivityReceiver.isConnected()) {
+                            getToken(name, userName, password, email, imageProfilePath);
+                        }else {
+                            displayProgressDialog(false);
+                            displaySnackBar(true, null, 0);
+                        }
                         if (!task.isSuccessful()) {
-//                            msg = getString(R.string.msg_subscribe_failed);
+                            displayProgressDialog(false);
+                            displaySnackBar(true, null, 0);
                         }
                     }
                 });
     }
 
-    private void getToken(String name, String email, String imageProfilePath){
+    private void getToken(String name, String userName, String password, String email, String imageProfilePath){
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
                     public void onComplete(@NonNull Task<InstanceIdResult> task) {
                         if (!task.isSuccessful()) {
-                            Log.d(TAG, "MOCA: getInstanceId failed", task.getException());
+                            displayProgressDialog(false);
+                            displaySnackBar(true, null, 0);
                             return;
                         }
                         // Get new Instance ID token
                         String token = task.getResult().getToken();
+                        Gson gson = new Gson();
+                        token = gson.toJson(new String[]{token});
+                        if (ConnectivityReceiver.isConnected()) {
+                            if (email != null) {
+                                signUp(name, email, imageProfilePath, token);
+                            } else {
+                                createAccount(name, userName, password, token);
+                            }
+                        }else {
+                            displayProgressDialog(false);
+                            displaySnackBar(true, null, 0);
+                        }
 
-                        signUp(name, email, imageProfilePath, token);
                     }
                 });
     }
@@ -292,13 +305,15 @@ public class RegisterFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.register_bt){
-            createAccount();
+            if(validateRegister()) {
+                subscribeToTopic(name, userName, password, null, null);
+            }
         }
     }
 
     @Override
     public void onGoogleListener(GoogleSignInAccount account) {
-        subscribeToTopic(account.getDisplayName(), account.getEmail(), account.getPhotoUrl().toString());
+        subscribeToTopic(account.getDisplayName(), null, null, account.getEmail(), account.getPhotoUrl().toString());
     }
 
     @Override

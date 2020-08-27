@@ -26,10 +26,18 @@ import com.example.ecommerceapp.ui.home.HomeActivity;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
@@ -61,6 +69,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Acc
     private Activity activity;
     private boolean back = false;
     private int verificationCode;
+    private String tokenJson;
+    private UserModel user;
 
     private static final String PREFERENCES_DATA_USER = "DATA_USER";
 
@@ -130,11 +140,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Acc
         userViewModel.getLogInUser().observe(this, new Observer<ArrayList<UserModel>>() {
             @Override
             public void onChanged(ArrayList<UserModel> userModels) {
-                displayProgressDialog(false);
                 responseData(userModels);
             }
         });
 
+        userViewModel.getTokenResult().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                displayProgressDialog(false);
+                responseTokenData(s);
+            }
+        });
 
         userViewModel.getEmail().observe(this, new Observer<String>() {
             @Override
@@ -165,7 +181,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Acc
         });
 
 
-
         userViewModel.getErrorMessage().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String s) {
@@ -174,14 +189,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Acc
             }
         });
     }
-    private void loginAuto(){
-        if(Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).isDataUserExist()){
-            Intent intent = new Intent(context, HomeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            activity.finish();
-
-        }
+    private void login(){
+        Toast.makeText(context, getString(R.string.loginSuccess), Toast.LENGTH_SHORT).show();
+        Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).setDataUser(user);
+        Intent intent = new Intent(context, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        activity.finish();
     }
     private void responseData(ArrayList<UserModel> userModels){
 
@@ -190,16 +204,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Acc
             if(Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).isDataUserExist()){
 
             }else {
-                Toast.makeText(context, getString(R.string.loginSuccess), Toast.LENGTH_SHORT).show();
-
-                Preferences.getINSTANCE(context, PREFERENCES_DATA_USER).setDataUser(userModels.get(0));
-                loginAuto();
+                user = userModels.get(0);
+                subscribeToTopic();
             }
         }
         else {
+            displayProgressDialog(false);
             displaySnackBar(true, getString(R.string.logInField), -2);
         }
     }
+
     private void responseData(String response){
         String message = "";
         if(response.equals(getString(R.string.failed))){
@@ -221,6 +235,67 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Acc
             return;
         }
         displaySnackBar(true, message, -2);
+    }
+
+    private void responseTokenData(String result){
+        if (result.equals(getString(R.string.failed))){
+            displaySnackBar(true, getString(R.string.addTokenFailed), -2);
+        }else {
+            user.setToken(result);
+            login();
+        }
+    }
+
+    private void subscribeToTopic(){
+        FirebaseMessaging.getInstance().subscribeToTopic("User")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (ConnectivityReceiver.isConnected()) {
+                            getToken();
+                        }else {
+                            displayProgressDialog(false);
+                            displaySnackBar(true, null, 0);
+                        }
+                        if (!task.isSuccessful()) {
+                            displayProgressDialog(false);
+                            displaySnackBar(true, null, 0);
+                        }
+                    }
+                });
+    }
+
+    private void getToken(){
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            displayProgressDialog(false);
+                            displaySnackBar(true, null, 0);
+                            return;
+                        }
+                        // Get new Instance ID token
+                        String token = task.getResult().getToken();
+                        tokenJson = user.getToken();
+                        if(tokenJson.contains(token)){
+                            displayProgressDialog(false);
+                            login();
+                        }else {
+                            ArrayList<String> tokens = new ArrayList<>();
+                            Gson gson = new Gson();
+                            Type type = new TypeToken<ArrayList<String>>(){}.getType();
+                            tokens = gson.fromJson(tokenJson, type);
+                            tokens.add(token);
+                            token = gson.toJson(tokens);
+                            if(token.length() > 1000){
+                                tokens.remove(0);
+                                token = gson.toJson(tokens);
+                            }
+                            addToken(token);
+                        }
+                    }
+                });
     }
     private void getFacebookData(JSONObject object){
         if(object != null) {
@@ -266,6 +341,14 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Acc
             }
         }
     }
+    private void addToken(String token){
+        if (ConnectivityReceiver.isConnected()) {
+            userViewModel.addToken(token, user.getId());
+        }else {
+            displaySnackBar(true, null, 0);
+        }
+    }
+
     private void getData(){
         binding.loginUsernameEt.setError(null);
         binding.loginPasswordEt.setError(null);

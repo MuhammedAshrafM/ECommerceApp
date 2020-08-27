@@ -1,27 +1,14 @@
 package com.example.ecommerceapp.ui.main;
 
-import android.util.Log;
-
-import com.example.ecommerceapp.data.Config;
 import com.example.ecommerceapp.data.EcoClient;
 import com.example.ecommerceapp.data.JavaMailAPI;
 import com.example.ecommerceapp.pojo.UserModel;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Properties;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -35,7 +22,6 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-import static com.facebook.internal.FacebookDialogFragment.TAG;
 
 public class UserViewModel extends ViewModel {
 
@@ -45,6 +31,7 @@ public class UserViewModel extends ViewModel {
     private MutableLiveData<ArrayList<UserModel>> mutableLiveDataLogIn;
     private MutableLiveData<String> mutableLiveEmail;
     private MutableLiveData<String> mutableLivePassword;
+    private MutableLiveData<String> mutableLiveToken;
     private MutableLiveData<Boolean> mutableLiveMessage;
     private CompositeDisposable compositeDisposable;
 
@@ -55,6 +42,7 @@ public class UserViewModel extends ViewModel {
         mutableLiveDataLogIn = new MutableLiveData<>();
         mutableLiveEmail = new MutableLiveData<>();
         mutableLivePassword = new MutableLiveData<>();
+        mutableLiveToken = new MutableLiveData<>();
         mutableLiveMessage = new MutableLiveData<>();
         compositeDisposable = new CompositeDisposable();
     }
@@ -76,6 +64,9 @@ public class UserViewModel extends ViewModel {
     }
     public LiveData<String> getEditPassword() {
         return mutableLivePassword;
+    }
+    public LiveData<String> getTokenResult() {
+        return mutableLiveToken;
     }
     public LiveData<Boolean> getMessageResult() {
         return mutableLiveMessage;
@@ -274,6 +265,33 @@ public class UserViewModel extends ViewModel {
         };
 
         observable.subscribe(observer);
+    }
+
+
+    public void addToken(String token, String userId){
+        Single<String> observable = EcoClient.getINSTANCE()
+                .addToken(token, userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+
+        SingleObserver<String> observer = new SingleObserver<String>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+
+            }
+
+            @Override
+            public void onSuccess(@NonNull String s) {
+                mutableLiveToken.setValue(s);
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                mutableLiveErrorMessage.setValue(e.getMessage());
+            }
+        };
+        observable.subscribe(observer);
+//        compositeDisposable.add(observable.subscribe(d-> mutableLiveDataSignUp.setValue(d)));
     }
 
     // this is one of lifecycle of viewModel and call it when viewModel is killed

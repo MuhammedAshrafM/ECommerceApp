@@ -85,6 +85,9 @@ public class EcoClient {
     public Single<ArrayList<UserModel>> logIn(UserModel userModel){
         return ecoInterface.logIn("logIn", userModel.toMap());
     }
+    public Single<String> addToken(String token, String userId){
+        return ecoInterface.addToken("addToken", token, userId);
+    }
     public Single<String> validateAccount(UserModel userModel){
         return ecoInterface.validateAccount("validateAccount", userModel.toMap());
     }

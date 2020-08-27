@@ -42,6 +42,7 @@ public class OrdersViewModel extends ViewModel {
         mutableLiveErrorMessage = new MutableLiveData<>();
 
         mutableLiveOrders = new MutableLiveData<>();
+        mutableLiveOrder = new MutableLiveData<>();
         mutableLiveProducts = new MutableLiveData<>();
         mutableLiveAddress = new MutableLiveData<>();
 
